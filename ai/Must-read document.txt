@@ -1,0 +1,8 @@
+1. 安装依赖（复制整行到终端运行）
+pip install -i https://pypi.tuna.tsinghua.edu.cn/simple openai python-dotenv langchain langchain-community chromadb sentence-transformers langchain-huggingface langchain-chroma pypdf docx2txt
+2. 配置密钥
+在 key.env 中写入：DEEPSEEK_API_KEY=你的密钥
+3. 放入资料
+将要用的 .txt/.md/.pdf/.docx 放进 knowledge 文件夹（没有则新建）
+4. 构建知识库（首次或资料更新后执行）
+python knowledge_ai.py --build
