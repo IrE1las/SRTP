@@ -7,7 +7,10 @@ from app.api import admin, ai_scores, auth, exercise_runtime, exercises, interlo
 from app.api import shunting_data, shunting_questions
 from app.api import lab_topics
 from app.api import management
-from app.core.database import Base, engine
+from app.core.database import Base, SessionLocal, engine
+from app.core.security import get_password_hash
+from app.models.user import User
+from app.services.interlocking.seed_service import seed_default_station
 import app.models  # noqa: F401 - imported so metadata includes all ORM tables
 
 app = FastAPI(
@@ -28,11 +31,34 @@ app.add_middleware(
 )
 
 
+DEFAULT_ADMIN_PASSWORD = '00000000'  # 团队约定的共享本机管理员口令，仅用于本地空数据库初始化
+
+
+def _ensure_default_admin() -> None:
+    """Create the shared admin account when the local database has no administrator."""
+
+    with SessionLocal() as db:
+        if db.query(User).filter(User.role == 'admin').first() is not None:
+            return
+        db.add(User(
+            username='admin',
+            password_hash=get_password_hash(DEFAULT_ADMIN_PASSWORD),
+            real_name='管理员',
+            role='admin',
+            student_id='',
+            class_name='',
+        ))
+        db.commit()
+
+
 @app.on_event("startup")
 def on_startup() -> None:
-    """Create database tables for the development environment."""
+    """Create database tables and seed the local default admin and demo station."""
 
     Base.metadata.create_all(bind=engine)
+    _ensure_default_admin()
+    with SessionLocal() as db:
+        seed_default_station(db)
 
 
 @app.get("/api/health", tags=["health"])

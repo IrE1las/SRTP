@@ -14,7 +14,20 @@ Vue 3 前端与 FastAPI 后端组成的铁路联锁教学网站，包含站场�
 
 ## 首次运行
 
-需要Python 3.12及Node.js/npm。在项目根目录建立本机运行环境：
+需要Python 3.12+及Node.js/npm（Windows）。
+
+双击根目录`启动项目.bat`（或运行`启动项目.ps1`）即可，启动器会自动完成本机首次准备，之后每次启动也会自动检查：
+
+1. 创建`.runtime/venv`虚拟环境，并按`framework/backend/requirements.lock.txt`安装后端依赖（锁文件更新时自动重装）；
+2. 缺少`framework/backend/.env`时从`.env.example`复制，并生成本机随机`SECRET_KEY`；
+3. 缺少`node_modules`时执行`npm ci`；
+4. 本地数据库为空时自动建表并初始化：共享管理员`admin`（密码`00000000`）、演示站场、调车联锁表35条进路与实验专题24道题目。
+
+各机器的数据库在本机生成，账号与作答数据相互独立、不随Git分发；每台机器首次启动都会自动创建同一个共享管理员账号`admin` / `00000000`。学生与教师账号可在登录页自行注册。需要真实AI调用时，编辑`framework/backend/.env`填写自己的`DEEPSEEK_API_KEY`。
+
+默认前端为`http://127.0.0.1:5173/`，后端为`http://127.0.0.1:8000/`。教学数据初始化脚本`framework/backend/scripts/seed_local_data.py`可单独重跑（幂等，已有数据时自动跳过）。
+
+手动准备（仅当自动步骤失败需要排查时）：
 
 ```powershell
 python -m venv .runtime/venv
@@ -23,9 +36,7 @@ npm --prefix framework/frontend ci
 Copy-Item framework/backend/.env.example framework/backend/.env
 ```
 
-编辑新建的`framework/backend/.env`，将`SECRET_KEY`设为本机新生成的随机值；需要真实AI调用时填写自己的`DEEPSEEK_API_KEY`。`.env.example`不包含可用密钥，勿将实际配置提交到Git。
-
-在Windows运行`启动项目.ps1`或`启动项目.bat`。默认前端为`http://127.0.0.1:5173/`，后端为`http://127.0.0.1:8000/`。各自的数据库在本机生成，已有题目／人员数据库不随代码分发。管理员初始化及资料导入见`接管与使用说明.md`、`调车联锁表数据库导入说明.md`与`管理员出题与批阅使用说明.md`。
+`.env.example`不包含可用密钥，勿将实际配置提交到Git。管理员初始化及资料导入详见`接管与使用说明.md`、`调车联锁表数据库导入说明.md`与`管理员出题与批阅使用说明.md`。
 
 ## 团队协作
 
