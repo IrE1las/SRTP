@@ -1,0 +1,131 @@
+{
+  "station_name": "下行咽喉标准站",
+  "throat_type": "下行咽喉",
+  "coordinate_system": "X轴从左到右递增，Y轴从上到下为股道5/III/I/II/4",
+  "direction_convention": { "1": "下行(X增大)", "2": "上行(X减小)" },
+
+  "external_directions": {
+    "left": {
+      "北京方面": {
+        "tracks": ["I","II"],
+        "entry_signals": ["X"],
+        "receive_tracks": ["5","III","I","4"],
+        "departure_tracks": ["5","III","II","4"],
+        "departure_terminal_button": "SLZA",
+        "has_indicator": false,
+        "departure_signal_display": "L或U或LU",
+        "departure_throat_track": "II",
+        "description": "X在I道接车，经渡线可达5、III、I、4道（接车股道=5/III/I/4；其中至I为I道直股、至4经17/19→27，均单一路径，至5/至III为变通）。发车经II道咽喉出站，可由5/III/II/4道发车。发车终端=SLZA，无表示器B。发车出站信号显示=L或U或LU（该方向自动闭塞多显示，取决于下游级联）。receive_tracks/departure_tracks列的是列车经渡线实际可达的终到/始发股道，不是进站信号所在股道。"
+      },
+      "东郊方面": {
+        "tracks": ["III"],
+        "entry_signals": ["XD"],
+        "receive_tracks": ["5","III","I","4"],
+        "departure_tracks": ["5","III","II","4"],
+        "departure_terminal_button": "XDLA",
+        "has_indicator": true,
+        "departure_signal_display": "L",
+        "departure_throat_track": "III",
+        "description": "XD在III道接车，经渡线可达5、III、I、4道（接车股道=5/III/I/4）。发车可由5/III/II/4道经III道咽喉出站。发车终端=XDLA，有表示器B。发车出站信号显示=L（该方向固定绿/半自动，只显示L）。receive_tracks/departure_tracks列的是列车经渡线实际可达的终到/始发股道，不是进站信号所在股道。"
+      }
+    },
+    "right": {
+      "站内": {
+        "tracks": ["5","III","I","II","4"],
+        "exit_signals": ["S5","SIII","D17","SII","S4"],
+        "description": "五条股道右侧均为站内方向。S5/SIII/SII/S4为出站信号机，D17为I道调车信号(I道无出站信号)。"
+      }
+    }
+  },
+
+  "tracks": [
+    { "id": "5",  "y_order": 1, "role": "尽头侧线", "exists_x_range": [10.5, 15],
+      "terminal_signal": "S5", "terminal_button_type": "LA", "has_train_departure_signal": true },
+    { "id": "III","y_order": 2, "role": "下行到发线", "exists_x_range": [0, 15],
+      "terminal_signal": "SIII","terminal_button_type": "LA", "has_train_departure_signal": true },
+    { "id": "I",  "y_order": 3, "role": "下行到发线", "exists_x_range": [0, 15],
+      "terminal_signal": "D17", "terminal_button_type": "LA", "has_train_departure_signal": false,
+      "note": "I道右侧仅有D17调车信号，无S系列出站信号。接车终端按钮用D17LA，迎面列车不填。" },
+    { "id": "II", "y_order": 4, "role": "下行到发线", "exists_x_range": [0, 15],
+      "terminal_signal": "SII", "terminal_button_type": "LA", "has_train_departure_signal": true },
+    { "id": "4",  "y_order": 5, "role": "尽头侧线", "exists_x_range": [12.5, 15],
+      "terminal_signal": "S4",  "terminal_button_type": "LA", "has_train_departure_signal": true }
+  ],
+
+  "signals": [
+    { "name": "XD",   "track": "III", "x": 1,  "direction": 1, "type": "进站", "button_suffix": "LA" },
+    { "name": "X",    "track": "I",   "x": 1,  "direction": 1, "type": "进站", "button_suffix": "LA" },
+    { "name": "D3",   "track": "I",   "x": 3,  "direction": 1, "type": "调车", "button_suffix": "DA" },
+    { "name": "D1",   "track": "II",  "x": 3,  "direction": 1, "type": "调车", "button_suffix": "DA" },
+    { "name": "D5",   "track": "II",  "x": 5,  "direction": 2, "type": "调车", "button_suffix": "DA" },
+    { "name": "D7",   "track": "I",   "x": 7,  "direction": 2, "type": "调车", "button_suffix": "DA" },
+    { "name": "D9",   "track": "I",   "x": 7,  "direction": 1, "type": "调车", "button_suffix": "DA" },
+    { "name": "D11",  "track": "III", "x": 7,  "direction": 1, "type": "调车", "button_suffix": "DA" },
+    { "name": "D13",  "track": "I",   "x": 9,  "direction": 1, "type": "调车", "button_suffix": "DA" },
+    { "name": "D15",  "track": "II",  "x": 9,  "direction": 1, "type": "调车", "button_suffix": "DA" },
+    { "name": "S5",   "track": "5",   "x": 15, "direction": 2, "type": "出站", "button_suffix": "LA" },
+    { "name": "SIII", "track": "III", "x": 15, "direction": 2, "type": "出站", "button_suffix": "LA" },
+    { "name": "D17",  "track": "I",   "x": 15, "direction": 2, "type": "调车", "button_suffix": "DA" },
+    { "name": "SII",  "track": "II",  "x": 15, "direction": 2, "type": "出站", "button_suffix": "LA" },
+    { "name": "S4",   "track": "4",   "x": 15, "direction": 2, "type": "出站", "button_suffix": "LA" }
+  ],
+
+  "switches": [
+    { "id": "1/3",   "type": "双动渡线", "switch_a": {"id": "1#", "track": "II", "x": 3.5},  "switch_b": {"id": "3#", "track": "I", "x": 4.5},  "connects": ["II","I"] },
+    { "id": "5/7",   "type": "双动渡线", "switch_a": {"id": "5#", "track": "I", "x": 3.5},   "switch_b": {"id": "7#", "track": "III","x": 4.5},  "connects": ["I","III"] },
+    { "id": "9/11",  "type": "双动渡线", "switch_a": {"id": "9#", "track": "I", "x": 7.5},   "switch_b": {"id": "11#","track": "III","x": 8.5},  "connects": ["I","III"] },
+    { "id": "13/15", "type": "双动渡线", "switch_a": {"id": "13#","track": "III","x": 7.5}, "switch_b": {"id": "15#","track": "I", "x": 8.5},   "connects": ["III","I"] },
+    { "id": "17/19", "type": "双动渡线", "switch_a": {"id": "17#","track": "I", "x": 9.5},   "switch_b": {"id": "19#","track": "II","x": 10.5},  "connects": ["I","II"] },
+    { "id": "21",    "type": "单动",    "switch_a": {"id": "21#","track": "III","x": 9.5}, "side_track": "5", "side_x": 10.5, "connects": ["III","5"], "no_insulation_on_side": true, "side_covered_by_section": "21DG" },
+    { "id": "23/25", "type": "双动渡线", "switch_a": {"id": "23#","track": "I", "x": 10.5},  "switch_b": {"id": "25#","track": "III","x": 11.5}, "connects": ["I","III"] },
+    { "id": "27",    "type": "单动",    "switch_a": {"id": "27#","track": "II","x": 11.5}, "side_track": "4", "side_x": 12.5, "connects": ["II","4"],  "no_insulation_on_side": true, "side_covered_by_section": "19-27DG" }
+  ],
+
+  "cross_double_crossovers": [
+    ["9/11", "13/15"]
+  ],
+
+  "sections": [
+    { "name": "IAG",      "track": "I",   "x_start": 1,  "x_end": 3,  "type": "AG", "contains": ["X"] },
+    { "name": "IIAG",     "track": "II",  "x_start": 1,  "x_end": 3,  "type": "AG", "contains": [] },
+    { "name": "5DG",      "track": "I",   "x_start": 3,  "x_end": 4,  "type": "DG", "contains": ["D3","5#"] },
+    { "name": "3DG",      "track": "I",   "x_start": 4,  "x_end": 7,  "type": "DG", "contains": ["3#","D7","D9"] },
+    { "name": "9-15DG",   "track": "I",   "x_start": 7,  "x_end": 9,  "type": "DG", "contains": ["9#","15#","D7","D9","D13"] },
+    { "name": "17-23DG",  "track": "I",   "x_start": 9,  "x_end": 15, "type": "DG", "contains": ["17#","23#","D13","D17"] },
+    { "name": "IG",       "track": "I",   "x_start": 15, "x_end": null,"type": "G",  "contains": ["D17"] },
+    { "name": "1DG",      "track": "II",  "x_start": 3,  "x_end": 5,  "type": "DG", "contains": ["D1","1#","D5"] },
+    { "name": "1/19WG",   "track": "II",  "x_start": 5,  "x_end": 9,  "type": "WG", "contains": ["D5","D15"] },
+    { "name": "19-27DG",  "track": "II",  "x_start": 9,  "x_end": 15, "type": "DG", "contains": ["19#","27#","D15","SII"], "also_covers_track": "4", "also_covers_note": "27#侧向无绝缘节，4道S4左侧归入19-27DG" },
+    { "name": "IIG",      "track": "II",  "x_start": 15, "x_end": null,"type": "G",  "contains": ["SII"] },
+    { "name": "7DG",      "track": "III", "x_start": 1,  "x_end": 7,  "type": "DG", "contains": ["XD","7#","D11"] },
+    { "name": "11-13DG",  "track": "III", "x_start": 7,  "x_end": 9,  "type": "DG", "contains": ["11#","13#","D11"] },
+    { "name": "21DG",     "track": "III", "x_start": 9,  "x_end": 10, "type": "DG", "contains": ["21#"], "also_covers_track": "5", "also_covers_note": "21#侧向无绝缘节，5道S5左侧归入21DG" },
+    { "name": "25DG",     "track": "III", "x_start": 10, "x_end": 15, "type": "DG", "contains": ["25#","SIII"] },
+    { "name": "IIIG",     "track": "III", "x_start": 15, "x_end": null,"type": "G",  "contains": ["SIII"] },
+    { "name": "5G",       "track": "5",   "x_start": 15, "x_end": null,"type": "G",  "contains": ["S5"] },
+    { "name": "4G",       "track": "4",   "x_start": 15, "x_end": null,"type": "G",  "contains": ["S4"] }
+  ],
+
+  "switch_section_mapping": {
+    "1#": "1DG", "3#": "3DG", "5#": "5DG", "7#": "7DG",
+    "9#": "9-15DG", "11#": "11-13DG", "13#": "11-13DG", "15#": "9-15DG",
+    "17#": "17-23DG", "19#": "19-27DG", "21#": "21DG",
+    "23#": "17-23DG", "25#": "25DG", "27#": "19-27DG"
+  },
+
+  "connectivity_graph": {
+    "I_track_downstream":   { "path": ["IAG","5DG","3DG","9-15DG","17-23DG","IG"] },
+    "II_track_downstream":  { "path": ["IIAG","1DG","1/19WG","19-27DG","IIG"] },
+    "III_track_downstream": { "path": ["7DG","11-13DG","21DG","25DG","IIIG"] },
+    "crossovers": [
+      { "id": "1/3",   "from_track": "II",  "from_section": "1DG",     "to_track": "I",   "to_section": "3DG",     "direction": "下行" },
+      { "id": "5/7",   "from_track": "I",   "from_section": "5DG",     "to_track": "III", "to_section": "7DG",     "direction": "下行" },
+      { "id": "9/11",  "from_track": "I",   "from_section": "9-15DG",  "to_track": "III", "to_section": "11-13DG", "direction": "下行" },
+      { "id": "13/15", "from_track": "III", "from_section": "11-13DG", "to_track": "I",   "to_section": "9-15DG",  "direction": "下行" },
+      { "id": "17/19", "from_track": "I",   "from_section": "17-23DG", "to_track": "II",  "to_section": "19-27DG", "direction": "下行" },
+      { "id": "21",    "from_track": "III", "from_section": "21DG",    "to_track": "5",   "to_section": "5G",      "direction": "下行" },
+      { "id": "23/25", "from_track": "I",   "from_section": "17-23DG", "to_track": "III", "to_section": "25DG",    "direction": "下行" },
+      { "id": "27",    "from_track": "II",  "from_section": "19-27DG", "to_track": "4",   "to_section": "4G",      "direction": "下行" }
+    ]
+  }
+}
