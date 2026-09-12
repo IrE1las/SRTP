@@ -115,10 +115,18 @@ Write-Host '[launch] Checking local teaching data (skipped when already present)
 if ($LASTEXITCODE -ne 0) { throw 'Local data bootstrap failed. Inspect .runtime logs.' }
 
 if (-not $NoBrowser) {
-    $edgeExe = 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
-    if(-not (Test-Path -LiteralPath $edgeExe)){throw 'Microsoft Edge was not found.'}
-    $profile = Join-Path $runtimeDir 'browser-profile'
-    Start-Process -FilePath $edgeExe -ArgumentList ('--user-data-dir="' + $profile + '" --no-first-run --new-window http://127.0.0.1:5173/admin')
+    $edgeCandidates = @(
+        'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe',
+        'C:\Program Files\Microsoft\Edge\Application\msedge.exe'
+    )
+    $edgeExe = $edgeCandidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+    if ($edgeExe) {
+        $profile = Join-Path $runtimeDir 'browser-profile'
+        Start-Process -FilePath $edgeExe -ArgumentList ('--user-data-dir="' + $profile + '" --no-first-run --new-window http://127.0.0.1:5173/admin')
+    } else {
+        Write-Host 'Edge was not found; opening the default browser instead.'
+        Start-Process 'http://127.0.0.1:5173/admin'
+    }
 }
 Write-Host ''
 Write-Host 'SRTP started. Open in your browser:'
