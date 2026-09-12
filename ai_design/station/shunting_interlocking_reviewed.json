@@ -1,0 +1,5319 @@
+{
+  "schema_version": 1,
+  "dataset_key": "original-station-shunting",
+  "station_key": "original-photo-station",
+  "station_name": "下行咽喉标准站",
+  "station_topology": {
+    "station_name": "下行咽喉标准站",
+    "throat_type": "下行咽喉",
+    "coordinate_system": "X轴从左到右递增，Y轴从上到下为股道5/III/I/II/4",
+    "direction_convention": {
+      "1": "下行(X增大)",
+      "2": "上行(X减小)"
+    },
+    "external_directions": {
+      "left": {
+        "北京方面": {
+          "tracks": [
+            "I",
+            "II"
+          ],
+          "entry_signals": [
+            "X"
+          ],
+          "receive_tracks": [
+            "5",
+            "III",
+            "I",
+            "4"
+          ],
+          "departure_tracks": [
+            "5",
+            "III",
+            "II",
+            "4"
+          ],
+          "departure_terminal_button": "SLZA",
+          "has_indicator": false,
+          "departure_signal_display": "L或U或LU",
+          "departure_throat_track": "II",
+          "description": "X在I道接车，经渡线可达5、III、I、4道（接车股道=5/III/I/4；其中至I为I道直股、至4经17/19→27，均单一路径，至5/至III为变通）。发车经II道咽喉出站，可由5/III/II/4道发车。发车终端=SLZA，无表示器B。发车出站信号显示=L或U或LU（该方向自动闭塞多显示，取决于下游级联）。receive_tracks/departure_tracks列的是列车经渡线实际可达的终到/始发股道，不是进站信号所在股道。"
+        },
+        "东郊方面": {
+          "tracks": [
+            "III"
+          ],
+          "entry_signals": [
+            "XD"
+          ],
+          "receive_tracks": [
+            "5",
+            "III",
+            "I",
+            "4"
+          ],
+          "departure_tracks": [
+            "5",
+            "III",
+            "II",
+            "4"
+          ],
+          "departure_terminal_button": "XDLA",
+          "has_indicator": true,
+          "departure_signal_display": "L",
+          "departure_throat_track": "III",
+          "description": "XD在III道接车，经渡线可达5、III、I、4道（接车股道=5/III/I/4）。发车可由5/III/II/4道经III道咽喉出站。发车终端=XDLA，有表示器B。发车出站信号显示=L（该方向固定绿/半自动，只显示L）。receive_tracks/departure_tracks列的是列车经渡线实际可达的终到/始发股道，不是进站信号所在股道。"
+        }
+      },
+      "right": {
+        "站内": {
+          "tracks": [
+            "5",
+            "III",
+            "I",
+            "II",
+            "4"
+          ],
+          "exit_signals": [
+            "S5",
+            "SIII",
+            "D17",
+            "SII",
+            "S4"
+          ],
+          "description": "五条股道右侧均为站内方向。S5/SIII/SII/S4为出站信号机，D17为I道调车信号(I道无出站信号)。"
+        }
+      }
+    },
+    "tracks": [
+      {
+        "id": "5",
+        "y_order": 1,
+        "role": "尽头侧线",
+        "exists_x_range": [
+          10.5,
+          15
+        ],
+        "terminal_signal": "S5",
+        "terminal_button_type": "LA",
+        "has_train_departure_signal": true
+      },
+      {
+        "id": "III",
+        "y_order": 2,
+        "role": "下行到发线",
+        "exists_x_range": [
+          0,
+          15
+        ],
+        "terminal_signal": "SIII",
+        "terminal_button_type": "LA",
+        "has_train_departure_signal": true
+      },
+      {
+        "id": "I",
+        "y_order": 3,
+        "role": "下行到发线",
+        "exists_x_range": [
+          0,
+          15
+        ],
+        "terminal_signal": "D17",
+        "terminal_button_type": "LA",
+        "has_train_departure_signal": false,
+        "note": "I道右侧仅有D17调车信号，无S系列出站信号。接车终端按钮用D17LA，迎面列车不填。"
+      },
+      {
+        "id": "II",
+        "y_order": 4,
+        "role": "下行到发线",
+        "exists_x_range": [
+          0,
+          15
+        ],
+        "terminal_signal": "SII",
+        "terminal_button_type": "LA",
+        "has_train_departure_signal": true
+      },
+      {
+        "id": "4",
+        "y_order": 5,
+        "role": "尽头侧线",
+        "exists_x_range": [
+          12.5,
+          15
+        ],
+        "terminal_signal": "S4",
+        "terminal_button_type": "LA",
+        "has_train_departure_signal": true
+      }
+    ],
+    "signals": [
+      {
+        "name": "XD",
+        "track": "III",
+        "x": 1,
+        "direction": 1,
+        "type": "进站",
+        "button_suffix": "LA"
+      },
+      {
+        "name": "X",
+        "track": "I",
+        "x": 1,
+        "direction": 1,
+        "type": "进站",
+        "button_suffix": "LA"
+      },
+      {
+        "name": "D3",
+        "track": "I",
+        "x": 3,
+        "direction": 1,
+        "type": "调车",
+        "button_suffix": "DA"
+      },
+      {
+        "name": "D1",
+        "track": "II",
+        "x": 3,
+        "direction": 1,
+        "type": "调车",
+        "button_suffix": "DA"
+      },
+      {
+        "name": "D5",
+        "track": "II",
+        "x": 5,
+        "direction": 2,
+        "type": "调车",
+        "button_suffix": "DA"
+      },
+      {
+        "name": "D7",
+        "track": "I",
+        "x": 7,
+        "direction": 2,
+        "type": "调车",
+        "button_suffix": "DA"
+      },
+      {
+        "name": "D9",
+        "track": "I",
+        "x": 7,
+        "direction": 1,
+        "type": "调车",
+        "button_suffix": "DA"
+      },
+      {
+        "name": "D11",
+        "track": "III",
+        "x": 7,
+        "direction": 1,
+        "type": "调车",
+        "button_suffix": "DA"
+      },
+      {
+        "name": "D13",
+        "track": "I",
+        "x": 9,
+        "direction": 1,
+        "type": "调车",
+        "button_suffix": "DA"
+      },
+      {
+        "name": "D15",
+        "track": "II",
+        "x": 9,
+        "direction": 1,
+        "type": "调车",
+        "button_suffix": "DA"
+      },
+      {
+        "name": "S5",
+        "track": "5",
+        "x": 15,
+        "direction": 2,
+        "type": "出站",
+        "button_suffix": "LA"
+      },
+      {
+        "name": "SIII",
+        "track": "III",
+        "x": 15,
+        "direction": 2,
+        "type": "出站",
+        "button_suffix": "LA"
+      },
+      {
+        "name": "D17",
+        "track": "I",
+        "x": 15,
+        "direction": 2,
+        "type": "调车",
+        "button_suffix": "DA"
+      },
+      {
+        "name": "SII",
+        "track": "II",
+        "x": 15,
+        "direction": 2,
+        "type": "出站",
+        "button_suffix": "LA"
+      },
+      {
+        "name": "S4",
+        "track": "4",
+        "x": 15,
+        "direction": 2,
+        "type": "出站",
+        "button_suffix": "LA"
+      }
+    ],
+    "switches": [
+      {
+        "id": "1/3",
+        "type": "双动渡线",
+        "switch_a": {
+          "id": "1#",
+          "track": "II",
+          "x": 3.5
+        },
+        "switch_b": {
+          "id": "3#",
+          "track": "I",
+          "x": 4.5
+        },
+        "connects": [
+          "II",
+          "I"
+        ]
+      },
+      {
+        "id": "5/7",
+        "type": "双动渡线",
+        "switch_a": {
+          "id": "5#",
+          "track": "I",
+          "x": 3.5
+        },
+        "switch_b": {
+          "id": "7#",
+          "track": "III",
+          "x": 4.5
+        },
+        "connects": [
+          "I",
+          "III"
+        ]
+      },
+      {
+        "id": "9/11",
+        "type": "双动渡线",
+        "switch_a": {
+          "id": "9#",
+          "track": "I",
+          "x": 7.5
+        },
+        "switch_b": {
+          "id": "11#",
+          "track": "III",
+          "x": 8.5
+        },
+        "connects": [
+          "I",
+          "III"
+        ]
+      },
+      {
+        "id": "13/15",
+        "type": "双动渡线",
+        "switch_a": {
+          "id": "13#",
+          "track": "III",
+          "x": 7.5
+        },
+        "switch_b": {
+          "id": "15#",
+          "track": "I",
+          "x": 8.5
+        },
+        "connects": [
+          "III",
+          "I"
+        ]
+      },
+      {
+        "id": "17/19",
+        "type": "双动渡线",
+        "switch_a": {
+          "id": "17#",
+          "track": "I",
+          "x": 9.5
+        },
+        "switch_b": {
+          "id": "19#",
+          "track": "II",
+          "x": 10.5
+        },
+        "connects": [
+          "I",
+          "II"
+        ]
+      },
+      {
+        "id": "21",
+        "type": "单动",
+        "switch_a": {
+          "id": "21#",
+          "track": "III",
+          "x": 9.5
+        },
+        "side_track": "5",
+        "side_x": 10.5,
+        "connects": [
+          "III",
+          "5"
+        ],
+        "no_insulation_on_side": true,
+        "side_covered_by_section": "21DG"
+      },
+      {
+        "id": "23/25",
+        "type": "双动渡线",
+        "switch_a": {
+          "id": "23#",
+          "track": "I",
+          "x": 10.5
+        },
+        "switch_b": {
+          "id": "25#",
+          "track": "III",
+          "x": 11.5
+        },
+        "connects": [
+          "I",
+          "III"
+        ]
+      },
+      {
+        "id": "27",
+        "type": "单动",
+        "switch_a": {
+          "id": "27#",
+          "track": "II",
+          "x": 11.5
+        },
+        "side_track": "4",
+        "side_x": 12.5,
+        "connects": [
+          "II",
+          "4"
+        ],
+        "no_insulation_on_side": true,
+        "side_covered_by_section": "19-27DG"
+      }
+    ],
+    "cross_double_crossovers": [
+      [
+        "9/11",
+        "13/15"
+      ]
+    ],
+    "sections": [
+      {
+        "name": "IAG",
+        "track": "I",
+        "x_start": 1,
+        "x_end": 3,
+        "type": "AG",
+        "contains": [
+          "X"
+        ]
+      },
+      {
+        "name": "IIAG",
+        "track": "II",
+        "x_start": 1,
+        "x_end": 3,
+        "type": "AG",
+        "contains": []
+      },
+      {
+        "name": "5DG",
+        "track": "I",
+        "x_start": 3,
+        "x_end": 4,
+        "type": "DG",
+        "contains": [
+          "D3",
+          "5#"
+        ]
+      },
+      {
+        "name": "3DG",
+        "track": "I",
+        "x_start": 4,
+        "x_end": 7,
+        "type": "DG",
+        "contains": [
+          "3#",
+          "D7",
+          "D9"
+        ]
+      },
+      {
+        "name": "9-15DG",
+        "track": "I",
+        "x_start": 7,
+        "x_end": 9,
+        "type": "DG",
+        "contains": [
+          "9#",
+          "15#",
+          "D7",
+          "D9",
+          "D13"
+        ]
+      },
+      {
+        "name": "17-23DG",
+        "track": "I",
+        "x_start": 9,
+        "x_end": 15,
+        "type": "DG",
+        "contains": [
+          "17#",
+          "23#",
+          "D13",
+          "D17"
+        ]
+      },
+      {
+        "name": "IG",
+        "track": "I",
+        "x_start": 15,
+        "x_end": null,
+        "type": "G",
+        "contains": [
+          "D17"
+        ]
+      },
+      {
+        "name": "1DG",
+        "track": "II",
+        "x_start": 3,
+        "x_end": 5,
+        "type": "DG",
+        "contains": [
+          "D1",
+          "1#",
+          "D5"
+        ]
+      },
+      {
+        "name": "1/19WG",
+        "track": "II",
+        "x_start": 5,
+        "x_end": 9,
+        "type": "WG",
+        "contains": [
+          "D5",
+          "D15"
+        ]
+      },
+      {
+        "name": "19-27DG",
+        "track": "II",
+        "x_start": 9,
+        "x_end": 15,
+        "type": "DG",
+        "contains": [
+          "19#",
+          "27#",
+          "D15",
+          "SII"
+        ],
+        "also_covers_track": "4",
+        "also_covers_note": "27#侧向无绝缘节，4道S4左侧归入19-27DG"
+      },
+      {
+        "name": "IIG",
+        "track": "II",
+        "x_start": 15,
+        "x_end": null,
+        "type": "G",
+        "contains": [
+          "SII"
+        ]
+      },
+      {
+        "name": "7DG",
+        "track": "III",
+        "x_start": 1,
+        "x_end": 7,
+        "type": "DG",
+        "contains": [
+          "XD",
+          "7#",
+          "D11"
+        ]
+      },
+      {
+        "name": "11-13DG",
+        "track": "III",
+        "x_start": 7,
+        "x_end": 9,
+        "type": "DG",
+        "contains": [
+          "11#",
+          "13#",
+          "D11"
+        ]
+      },
+      {
+        "name": "21DG",
+        "track": "III",
+        "x_start": 9,
+        "x_end": 10,
+        "type": "DG",
+        "contains": [
+          "21#"
+        ],
+        "also_covers_track": "5",
+        "also_covers_note": "21#侧向无绝缘节，5道S5左侧归入21DG"
+      },
+      {
+        "name": "25DG",
+        "track": "III",
+        "x_start": 10,
+        "x_end": 15,
+        "type": "DG",
+        "contains": [
+          "25#",
+          "SIII"
+        ]
+      },
+      {
+        "name": "IIIG",
+        "track": "III",
+        "x_start": 15,
+        "x_end": null,
+        "type": "G",
+        "contains": [
+          "SIII"
+        ]
+      },
+      {
+        "name": "5G",
+        "track": "5",
+        "x_start": 15,
+        "x_end": null,
+        "type": "G",
+        "contains": [
+          "S5"
+        ]
+      },
+      {
+        "name": "4G",
+        "track": "4",
+        "x_start": 15,
+        "x_end": null,
+        "type": "G",
+        "contains": [
+          "S4"
+        ]
+      }
+    ],
+    "switch_section_mapping": {
+      "1#": "1DG",
+      "3#": "3DG",
+      "5#": "5DG",
+      "7#": "7DG",
+      "9#": "9-15DG",
+      "11#": "11-13DG",
+      "13#": "11-13DG",
+      "15#": "9-15DG",
+      "17#": "17-23DG",
+      "19#": "19-27DG",
+      "21#": "21DG",
+      "23#": "17-23DG",
+      "25#": "25DG",
+      "27#": "19-27DG"
+    },
+    "connectivity_graph": {
+      "I_track_downstream": {
+        "path": [
+          "IAG",
+          "5DG",
+          "3DG",
+          "9-15DG",
+          "17-23DG",
+          "IG"
+        ]
+      },
+      "II_track_downstream": {
+        "path": [
+          "IIAG",
+          "1DG",
+          "1/19WG",
+          "19-27DG",
+          "IIG"
+        ]
+      },
+      "III_track_downstream": {
+        "path": [
+          "7DG",
+          "11-13DG",
+          "21DG",
+          "25DG",
+          "IIIG"
+        ]
+      },
+      "crossovers": [
+        {
+          "id": "1/3",
+          "from_track": "II",
+          "from_section": "1DG",
+          "to_track": "I",
+          "to_section": "3DG",
+          "direction": "下行"
+        },
+        {
+          "id": "5/7",
+          "from_track": "I",
+          "from_section": "5DG",
+          "to_track": "III",
+          "to_section": "7DG",
+          "direction": "下行"
+        },
+        {
+          "id": "9/11",
+          "from_track": "I",
+          "from_section": "9-15DG",
+          "to_track": "III",
+          "to_section": "11-13DG",
+          "direction": "下行"
+        },
+        {
+          "id": "13/15",
+          "from_track": "III",
+          "from_section": "11-13DG",
+          "to_track": "I",
+          "to_section": "9-15DG",
+          "direction": "下行"
+        },
+        {
+          "id": "17/19",
+          "from_track": "I",
+          "from_section": "17-23DG",
+          "to_track": "II",
+          "to_section": "19-27DG",
+          "direction": "下行"
+        },
+        {
+          "id": "21",
+          "from_track": "III",
+          "from_section": "21DG",
+          "to_track": "5",
+          "to_section": "5G",
+          "direction": "下行"
+        },
+        {
+          "id": "23/25",
+          "from_track": "I",
+          "from_section": "17-23DG",
+          "to_track": "III",
+          "to_section": "25DG",
+          "direction": "下行"
+        },
+        {
+          "id": "27",
+          "from_track": "II",
+          "from_section": "19-27DG",
+          "to_track": "4",
+          "to_section": "4G",
+          "direction": "下行"
+        }
+      ]
+    }
+  },
+  "source": {
+    "workbook": "outputs/01a08987-4697-7603-b9c1-39b48954f274/调车联锁表_图片识别_人工核对稿_修订版.xlsx",
+    "workbook_sha256": "0f04798665813103a6213b5821b54e0ba2f29268df542f3ce74270ea9aa68b04",
+    "workbook_snapshot": ".backups/20260910-184907-shunting-import/reviewed-workbook.xlsx",
+    "snapshot_mode": "open_workbook_snapshot",
+    "sheet": "核对表",
+    "reviewed": true,
+    "review_confirmation": "用户已明确确认核对完毕并授权导入项目数据库。",
+    "reviewed_at": "2026-09-10T18:49:07.968761+08:00",
+    "assets": [
+      {
+        "path": "ai_design/station/station_topology.json",
+        "sha256": "d80ed46857574a8102864d729d94c68c874d6f82657c185d3741f6eaa6791683"
+      },
+      {
+        "path": "ai_design/station/interlocking_rules.md",
+        "sha256": "c09da642d20008333539eb8c147b655c1dd60365e20ddb03f5cbace35443c8fc"
+      },
+      {
+        "path": "pictures/原始图.jpg",
+        "sha256": "6d26879b06ae291104b7f9a307f35bbb80bc74fb6dbc33cceb8eda088554a396"
+      },
+      {
+        "path": "pictures/01.jpg",
+        "sha256": "ffde45c71409c35d4eca432850bd8012f0e736649c4bc100c42c7af06e81b315"
+      },
+      {
+        "path": "pictures/02.jpg",
+        "sha256": "d4fe1c0d04fee02e9dc777686ac29e674764769ab0038c476c4731f51e822677"
+      },
+      {
+        "path": "pictures/03.jpg",
+        "sha256": "6afa08d3c0a2111c86d082162792023c97fd60e3dae94d579c6f0f24207c3e88"
+      }
+    ],
+    "notation": "原文和下标字符段分开保留；圆括号、方括号、大括号、条件尖括号和换行均按核对稿保存。"
+  },
+  "routes": [
+    {
+      "route_number": 20,
+      "fields": {
+        "进路号码": 20,
+        "方向": "由D1",
+        "进路": "至D9",
+        "进路方式": null,
+        "排列进路按下按钮": "D1A、D7A",
+        "确定运行方向道岔": null,
+        "信号机名称": "D1",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "(1/3)",
+        "敌对信号": "D7、<(1/3)>S5L、\nSIIIL、SIIL、S4L",
+        "轨道区段": "1DG、3DG、<5/7>5DG",
+        "迎面进路(列车)": null,
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "1",
+            "vertical_align": "subscript"
+          }
+        ],
+        "进路": [
+          {
+            "text": "至D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "9",
+            "vertical_align": "subscript"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "1",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "7",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "1",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "(1/3)",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "7",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、<(1/3)>S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "5",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "L、\nS",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "III",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "L、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "II",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "L、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "4",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "L",
+            "vertical_align": "baseline"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "1DG、3DG、<5/7>5DG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 7,
+        "来源图片": "03.jpg",
+        "图中位置": "主体第1行",
+        "重点复核": "N06",
+        "识别说明": "条件后列有多个信号，保留原顺序及换行。",
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 21,
+      "fields": {
+        "进路号码": 21,
+        "方向": "由D1",
+        "进路": "至D15",
+        "进路方式": null,
+        "排列进路按下按钮": "D1A、D5A",
+        "确定运行方向道岔": null,
+        "信号机名称": "D1",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "1/3",
+        "敌对信号": "D5、<19>SII、S4",
+        "轨道区段": "1DG",
+        "迎面进路(列车)": null,
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "1",
+            "vertical_align": "subscript"
+          }
+        ],
+        "进路": [
+          {
+            "text": "至D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "15",
+            "vertical_align": "subscript"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "1",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "5",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "1",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "1/3",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "5",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、<19>S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "II",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "4",
+            "vertical_align": "subscript"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "1DG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 8,
+        "来源图片": "03.jpg",
+        "图中位置": "主体第2行",
+        "重点复核": null,
+        "识别说明": null,
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 22,
+      "fields": {
+        "进路号码": 22,
+        "方向": "由D3",
+        "进路": "至D9",
+        "进路方式": null,
+        "排列进路按下按钮": "D3A、D7A",
+        "确定运行方向道岔": null,
+        "信号机名称": "D3",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "5/7、1/3",
+        "敌对信号": "D7、X",
+        "轨道区段": "5DG、3DG",
+        "迎面进路(列车)": null,
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "3",
+            "vertical_align": "subscript"
+          }
+        ],
+        "进路": [
+          {
+            "text": "至D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "9",
+            "vertical_align": "subscript"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "3",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "7",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "3",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "5/7、1/3",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "7",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、X",
+            "vertical_align": "baseline"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "5DG、3DG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 9,
+        "来源图片": "03.jpg",
+        "图中位置": "主体第3行",
+        "重点复核": null,
+        "识别说明": null,
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 23,
+      "fields": {
+        "进路号码": 23,
+        "方向": "由D3",
+        "进路": "至D11",
+        "进路方式": null,
+        "排列进路按下按钮": "D3A、D11A",
+        "确定运行方向道岔": null,
+        "信号机名称": "D3",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "(5/7)",
+        "敌对信号": "X、<(5/7)>S5D、\nSIIID、D17、SIID、S4D",
+        "轨道区段": "5DG、<1/3>3DG、7DG",
+        "迎面进路(列车)": null,
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "3",
+            "vertical_align": "subscript"
+          }
+        ],
+        "进路": [
+          {
+            "text": "至D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "11",
+            "vertical_align": "subscript"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "3",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "11",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "3",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "(5/7)",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "X、<(5/7)>S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "5",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "D、\nS",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "III",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "D、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "17",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "II",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "D、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "4",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "5DG、<1/3>3DG、7DG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 10,
+        "来源图片": "03.jpg",
+        "图中位置": "主体第4行",
+        "重点复核": "N06",
+        "识别说明": "条件后列有多个信号，保留原顺序及换行。",
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 24,
+      "fields": {
+        "进路号码": 24,
+        "方向": "由D5",
+        "进路": "向D1",
+        "进路方式": null,
+        "排列进路按下按钮": "D5A、D1A",
+        "确定运行方向道岔": null,
+        "信号机名称": "D5",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "1/3",
+        "敌对信号": "D1、<19>SIIL、S4L",
+        "轨道区段": "1DG",
+        "迎面进路(列车)": null,
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "5",
+            "vertical_align": "subscript"
+          }
+        ],
+        "进路": [
+          {
+            "text": "向D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "1",
+            "vertical_align": "subscript"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "5",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "1",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "5",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "1/3",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "1",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、<19>S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "II",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "L、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "4",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "L",
+            "vertical_align": "baseline"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "1DG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 11,
+        "来源图片": "03.jpg",
+        "图中位置": "主体第5行",
+        "重点复核": null,
+        "识别说明": null,
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 25,
+      "fields": {
+        "进路号码": 25,
+        "方向": "由D7",
+        "进路": "向D1信号机",
+        "进路方式": null,
+        "排列进路按下按钮": "D7A、D1A",
+        "确定运行方向道岔": null,
+        "信号机名称": "D7",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "(1/3)",
+        "敌对信号": "D1、<(1/3)>S5L、\nSIIIL、SIIL、S4L",
+        "轨道区段": "3DG、<5/7>5DG、1DG",
+        "迎面进路(列车)": null,
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "7",
+            "vertical_align": "subscript"
+          }
+        ],
+        "进路": [
+          {
+            "text": "向D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "1",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "信号机",
+            "vertical_align": "baseline"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "7",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "1",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "7",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "(1/3)",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "1",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、<(1/3)>S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "5",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "L、\nS",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "III",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "L、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "II",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "L、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "4",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "L",
+            "vertical_align": "baseline"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "3DG、<5/7>5DG、1DG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 12,
+        "来源图片": "03.jpg",
+        "图中位置": "主体第6行",
+        "重点复核": "N06",
+        "识别说明": "条件后列有多个信号，保留原顺序及换行。",
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 26,
+      "fields": {
+        "进路号码": 26,
+        "方向": "由D7",
+        "进路": "向D3信号机",
+        "进路方式": null,
+        "排列进路按下按钮": "D7A、D3A",
+        "确定运行方向道岔": null,
+        "信号机名称": "D7",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "1/3、5/7",
+        "敌对信号": "D3、X",
+        "轨道区段": "3DG、5DG",
+        "迎面进路(列车)": null,
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "7",
+            "vertical_align": "subscript"
+          }
+        ],
+        "进路": [
+          {
+            "text": "向D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "3",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "信号机",
+            "vertical_align": "baseline"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "7",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "3",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "7",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "1/3、5/7",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "3",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、X",
+            "vertical_align": "baseline"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "3DG、5DG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 13,
+        "来源图片": "03.jpg",
+        "图中位置": "主体第7行",
+        "重点复核": null,
+        "识别说明": null,
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 27,
+      "fields": {
+        "进路号码": 27,
+        "方向": "由D9",
+        "进路": "至5股道",
+        "进路方式": null,
+        "排列进路按下按钮": "D9A、S5DA",
+        "确定运行方向道岔": null,
+        "信号机名称": "D9",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "(9/11)、[13/15]、(21)",
+        "敌对信号": "S5、X",
+        "轨道区段": "9-15DG、11-13DG、21DG、\n<23/25>25DG",
+        "迎面进路(列车)": "5G",
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "9",
+            "vertical_align": "subscript"
+          }
+        ],
+        "进路": [
+          {
+            "text": "至5股道",
+            "vertical_align": "baseline"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "9",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "5",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "DA",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "9",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "(9/11)、[13/15]、(21)",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "5",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、X",
+            "vertical_align": "baseline"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "9-15DG、11-13DG、21DG、\n<23/25>25DG",
+            "vertical_align": "baseline"
+          }
+        ],
+        "迎面进路(列车)": [
+          {
+            "text": "5G",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 14,
+        "来源图片": "03.jpg",
+        "图中位置": "主体第8行",
+        "重点复核": null,
+        "识别说明": null,
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 28,
+      "fields": {
+        "进路号码": 28,
+        "方向": "由D9",
+        "进路": "至D13信号机",
+        "进路方式": null,
+        "排列进路按下按钮": "D9A、D13A",
+        "确定运行方向道岔": null,
+        "信号机名称": "D9",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "9/11、13/15",
+        "敌对信号": "D17、<9>X、SIII、\nSII、S4",
+        "轨道区段": "9-15DG",
+        "迎面进路(列车)": null,
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "9",
+            "vertical_align": "subscript"
+          }
+        ],
+        "进路": [
+          {
+            "text": "至D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "13",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "信号机",
+            "vertical_align": "baseline"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "9",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "13",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "9",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "9/11、13/15",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "17",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、<9>X、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "III",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、\nS",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "II",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "4",
+            "vertical_align": "subscript"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "9-15DG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 15,
+        "来源图片": "03.jpg",
+        "图中位置": "主体第9行",
+        "重点复核": "N06",
+        "识别说明": "条件后列有多个信号，保留原顺序及换行。",
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 29,
+      "fields": {
+        "进路号码": 29,
+        "方向": "由D11",
+        "进路": "至5股道",
+        "进路方式": null,
+        "排列进路按下按钮": "D11A、S5DA",
+        "确定运行方向道岔": null,
+        "信号机名称": "D11",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "9/11、13/15、(21)",
+        "敌对信号": "S5、XD、<13>X",
+        "轨道区段": "11-13DG、21DG、<23/25>25DG",
+        "迎面进路(列车)": "5G",
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "11",
+            "vertical_align": "subscript"
+          }
+        ],
+        "进路": [
+          {
+            "text": "至5股道",
+            "vertical_align": "baseline"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "11",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "5",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "DA",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "11",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "9/11、13/15、(21)",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "5",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、X",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "D",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、<13>X",
+            "vertical_align": "baseline"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "11-13DG、21DG、<23/25>25DG",
+            "vertical_align": "baseline"
+          }
+        ],
+        "迎面进路(列车)": [
+          {
+            "text": "5G",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 16,
+        "来源图片": "03.jpg",
+        "图中位置": "主体第10行",
+        "重点复核": null,
+        "识别说明": null,
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 30,
+      "fields": {
+        "进路号码": 30,
+        "方向": "由D11",
+        "进路": "至III股道",
+        "进路方式": null,
+        "排列进路按下按钮": "D11A、SIIIDA",
+        "确定运行方向道岔": null,
+        "信号机名称": "D11",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "9/11、13/15、21、23/25",
+        "敌对信号": "SIII、XD、<13>X",
+        "轨道区段": "11-13DG、21DG、25DG",
+        "迎面进路(列车)": "IIIG",
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "11",
+            "vertical_align": "subscript"
+          }
+        ],
+        "进路": [
+          {
+            "text": "至III股道",
+            "vertical_align": "baseline"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "11",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "III",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "DA",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "11",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "9/11、13/15、21、23/25",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "III",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、X",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "D",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、<13>X",
+            "vertical_align": "baseline"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "11-13DG、21DG、25DG",
+            "vertical_align": "baseline"
+          }
+        ],
+        "迎面进路(列车)": [
+          {
+            "text": "IIIG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 17,
+        "来源图片": "03.jpg",
+        "图中位置": "主体第11行",
+        "重点复核": null,
+        "识别说明": null,
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 31,
+      "fields": {
+        "进路号码": 31,
+        "方向": "由D11",
+        "进路": "至D13信号机",
+        "进路方式": null,
+        "排列进路按下按钮": "D11A、D13A",
+        "确定运行方向道岔": null,
+        "信号机名称": "D11",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "[9/11]、(13/15)",
+        "敌对信号": "XD、D17、<(13/15)>\nSIII、SII、S4",
+        "轨道区段": "11-13DG、9-15DG",
+        "迎面进路(列车)": null,
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "11",
+            "vertical_align": "subscript"
+          }
+        ],
+        "进路": [
+          {
+            "text": "至D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "13",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "信号机",
+            "vertical_align": "baseline"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "11",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "13",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "11",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "[9/11]、(13/15)",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "X",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "D",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "17",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、<(13/15)>\nS",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "III",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "II",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "4",
+            "vertical_align": "subscript"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "11-13DG、9-15DG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 18,
+        "来源图片": "03.jpg / 02.jpg",
+        "图中位置": "03第12行；02顶部第1行",
+        "重点复核": "N06",
+        "识别说明": "条件后列有多个信号，保留原顺序及换行。",
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 32,
+      "fields": {
+        "进路号码": 32,
+        "方向": "由D13",
+        "进路": "至III股道",
+        "进路方式": null,
+        "排列进路按下按钮": "D13A、SIIIDA",
+        "确定运行方向道岔": null,
+        "信号机名称": "D13",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "17/19、(23/25)",
+        "敌对信号": "SIII、<17>XD、X",
+        "轨道区段": "17-23DG、25DG、<21>21DG IIIG",
+        "迎面进路(列车)": null,
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "13",
+            "vertical_align": "subscript"
+          }
+        ],
+        "进路": [
+          {
+            "text": "至III股道",
+            "vertical_align": "baseline"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "13",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "III",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "DA",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "13",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "17/19、(23/25)",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "III",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、<17>X",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "D",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、X",
+            "vertical_align": "baseline"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "17-23DG、25DG、<21>21DG IIIG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 19,
+        "来源图片": "03.jpg / 02.jpg",
+        "图中位置": "03第13行；02顶部第2行",
+        "重点复核": "N01",
+        "识别说明": "21DG 与 IIIG 之间缺清晰分隔。",
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 33,
+      "fields": {
+        "进路号码": 33,
+        "方向": "由D13",
+        "进路": "至I股道",
+        "进路方式": null,
+        "排列进路按下按钮": "D13A、D17A",
+        "确定运行方向道岔": null,
+        "信号机名称": "D13",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "17/19、23/25",
+        "敌对信号": "D17、<17>XD、X",
+        "轨道区段": "17-23DG",
+        "迎面进路(列车)": null,
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "13",
+            "vertical_align": "subscript"
+          }
+        ],
+        "进路": [
+          {
+            "text": "至I股道",
+            "vertical_align": "baseline"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "13",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "17",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "13",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "17/19、23/25",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "17",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、<17>X",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "D",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、X",
+            "vertical_align": "baseline"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "17-23DG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 20,
+        "来源图片": "03.jpg / 02.jpg",
+        "图中位置": "03第14行；02顶部第3行",
+        "重点复核": null,
+        "识别说明": null,
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 34,
+      "fields": {
+        "进路号码": 34,
+        "方向": "由D13",
+        "进路": "至II股道",
+        "进路方式": null,
+        "排列进路按下按钮": "D13A、SIIDA",
+        "确定运行方向道岔": null,
+        "信号机名称": "D13",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "(17/19)、{23/25}、27",
+        "敌对信号": "SII、\n<(17/19)>XD、X",
+        "轨道区段": "17-23DG、19-27DG",
+        "迎面进路(列车)": "IIG",
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "13",
+            "vertical_align": "subscript"
+          }
+        ],
+        "进路": [
+          {
+            "text": "至II股道",
+            "vertical_align": "baseline"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "13",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "II",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "DA",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "13",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "(17/19)、{23/25}、27",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "II",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、\n<(17/19)>X",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "D",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、X",
+            "vertical_align": "baseline"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "17-23DG、19-27DG",
+            "vertical_align": "baseline"
+          }
+        ],
+        "迎面进路(列车)": [
+          {
+            "text": "IIG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 21,
+        "来源图片": "02.jpg",
+        "图中位置": "主体第1行",
+        "重点复核": "N06",
+        "识别说明": "条件后列有多个信号，保留原顺序及换行。",
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 35,
+      "fields": {
+        "进路号码": 35,
+        "方向": "由D13",
+        "进路": "至4股道",
+        "进路方式": null,
+        "排列进路按下按钮": "D13A、S4DA",
+        "确定运行方向道岔": null,
+        "信号机名称": "D13",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "(17/19)、{23/25}、(27)",
+        "敌对信号": "S4、<(17/19)>XD、X",
+        "轨道区段": "17-23DG、19-27DG",
+        "迎面进路(列车)": "4G",
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "13",
+            "vertical_align": "subscript"
+          }
+        ],
+        "进路": [
+          {
+            "text": "至4股道",
+            "vertical_align": "baseline"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "13",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "4",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "DA",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "13",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "(17/19)、{23/25}、(27)",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "4",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、<(17/19)>X",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "D",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、X",
+            "vertical_align": "baseline"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "17-23DG、19-27DG",
+            "vertical_align": "baseline"
+          }
+        ],
+        "迎面进路(列车)": [
+          {
+            "text": "4G",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 22,
+        "来源图片": "02.jpg",
+        "图中位置": "主体第2行",
+        "重点复核": "N06",
+        "识别说明": "条件后列有多个信号，保留原顺序及换行。",
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 36,
+      "fields": {
+        "进路号码": 36,
+        "方向": "由D15",
+        "进路": "至II股道",
+        "进路方式": null,
+        "排列进路按下按钮": "D15A、SIIDA",
+        "确定运行方向道岔": null,
+        "信号机名称": "D15",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "17/19、27",
+        "敌对信号": "SII",
+        "轨道区段": "19-27DG",
+        "迎面进路(列车)": "IIG",
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "15",
+            "vertical_align": "subscript"
+          }
+        ],
+        "进路": [
+          {
+            "text": "至II股道",
+            "vertical_align": "baseline"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "15",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "II",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "DA",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "15",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "17/19、27",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "II",
+            "vertical_align": "subscript"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "19-27DG",
+            "vertical_align": "baseline"
+          }
+        ],
+        "迎面进路(列车)": [
+          {
+            "text": "IIG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 23,
+        "来源图片": "02.jpg",
+        "图中位置": "主体第3行",
+        "重点复核": null,
+        "识别说明": null,
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 37,
+      "fields": {
+        "进路号码": 37,
+        "方向": "由D15",
+        "进路": "至4股道",
+        "进路方式": null,
+        "排列进路按下按钮": "D15A、S4DA",
+        "确定运行方向道岔": null,
+        "信号机名称": "D15",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "17/19、(27)",
+        "敌对信号": "S4",
+        "轨道区段": "19-27DG",
+        "迎面进路(列车)": "4G",
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "15",
+            "vertical_align": "subscript"
+          }
+        ],
+        "进路": [
+          {
+            "text": "至4股道",
+            "vertical_align": "baseline"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "15",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "4",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "DA",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "15",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "17/19、(27)",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "4",
+            "vertical_align": "subscript"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "19-27DG",
+            "vertical_align": "baseline"
+          }
+        ],
+        "迎面进路(列车)": [
+          {
+            "text": "4G",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 24,
+        "来源图片": "02.jpg",
+        "图中位置": "主体第4行",
+        "重点复核": null,
+        "识别说明": null,
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 38,
+      "fields": {
+        "进路号码": 38,
+        "方向": "由D17",
+        "进路": "至D7",
+        "进路方式": null,
+        "排列进路按下按钮": "D17A、D9A",
+        "确定运行方向道岔": null,
+        "信号机名称": "D17",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "23/25、17/19、13/15、\n9/11",
+        "敌对信号": "D9、D13、<9>X",
+        "轨道区段": "17-23DG、9-15DG",
+        "迎面进路(列车)": null,
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "17",
+            "vertical_align": "subscript"
+          }
+        ],
+        "进路": [
+          {
+            "text": "至D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "7",
+            "vertical_align": "subscript"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "17",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "9",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "17",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "23/25、17/19、13/15、\n9/11",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "9",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "13",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、<9>X",
+            "vertical_align": "baseline"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "17-23DG、9-15DG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 25,
+        "来源图片": "02.jpg",
+        "图中位置": "主体第5行",
+        "重点复核": null,
+        "识别说明": null,
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 39,
+      "fields": {
+        "进路号码": 39,
+        "方向": "由D17",
+        "进路": "向D3",
+        "进路方式": null,
+        "排列进路按下按钮": "D17A、D3A",
+        "确定运行方向道岔": null,
+        "信号机名称": "D17",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "23/25、17/19、(13/15)\n[9/11]、(5/7)",
+        "敌对信号": "X、D3、D11、D13",
+        "轨道区段": "17-23DG、9-15DG、11-13DG、\n7DG、5DG、<1/3>3DG",
+        "迎面进路(列车)": null,
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "17",
+            "vertical_align": "subscript"
+          }
+        ],
+        "进路": [
+          {
+            "text": "向D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "3",
+            "vertical_align": "subscript"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "17",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "3",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "17",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "23/25、17/19、(13/15)\n[9/11]、(5/7)",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "X、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "3",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "11",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "13",
+            "vertical_align": "subscript"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "17-23DG、9-15DG、11-13DG、\n7DG、5DG、<1/3>3DG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 26,
+        "来源图片": "02.jpg",
+        "图中位置": "主体第6行",
+        "重点复核": "N07",
+        "识别说明": "(13/15) 后换行，未添加不清晰的顿号。",
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 40,
+      "fields": {
+        "进路号码": 40,
+        "方向": "由D17",
+        "进路": "向XD",
+        "进路方式": null,
+        "排列进路按下按钮": "D17A、XDDZA",
+        "确定运行方向道岔": null,
+        "信号机名称": "D17",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "23/25、17/19、(13/15)\n[9/11]、5/7",
+        "敌对信号": "XD、D11、D13",
+        "轨道区段": "17-23DG、9-15DG、\n11-13DG、7DG",
+        "迎面进路(列车)": null,
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "17",
+            "vertical_align": "subscript"
+          }
+        ],
+        "进路": [
+          {
+            "text": "向X",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "D",
+            "vertical_align": "subscript"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "17",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A、X",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "D",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "DZA",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "17",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "23/25、17/19、(13/15)\n[9/11]、5/7",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "X",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "D",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "11",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "13",
+            "vertical_align": "subscript"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "17-23DG、9-15DG、\n11-13DG、7DG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 27,
+        "来源图片": "02.jpg",
+        "图中位置": "主体第7行",
+        "重点复核": "N07",
+        "识别说明": "(13/15) 后换行，未添加不清晰的顿号。",
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 41,
+      "fields": {
+        "进路号码": 41,
+        "方向": "由S5D",
+        "进路": "至D7",
+        "进路方式": null,
+        "排列进路按下按钮": "S5DA、D9A",
+        "确定运行方向道岔": null,
+        "信号机名称": "S5",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "(21)、(9/11)、[13/15]",
+        "敌对信号": "D9、S5L、<(9/11)>X",
+        "轨道区段": "21DG、<23/25>25DG、\n11-13DG、9-15DG",
+        "迎面进路(列车)": null,
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "5",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          }
+        ],
+        "进路": [
+          {
+            "text": "至D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "7",
+            "vertical_align": "subscript"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "5",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "DA、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "9",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "5",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "(21)、(9/11)、[13/15]",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "9",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "5",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "L、<(9/11)>X",
+            "vertical_align": "baseline"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "21DG、<23/25>25DG、\n11-13DG、9-15DG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 28,
+        "来源图片": "02.jpg",
+        "图中位置": "主体第8行",
+        "重点复核": null,
+        "识别说明": null,
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 42,
+      "fields": {
+        "进路号码": 42,
+        "方向": "由S5D",
+        "进路": "向D3",
+        "进路方式": null,
+        "排列进路按下按钮": "S5DA、D3A",
+        "确定运行方向道岔": null,
+        "信号机名称": "S5",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "(21)、9/11、13/15、(5/7)",
+        "敌对信号": "X、D3、D11",
+        "轨道区段": "21DG、<23/25>25DG、11-13DG、\n7DG、5DG、<1/3>3DG",
+        "迎面进路(列车)": null,
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "5",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          }
+        ],
+        "进路": [
+          {
+            "text": "向D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "3",
+            "vertical_align": "subscript"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "5",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "DA、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "3",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "5",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "(21)、9/11、13/15、(5/7)",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "X、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "3",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "11",
+            "vertical_align": "subscript"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "21DG、<23/25>25DG、11-13DG、\n7DG、5DG、<1/3>3DG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 29,
+        "来源图片": "02.jpg",
+        "图中位置": "主体第9行",
+        "重点复核": null,
+        "识别说明": null,
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 43,
+      "fields": {
+        "进路号码": 43,
+        "方向": "由S5D",
+        "进路": "向XD",
+        "进路方式": null,
+        "排列进路按下按钮": "S5DA、XDDZA",
+        "确定运行方向道岔": null,
+        "信号机名称": "S5",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "(21)、9/11、13/15、5/7",
+        "敌对信号": "XD、D11、S5L",
+        "轨道区段": "21DG、<23/25>25DG、\n11-13DG、7DG",
+        "迎面进路(列车)": null,
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "5",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          }
+        ],
+        "进路": [
+          {
+            "text": "向X",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "D",
+            "vertical_align": "subscript"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "5",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "DA、X",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "D",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "DZA",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "5",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "(21)、9/11、13/15、5/7",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "X",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "D",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "11",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "5",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "L",
+            "vertical_align": "baseline"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "21DG、<23/25>25DG、\n11-13DG、7DG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 30,
+        "来源图片": "02.jpg",
+        "图中位置": "主体第10行",
+        "重点复核": null,
+        "识别说明": null,
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 44,
+      "fields": {
+        "进路号码": 44,
+        "方向": "由SIIID",
+        "进路": "至D7",
+        "进路方式": null,
+        "排列进路按下按钮": "SIIIDA、D9A",
+        "确定运行方向道岔": null,
+        "信号机名称": "SIII",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "(23/25)、17/19、\n13/15、9/11",
+        "敌对信号": "D9、D13、SIIIL、\n<9>X",
+        "轨道区段": "25G、<21>21DG、\n17-23DG、9-15DG",
+        "迎面进路(列车)": null,
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "III",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          }
+        ],
+        "进路": [
+          {
+            "text": "至D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "7",
+            "vertical_align": "subscript"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "III",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "DA、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "9",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "III",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "(23/25)、17/19、\n13/15、9/11",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "9",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "13",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "III",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "L、\n<9>X",
+            "vertical_align": "baseline"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "25G、<21>21DG、\n17-23DG、9-15DG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 31,
+        "来源图片": "02.jpg",
+        "图中位置": "主体第11行",
+        "重点复核": "N02",
+        "识别说明": "首项原文为 25G，未改成 25DG。",
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 45,
+      "fields": {
+        "进路号码": 45,
+        "方向": "由SIIID",
+        "进路": "向D3",
+        "进路方式": null,
+        "排列进路按下按钮": "SIIIDA、D3A",
+        "确定运行方向道岔": null,
+        "信号机名称": "SIII",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "23/25、21、9/11、13/15、\n(5/7)",
+        "敌对信号": "X、D3、D11",
+        "轨道区段": "25DG、21DG、11-13DG、\n7DG、5DG、<1/3>3DG",
+        "迎面进路(列车)": null,
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "III",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          }
+        ],
+        "进路": [
+          {
+            "text": "向D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "3",
+            "vertical_align": "subscript"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "III",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "DA、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "3",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "III",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "23/25、21、9/11、13/15、\n(5/7)",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "X、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "3",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "11",
+            "vertical_align": "subscript"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "25DG、21DG、11-13DG、\n7DG、5DG、<1/3>3DG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 32,
+        "来源图片": "02.jpg",
+        "图中位置": "主体第12行",
+        "重点复核": null,
+        "识别说明": null,
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 46,
+      "fields": {
+        "进路号码": 46,
+        "方向": "由SIIID",
+        "进路": "向XD",
+        "进路方式": null,
+        "排列进路按下按钮": "SIIIDA、XDDZA",
+        "确定运行方向道岔": null,
+        "信号机名称": "SIII",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "23/25、21、9/11、13/15、5/7",
+        "敌对信号": "XD、D11、SIIIL",
+        "轨道区段": "25DG、21DG、11-13DG、7DG",
+        "迎面进路(列车)": null,
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "III",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          }
+        ],
+        "进路": [
+          {
+            "text": "向X",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "D",
+            "vertical_align": "subscript"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "III",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "DA、X",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "D",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "DZA",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "III",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "23/25、21、9/11、13/15、5/7",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "X",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "D",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "11",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "III",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "L",
+            "vertical_align": "baseline"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "25DG、21DG、11-13DG、7DG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 33,
+        "来源图片": "01.jpg",
+        "图中位置": "主体第1行",
+        "重点复核": null,
+        "识别说明": null,
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 47,
+      "fields": {
+        "进路号码": 47,
+        "方向": "由SIID",
+        "进路": "至D7",
+        "进路方式": null,
+        "排列进路按下按钮": "SIIDA、D9A",
+        "确定运行方向道岔": null,
+        "信号机名称": "SII",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "27、(17/19){23/25}、\n13/15、9/11",
+        "敌对信号": "D9、D13、SIIL、\n<9>X",
+        "轨道区段": "19-27DG、17-23DG、9-15DG",
+        "迎面进路(列车)": null,
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "II",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          }
+        ],
+        "进路": [
+          {
+            "text": "至D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "7",
+            "vertical_align": "subscript"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "II",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "DA、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "9",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "II",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "27、(17/19){23/25}、\n13/15、9/11",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "9",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "13",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "II",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "L、\n<9>X",
+            "vertical_align": "baseline"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "19-27DG、17-23DG、9-15DG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 34,
+        "来源图片": "01.jpg",
+        "图中位置": "主体第2行",
+        "重点复核": null,
+        "识别说明": null,
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 48,
+      "fields": {
+        "进路号码": 48,
+        "方向": "由SIID",
+        "进路": "向D3",
+        "进路方式": null,
+        "排列进路按下按钮": "SIIDA、D3A",
+        "确定运行方向道岔": null,
+        "信号机名称": "SII",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "27、(17/19){23/25}、\n(13/15)、[9/11]、(5/7)",
+        "敌对信号": "X、D3、D11、D13",
+        "轨道区段": "19-27DG、17-23DG、9-15DG、\n11-13DG、7DG、5DG、<1/3>3DG",
+        "迎面进路(列车)": null,
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "II",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          }
+        ],
+        "进路": [
+          {
+            "text": "向D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "3",
+            "vertical_align": "subscript"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "II",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "DA、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "3",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "II",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "27、(17/19){23/25}、\n(13/15)、[9/11]、(5/7)",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "X、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "3",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "11",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "13",
+            "vertical_align": "subscript"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "19-27DG、17-23DG、9-15DG、\n11-13DG、7DG、5DG、<1/3>3DG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 35,
+        "来源图片": "01.jpg",
+        "图中位置": "主体第3行",
+        "重点复核": null,
+        "识别说明": null,
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 49,
+      "fields": {
+        "进路号码": 49,
+        "方向": "由SIID",
+        "进路": "向XD",
+        "进路方式": null,
+        "排列进路按下按钮": "SIIDA、XDDZA",
+        "确定运行方向道岔": null,
+        "信号机名称": "SII",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "27、(17/19){23/25}、\n(13/15)、[9/11]、5/7",
+        "敌对信号": "XD、D11、D13、SIIL",
+        "轨道区段": "19-27DG、17-23DG、9-15DG、\n11-13DG、7DG",
+        "迎面进路(列车)": null,
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "II",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          }
+        ],
+        "进路": [
+          {
+            "text": "向X",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "D",
+            "vertical_align": "subscript"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "II",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "DA、X",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "D",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "DZA",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "II",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "27、(17/19){23/25}、\n(13/15)、[9/11]、5/7",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "X",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "D",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "11",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "13",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "II",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "L",
+            "vertical_align": "baseline"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "19-27DG、17-23DG、9-15DG、\n11-13DG、7DG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 36,
+        "来源图片": "01.jpg",
+        "图中位置": "主体第4行",
+        "重点复核": null,
+        "识别说明": null,
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 50,
+      "fields": {
+        "进路号码": 50,
+        "方向": "由SIID",
+        "进路": "至D5",
+        "进路方式": null,
+        "排列进路按下按钮": "SIIDA、D5A",
+        "确定运行方向道岔": null,
+        "信号机名称": "SII",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "27、17/19",
+        "敌对信号": "D15、SIIL、<1>D1",
+        "轨道区段": "19-27DG、1/19WG",
+        "迎面进路(列车)": null,
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "II",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          }
+        ],
+        "进路": [
+          {
+            "text": "至D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "5",
+            "vertical_align": "subscript"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "II",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "DA、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "5",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "II",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "27、17/19",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "15",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "II",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "L、<1>D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "1",
+            "vertical_align": "subscript"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "19-27DG、1/19WG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 37,
+        "来源图片": "01.jpg",
+        "图中位置": "主体第5行",
+        "重点复核": "N03、N04",
+        "识别说明": "末项辨读为 1/19WG，需核对正式标识。 本行为 <1>D1，54 号为 <1/3>D1。",
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 51,
+      "fields": {
+        "进路号码": 51,
+        "方向": "由S4D",
+        "进路": "至D7",
+        "进路方式": null,
+        "排列进路按下按钮": "S4DA、D9A",
+        "确定运行方向道岔": null,
+        "信号机名称": "S4",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "(27)、(17/19){23/25}、\n13/15、9/11",
+        "敌对信号": "D9、D13、S4L、<9>X",
+        "轨道区段": "19-27DG、17-23DG、9-15DG",
+        "迎面进路(列车)": null,
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "4",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          }
+        ],
+        "进路": [
+          {
+            "text": "至D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "7",
+            "vertical_align": "subscript"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "4",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "DA、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "9",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "4",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "(27)、(17/19){23/25}、\n13/15、9/11",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "9",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "13",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "4",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "L、<9>X",
+            "vertical_align": "baseline"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "19-27DG、17-23DG、9-15DG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 38,
+        "来源图片": "01.jpg",
+        "图中位置": "主体第6行",
+        "重点复核": null,
+        "识别说明": null,
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 52,
+      "fields": {
+        "进路号码": 52,
+        "方向": "由S4D",
+        "进路": "向D3",
+        "进路方式": null,
+        "排列进路按下按钮": "S4DA、D3A",
+        "确定运行方向道岔": null,
+        "信号机名称": "S4",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "(27)、(17/19){23/25}、\n(13/15)、[9/11]、(5/7)",
+        "敌对信号": "X、D3、D11、D13",
+        "轨道区段": "19-27DG、17-23DG、9-15DG、\n11-13DG、7DG、5DG、<1/3>3DG",
+        "迎面进路(列车)": null,
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "4",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          }
+        ],
+        "进路": [
+          {
+            "text": "向D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "3",
+            "vertical_align": "subscript"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "4",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "DA、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "3",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "4",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "(27)、(17/19){23/25}、\n(13/15)、[9/11]、(5/7)",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "X、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "3",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "11",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "13",
+            "vertical_align": "subscript"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "19-27DG、17-23DG、9-15DG、\n11-13DG、7DG、5DG、<1/3>3DG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 39,
+        "来源图片": "01.jpg",
+        "图中位置": "主体第7行",
+        "重点复核": null,
+        "识别说明": null,
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 53,
+      "fields": {
+        "进路号码": 53,
+        "方向": "由S4D",
+        "进路": "向XD",
+        "进路方式": null,
+        "排列进路按下按钮": "S4DA、XDDZA",
+        "确定运行方向道岔": null,
+        "信号机名称": "S4",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "(27)、(17/19){23/25}、\n(13/15)、[9/11]、5/7",
+        "敌对信号": "XD、D11、D13、S4L",
+        "轨道区段": "19-27DG、17-23DG、9-15DG、\n11-13DG、7DG",
+        "迎面进路(列车)": null,
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "4",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          }
+        ],
+        "进路": [
+          {
+            "text": "向X",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "D",
+            "vertical_align": "subscript"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "4",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "DA、X",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "D",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "DZA",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "4",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "(27)、(17/19){23/25}、\n(13/15)、[9/11]、5/7",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "X",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "D",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "11",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "13",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "4",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "L",
+            "vertical_align": "baseline"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "19-27DG、17-23DG、9-15DG、\n11-13DG、7DG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 40,
+        "来源图片": "01.jpg",
+        "图中位置": "主体第8行",
+        "重点复核": null,
+        "识别说明": null,
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    },
+    {
+      "route_number": 54,
+      "fields": {
+        "进路号码": 54,
+        "方向": "由S4D",
+        "进路": "至D5",
+        "进路方式": null,
+        "排列进路按下按钮": "S4DA、D5A",
+        "确定运行方向道岔": null,
+        "信号机名称": "S4",
+        "信号机显示": "B",
+        "表示器": null,
+        "道岔": "(27)、17/19",
+        "敌对信号": "D15、S4L、<1/3>D1",
+        "轨道区段": "19-27DG、1/19WG",
+        "迎面进路(列车)": null,
+        "迎面进路(调车)": null,
+        "其他联锁": null
+      },
+      "rich_text": {
+        "方向": [
+          {
+            "text": "由S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "4",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          }
+        ],
+        "进路": [
+          {
+            "text": "至D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "5",
+            "vertical_align": "subscript"
+          }
+        ],
+        "排列进路按下按钮": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "4",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "DA、D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "5",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "A",
+            "vertical_align": "baseline"
+          }
+        ],
+        "信号机名称": [
+          {
+            "text": "S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "4",
+            "vertical_align": "subscript"
+          }
+        ],
+        "信号机显示": [
+          {
+            "text": "B",
+            "vertical_align": "baseline"
+          }
+        ],
+        "道岔": [
+          {
+            "text": "(27)、17/19",
+            "vertical_align": "baseline"
+          }
+        ],
+        "敌对信号": [
+          {
+            "text": "D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "15",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "、S",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "4",
+            "vertical_align": "subscript"
+          },
+          {
+            "text": "L、<1/3>D",
+            "vertical_align": "baseline"
+          },
+          {
+            "text": "1",
+            "vertical_align": "subscript"
+          }
+        ],
+        "轨道区段": [
+          {
+            "text": "19-27DG、1/19WG",
+            "vertical_align": "baseline"
+          }
+        ]
+      },
+      "provenance": {
+        "excel_row": 41,
+        "来源图片": "01.jpg",
+        "图中位置": "主体第9行",
+        "重点复核": "N03",
+        "识别说明": "末项辨读为 1/19WG，需核对正式标识。",
+        "人工核对状态": "待核对",
+        "人工修订说明": null
+      }
+    }
+  ]
+}

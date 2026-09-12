@@ -216,3 +216,43 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# FinalShell portable tool (removed)
+
+# Framework - 前端依赖
+framework/frontend/node_modules/
+
+# Framework - 后端虚拟环境
+framework/backend/.venv/
+
+# Framework - 敏感配置 & 数据库
+framework/backend/.env
+framework/backend/*.db
+framework/*.db
+
+# Project-local runtime, credentials, and recovery copies
+.runtime/
+.backups/
+framework/backend/.env
+ai_design/ai/key.env
+
+# Team collaboration: keep local evidence, caches and credentials off GitHub.
+.planning/
+outputs/
+.claude/
+node_modules/
+*.env
+.env.*
+!.env.example
+!*.env.example
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.sqlite3-*
+ai_design/ai/vector_db/
+
+# Third-party lab executables are local course tools, not website dependencies.
+/车站与区间控制实验/联锁仿真软件/
+/车站与区间控制实验/区间信号实验系统.exe
+
