@@ -1,3 +1,5 @@
 # Preserve repository bytes on every platform. Rules, tables and report sources
 # are verified by SHA256; automatic LF/CRLF conversion invalidates that evidence.
 * -text
+# Windows cmd requires reliable CRLF checkout bytes for double-click launchers.
+*.bat text eol=crlf

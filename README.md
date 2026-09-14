@@ -14,18 +14,15 @@ Vue 3 前端与 FastAPI 后端组成的铁路联锁教学网站，包含站场�
 
 ## 首次运行
 
-需要Python 3.12及Node.js/npm。在项目根目录建立本机运行环境：
+支持 **Windows 10/11 x64**。无需预装 Python、Node.js、npm，也无需管理员权限。将完整仓库同步到可写目录后，双击根目录 **`启动项目.bat`**，等待准备完成，浏览器会自动打开。
 
-```powershell
-python -m venv .runtime/venv
-.runtime/venv/Scripts/python.exe -m pip install -r framework/backend/requirements.lock.txt
-npm --prefix framework/frontend ci
-Copy-Item framework/backend/.env.example framework/backend/.env
-```
+**首次需要联网**访问 GitHub/Astral、PyPI 和 nodejs.org/npm。启动器会下载并校验固定版本的 uv、Python、Node.js，安装两端锁文件中的依赖；耗时取决于网络。所有运行环境和缓存都放在本项目 `.runtime/`，不修改系统 PATH、Python 注册表或系统安装。不要复制其他人的 `.runtime`、`node_modules`、`.env` 或数据库。
 
-编辑新建的`framework/backend/.env`，将`SECRET_KEY`设为本机新生成的随机值；需要真实AI调用时填写自己的`DEEPSEEK_API_KEY`。`.env.example`不包含可用密钥，勿将实际配置提交到Git。
+后续启动复用本地环境；同步后的锁文件变化会触发依赖更新。运行版本固定在 `runtime-manifest.json`：Python 3.12.14、Node.js 22.23.2、uv 0.12.13。首次初始化 `.env` 时自动生成本机随机 `SECRET_KEY`，空数据库自动创建管理员 `admin` / `00000000`、演示站场、已核对调车数据和实验专题。已有本地配置和数据继续保留。
 
-在Windows运行`启动项目.ps1`或`启动项目.bat`。默认前端为`http://127.0.0.1:5173/`，后端为`http://127.0.0.1:8000/`。各自的数据库在本机生成，已有题目／人员数据库不随代码分发。管理员初始化及资料导入见`接管与使用说明.md`、`调车联锁表数据库导入说明.md`与`管理员出题与批阅使用说明.md`。
+前端优先使用 `http://127.0.0.1:5173/`，后端优先使用 8000；占用时自动选择后续可用端口，以启动窗口显示的地址为准。每个副本有独立数据库。关闭启动窗口后服务仍继续运行；双击 **`停止项目.bat`** 停止当前副本的新版服务。重复启动同一副本会复用健康服务，其他副本不会被停止。
+
+真实 AI 解释仍需在 `framework/backend/.env` 填写自己的 `DEEPSEEK_API_KEY` 并联网。自动安装环境不会提供 API 密钥或把本机数据库分享给组员。运行问题、离线复用、修复环境与开发命令见 **[团队启动说明](团队启动说明.md)**。
 
 ## 团队协作
 
@@ -35,4 +32,4 @@ Copy-Item framework/backend/.env.example framework/backend/.env
 
 仓库不包含本地密钥、用户数据库、浏览器登录状态、依赖目录、构建缓存、备份及本机验证截图。`.planning/`与`outputs/`中的记录只存在于各开发者本机，历史说明中对它们的引用不代表这些文件已上传。与网站运行无关的第三方课程可执行软件也不上传。
 
-前端验证：`npm --prefix framework/frontend run build`。后端验证：在`framework/backend`目录使用已安装依赖的Python运行`python -m pytest tests -q`；验证前须配置测试运行所需的本地`.env`。
+开发与验证可以直接使用启动器准备的环境，具体命令见团队启动说明；不要使用系统默认 `python`/`npm` 混入另一套版本。

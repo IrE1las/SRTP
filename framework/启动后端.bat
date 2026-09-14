@@ -1,11 +1,9 @@
 @echo off
-chcp 65001 >nul
-echo ============================================
-echo   启动后端 (FastAPI, 端口 8000)
-echo ============================================
-cd /d "%~dp0backend"
-set PYTHONDONTWRITEBYTECODE=1
-set TEMP=%~dp0..\.runtime\tmp
-set TMP=%TEMP%
-"%~dp0..\.runtime\venv\Scripts\python.exe" -m uvicorn main:app --host 127.0.0.1 --port 8000
-pause
+setlocal
+"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\launch.ps1" %*
+set "SRTP_EXIT=%ERRORLEVEL%"
+echo.
+if not "%SRTP_EXIT%"=="0" echo Startup failed. See the errors above and .runtime\launch-v2.log.
+if "%SRTP_EXIT%"=="0" echo Services keep running after this window closes. Use the stop BAT to stop this checkout.
+if not "%SRTP_NO_PAUSE%"=="1" pause
+exit /b %SRTP_EXIT%

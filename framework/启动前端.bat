@@ -1,9 +1,9 @@
 @echo off
-chcp 65001 >nul
-echo ============================================
-echo   启动前端 (Vite, 端口 5173)
-echo   浏览器打开 http://localhost:5173
-echo ============================================
-cd /d "%~dp0frontend"
-call npm run dev
-pause
+setlocal
+"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\launch.ps1" %*
+set "SRTP_EXIT=%ERRORLEVEL%"
+echo.
+if not "%SRTP_EXIT%"=="0" echo Startup failed. See the errors above and .runtime\launch-v2.log.
+if "%SRTP_EXIT%"=="0" echo Services keep running after this window closes. Use the stop BAT to stop this checkout.
+if not "%SRTP_NO_PAUSE%"=="1" pause
+exit /b %SRTP_EXIT%
