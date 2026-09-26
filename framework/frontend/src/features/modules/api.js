@@ -1,0 +1,11 @@
+import request from '@/utils/request'
+export const getModules = () => request.get('/modules')
+export const getQuestions = () => request.get('/module-one/experiment-1/questions')
+export const getStation = () => request.get('/module-one/station')
+export const getConfiguration = id => request.get(`/module-one/experiment-1/questions/${id}/configuration`)
+export const createAttempt = data => request.post('/module-one/experiment-1/attempts', data)
+export const getAttempt = id => request.get(`/module-one/attempts/${id}`)
+export const getAttempts = () => request.get('/module-one/attempts')
+export const sendCommand = (id, data) => request.post(`/module-one/attempts/${id}/commands`, data)
+export const submitAttempt = (id, data) => request.post(`/module-one/attempts/${id}/submit`, data)
+export const getReplay = id => request.get(`/module-one/attempts/${id}/replay`)

@@ -1,7 +1,8 @@
 """Session-isolated, conservative first-stage teaching interlocking runtime.
 
-This simulator is intentionally separate from the legacy exercise engine.  It
-does not expose route cancellation, manual unlocking or arbitrary train moves.
+This simulator is intentionally separate from the legacy exercise engine.
+Experiment commands extend this same state machine through commands.py.
+Manual unlocking and arbitrary train moves remain unsupported.
 Its decisions are traceable to the supplied TB/T 3027, 3578 and 3537 copies and
 to the imported workbook rows; it is not safety-certified railway software.
 """
@@ -53,9 +54,9 @@ class SimulationService:
     def new_session(self, owner_id: int, interval_available: bool = True,
                     occupied_sections: list[str] | None = None) -> dict:
         session = RuntimeSession(id=str(uuid4()), owner_id=owner_id, interval_available=interval_available)
-        session.sections = {item["name"]: {"occupied": False, "owners": set()}
+        session.sections = {item["name"]: {"occupied": False, "occupancy_kind": "clear", "occupancy_origin": "preset", "owners": set()}
                             for item in self.package["sections"]}
-        session.switches = {item["id"]: {"position": 0, "represented": True, "owners": set()}
+        session.switches = {item["id"]: {"position": 0, "represented": True, "manual_locked": False, "sealed": False, "owners": set()}
                             for item in self.package["switches"]}
         session.signals = {item["name"]: {"aspect": None, "route": None}
                            for item in self.package["signals"]}
@@ -63,6 +64,7 @@ class SimulationService:
             if name not in session.sections:
                 raise SimulationError(f"预置占用区段 {name} 不在本站配置中")
             session.sections[name]["occupied"] = True
+            session.sections[name]["occupancy_kind"] = "vehicle"
         self._event(session, "session", "新建独立仿真会话；普通站内区间许可已预置" if interval_available
                     else "新建条件反例会话；区间许可未具备")
         if occupied_sections:
@@ -95,7 +97,7 @@ class SimulationService:
     def _release_due(self, session: RuntimeSession) -> None:
         now = monotonic()
         for instance in session.routes.values():
-            if instance["status"] == "released":
+            if instance["status"] in {"released", "cancelled"}:
                 continue
             for section_name, due in list(instance["release_due"].items()):
                 if due > now or session.sections[section_name]["occupied"]:
@@ -133,8 +135,11 @@ class SimulationService:
             "selected_buttons": list(session.selected), "selection_remaining_seconds": remaining,
             "last_message": session.last_message,
             "sections": {name: {"occupied": state["occupied"], "locked": bool(state["owners"]),
+                                 "occupancy_kind": state.get("occupancy_kind", "clear"),
+                                 "occupancy_origin": state.get("occupancy_origin", "preset"),
                                  "owners": sorted(state["owners"])} for name, state in session.sections.items()},
             "switches": {name: {"position": state["position"], "represented": state["represented"],
+                                 "manual_locked": state.get("manual_locked", False), "sealed": state.get("sealed", False),
                                  "locked": bool(state["owners"]), "owners": sorted(state["owners"])}
                          for name, state in session.switches.items()},
             "signals": {name: dict(state) for name, state in session.signals.items()},
@@ -167,9 +172,12 @@ class SimulationService:
             self._snapshot(session)
             return deepcopy(session.history)
 
-    def _reject(self, session: RuntimeSession, message: str, route_id: str | None = None) -> dict:
+    def _reject(self, session: RuntimeSession, message: str, route_id: str | None = None,
+                reason_code: str = "INVALID_OPERATION", devices: list[str] | None = None) -> dict:
         self._event(session, "rejected", message, route_id)
-        return {"accepted": False, "message": message, "snapshot": self._snapshot(session)}
+        session.events[-1].update(reason_code=reason_code, devices=devices or [])
+        return {"accepted": False, "message": message, "reason_code": reason_code,
+                "devices": devices or [], "snapshot": self._snapshot(session)}
 
     def _conditional_sections(self, session: RuntimeSession, route: dict) -> list[str]:
         sections = route["overlap_sections"]
@@ -190,53 +198,64 @@ class SimulationService:
     def _hostile_names(route: dict) -> set[str]:
         return {str(name).split("#")[0] for name in route["hostile_signals"]}
 
-    def _blocking_reason(self, session: RuntimeSession, route: dict) -> str | None:
+    def _blocking_fact(self, session: RuntimeSession, route: dict, ignore_instance=None):
+        """Stable rejection facts; no state is mutated during validation."""
         if route["status"] != "ready":
-            return f"进路 {route['id']} 数据阻塞：{'；'.join(route['reasons'])}"
+            return "DATA_BLOCKED", f"进路 {route['id']} 数据待核对，不能办理", []
         if route["attribute"] in {12, 14} and not session.interval_available:
-            return "区间许可未具备，出站信号不得开放"
-        if session.signals[route["signal"]]["aspect"] is not None:
-            return f"{route['signal']} 信号机已有开放进路"
-        for instance in session.routes.values():
-            if instance["status"] == "released":
-                continue
-            other = self.routes[instance["route_id"]]
-            if other["signal"] == route["signal"]:
-                return f"{route['signal']} 信号机的上一条进路尚未全部解锁"
-            if (other["signal"] in self._hostile_names(route) or
-                    route["signal"] in self._hostile_names(other)):
-                return f"与已建立的 {instance['route_id']} 号进路敌对"
+            return "INTERVAL_UNAVAILABLE", "区间许可未具备，出站信号不得开放", [route["signal"]]
         try:
             conditional = self._conditional_sections(session, route)
         except SimulationError as exc:
-            return str(exc)
-        for section_name in route["sections"] + conditional:
-            state = session.sections[section_name]
-            if state["owners"]:
-                return f"区段 {section_name} 已被其他进路锁闭"
+            return "DATA_BLOCKED", str(exc), []
+        # Occupancy and indication precede locking/conflict checks.
+        for name in route["sections"] + conditional:
+            state = session.sections[name]
             if state["occupied"]:
-                is_last = section_name == route["sections"][-1]
-                has_switch = bool(self.section_defs[section_name]["switches"])
-                if not (route["kind"] == "short_shunt" and is_last and not has_switch):
-                    return f"区段 {section_name} 已占用"
-        for switch_id, position in route["switches"].items():
-            state = session.switches[switch_id]
-            if state["owners"]:
-                return f"道岔 {switch_id} 已被其他进路锁闭"
+                exception = (route["kind"] == "short_shunt" and name == route["sections"][-1]
+                             and not self.section_defs[name]["switches"])
+                if not exception:
+                    return "SECTION_OCCUPIED", f"区段 {name} 已占用", [name]
+        for sid, pos in route["switches"].items():
+            state = session.switches[sid]
             if not state["represented"]:
-                return f"道岔 {switch_id} 无表示，不能构成进路"
-            switch_section = self.switch_defs[switch_id]["section"]
-            if state["position"] != position and switch_section in session.sections:
-                if session.sections[switch_section]["occupied"]:
-                    return f"道岔 {switch_id} 所在区段 {switch_section} 占用，不能转换"
+                return "SWITCH_UNREPRESENTED", f"道岔 {sid} 无表示，不能构成进路", [sid]
+            section = self.switch_defs[sid]["section"]
+            if state["position"] != pos and session.sections.get(section, {}).get("occupied"):
+                return "SECTION_OCCUPIED", f"道岔 {sid} 所在区段 {section} 占用，不能转换", [section, sid]
+        for sid, pos in route["switches"].items():
+            state = session.switches[sid]
+            if state.get("sealed"):
+                return "SEALED_FOR_ROUTE", f"道岔 {sid} 已封闭，不能纳入新进路", [sid]
+            if state.get("manual_locked") and state["position"] != pos:
+                return "SWITCH_MANUAL_LOCKED", f"道岔 {sid} 单锁在不符位置，不能转换", [sid]
+        for instance in session.routes.values():
+            if instance["id"] == ignore_instance or instance["status"] in {"released", "cancelled"}:
+                continue
+            other = self.routes[instance["route_id"]]
+            if other["signal"] == route["signal"]:
+                return "SIGNAL_ROUTE_LOCKED", f"{route['signal']} 上一条进路尚未解锁", [route["signal"]]
+            if (other["signal"] in self._hostile_names(route) or
+                    route["signal"] in self._hostile_names(other)):
+                return "HOSTILE_ROUTE", f"与已建立的 {instance['route_id']} 号进路敌对", [other["signal"], route["signal"]]
+        for name in route["sections"] + conditional:
+            if session.sections[name]["owners"] - {ignore_instance}:
+                return "SECTION_LOCKED", f"区段 {name} 已被其他进路锁闭", [name]
+        for sid in route["switches"]:
+            if session.switches[sid]["owners"] - {ignore_instance}:
+                return "SWITCH_ROUTE_LOCKED", f"道岔 {sid} 已被其他进路锁闭", [sid]
         return None
 
+    def _blocking_reason(self, session, route):
+        fact = self._blocking_fact(session, route)
+        return fact[1] if fact else None
+
     def _arrange(self, session: RuntimeSession, route: dict) -> dict:
-        reason = self._blocking_reason(session, route)
+        fact = self._blocking_fact(session, route)
         session.selected = []
         session.selection_deadline = None
-        if reason:
-            return self._reject(session, reason, route["id"])
+        if fact:
+            return self._reject(session, fact[1], route["id"], fact[0], fact[2])
         instance_id = str(uuid4())
         conditional_sections = self._conditional_sections(session, route)
         self._event(session, "route_check", f"进路 {route['id']} 条件检查通过", route["id"])
@@ -260,7 +279,7 @@ class SimulationService:
             "remaining": set(route["sections"]), "switches": list(route["switches"]),
             "progress": -2 if route["approach_section"] in session.sections
             and route["approach_section"] not in route["sections"] else -1,
-            "status": "signal_open", "release_due": {},
+            "status": "signal_open", "release_due": {}, "train_started": False,
         }
         message = f"进路 {route['id']} 已锁闭，{route['signal']} 显示 {route['aspect']}"
         self._event(session, "signal_open", message, route["id"])
@@ -312,13 +331,14 @@ class SimulationService:
             instance = session.routes.get(instance_id)
             if not instance:
                 return self._reject(session, "进路实例不存在")
-            if instance["status"] == "released":
+            if instance["status"] in {"released", "cancelled", "closed_locked"}:
                 return self._reject(session, "该进路已完成正常解锁")
             if instance["progress"] == -2:
                 approach = instance["approach_section"]
                 if session.sections[approach]["occupied"]:
                     return self._reject(session, f"接近区段 {approach} 已有车辆占用", instance["route_id"])
-                session.sections[approach]["occupied"] = True
+                instance["train_started"] = True
+                session.sections[approach].update(occupied=True, occupancy_kind="vehicle", occupancy_origin="simulation")
                 instance["progress"] = -1
                 instance["status"] = "approaching"
                 self._event(session, "train_approach", f"仿真车辆接近 {approach}；信号保持开放",
@@ -330,11 +350,12 @@ class SimulationService:
                 next_section = sections[next_index]
                 if session.sections[next_section]["occupied"]:
                     return self._reject(session, f"区段 {next_section} 已占用，仿真行车不能越过", instance["route_id"])
-                session.sections[next_section]["occupied"] = True
+                instance["train_started"] = True
+                session.sections[next_section].update(occupied=True, occupancy_kind="vehicle", occupancy_origin="simulation")
                 self._event(session, "train_enter", f"车辆进入 {next_section}", instance["route_id"])
                 if next_index == 0 and instance["approach_section"]:
                     approach = instance["approach_section"]
-                    session.sections[approach]["occupied"] = False
+                    session.sections[approach].update(occupied=False, occupancy_kind="clear", occupancy_origin="simulation")
                     self._event(session, "approach_clear", f"车辆出清接近区段 {approach}", instance["route_id"])
                 if next_index == 0 and instance["kind"] == "train":
                     session.signals[instance["signal"]] = {"aspect": None, "route": None}
@@ -342,7 +363,7 @@ class SimulationService:
                                 instance["route_id"])
                 if next_index > 0:
                     previous = sections[next_index - 1]
-                    session.sections[previous]["occupied"] = False
+                    session.sections[previous].update(occupied=False, occupancy_kind="clear", occupancy_origin="simulation")
                     instance["release_due"][previous] = monotonic() + 3
                     self._event(session, "train_clear", f"车辆出清 {previous}；三点检查后延时解锁",
                                 instance["route_id"])
@@ -356,7 +377,7 @@ class SimulationService:
                 last = sections[-1]
                 if not session.sections[last]["occupied"]:
                     return self._reject(session, "末端区段未被仿真车辆占用，不能宣布出清", instance["route_id"])
-                session.sections[last]["occupied"] = False
+                session.sections[last].update(occupied=False, occupancy_kind="clear", occupancy_origin="simulation")
                 instance["release_due"][last] = monotonic() + 3
                 instance["progress"] = len(sections)
                 instance["status"] = "clearing"

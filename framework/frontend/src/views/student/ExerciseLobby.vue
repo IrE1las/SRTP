@@ -2,6 +2,7 @@
   <div class="lobby-page">
     <div class="section-title-row"><div><span class="section-overline">PRACTICE CENTER</span><h2>选择你的实训任务</h2></div><span class="lobby-subtitle">循序渐进，知行合一</span></div>
     <router-link class="report-entry" to="/student/lab-topics"><div><strong>车站与区间控制 · 实验专题</strong><p>对应实验一至八，围绕原始站场完成读图、联锁表填写、现象分析与区间闭塞练习。</p></div><span>进入专题 →</span></router-link>
+    <router-link class="report-entry" to="/student/modules"><div><strong>联锁实验平台 2.0 · 三模块实验中心</strong><p>一号车站动态操作、二号车站联锁表与区间控制规划。</p></div><span>进入实验中心 →</span></router-link>
     <div class="lobby-controls">
       <div class="lobby-tabs" role="tablist" aria-label="练习分类"><button id="classic-tab" :class="{ active: activeTab === 'classic' }" role="tab" :aria-selected="activeTab === 'classic'" aria-controls="lobby-panel" @click="activeTab = 'classic'">经典专项 <span>04</span></button><button id="published-tab" :class="{ active: activeTab === 'published' }" role="tab" :aria-selected="activeTab === 'published'" aria-controls="lobby-panel" @click="activeTab = 'published'">教学练习 <span>{{ store.lobbyExercises.length }}</span></button></div>
       <el-input v-model="query" :prefix-icon="Search" placeholder="搜索练习名称或专题" clearable class="lobby-search" aria-label="搜索练习" />

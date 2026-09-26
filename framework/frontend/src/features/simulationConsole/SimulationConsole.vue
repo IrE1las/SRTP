@@ -56,7 +56,7 @@
         <aside v-if="showIssues && station" class="issue-panel">
           <div class="panel-head"><strong>进路清单与数据问题</strong><button @click="showIssues = false" aria-label="关闭清单">×</button></div>
           <p>候选 {{ station.counts.candidate_routes }} 条：可办理 {{ station.counts.ready_routes }} 条，数据阻塞 {{ station.counts.blocked_routes }} 条。通过进路 {{ station.counts.excluded_routes }} 条属后续阶段。</p>
-          <div class="example-routes">
+          <div v-if="station.routes" class="example-routes">
             <strong>操作示例</strong>
             <button v-for="id in exampleIds" :key="id" @click="selectExample(id)" type="button">{{ id }} 号 · {{ exampleKind(id) }}</button>
           </div>
@@ -145,7 +145,7 @@ const recentEvents = computed(() => (displaySnapshot.value?.events || []).slice(
 const blockedRoutes = computed(() => (station.value?.routes || []).filter(route => route.status === 'blocked'))
 
 function kindText(kind) { return kind === 'train' ? '列车进路' : kind === 'short_shunt' ? '短调车' : '组合调车' }
-function exampleKind(id) { return kindText(station.value?.routes.find(route => route.id === id)?.kind) }
+function exampleKind(id) { return kindText(station.value?.routes?.find(route => route.id === id)?.kind) }
 function eventTime(value) { return new Date(value).toLocaleTimeString('zh-CN', { hour12: false }) }
 function onFullscreenChange() { isFullscreen.value = document.fullscreenElement === consoleRoot.value }
 async function enterFullscreen() {
@@ -220,7 +220,7 @@ async function advance(routeInstanceId) {
 function inspectDevice(type, name, state) { inspected.value = { type, name, state } }
 function showDisabled(message) { ElMessage.info(message) }
 function selectExample(id) {
-  const route = station.value?.routes.find(item => item.id === id)
+  const route = station.value?.routes?.find(item => item.id === id)
   if (!route) return
   showIssues.value = false
   ElMessage.info(`${id} 号${kindText(route.kind)}：请依次点击 ${route.button_sequence.join(' → ')}`)

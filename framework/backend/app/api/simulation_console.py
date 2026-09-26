@@ -41,7 +41,10 @@ def _call(action, *args):
 
 @router.get("/station")
 def get_station(current_user: User = AnyRole) -> dict:
-    return public_station_package()
+    package = public_station_package()
+    if current_user.role == "student":
+        return {k: v for k, v in package.items() if k not in {"routes", "source"}}
+    return package
 
 
 @router.post("/sessions")

@@ -20,6 +20,11 @@ const routes = [
     component: AppLayout,
     meta: { requiresAuth: true },
     children: [
+      { path: 'student/modules', component: () => import('@/features/modules/ModuleHub.vue'), meta: { roles: ['student','teacher','admin'] } },
+      { path: 'student/modules/one/experiment-1', component: () => import('@/features/modules/ExperimentOne.vue'), meta: { roles: ['student','teacher','admin'] } },
+      { path: 'student/modules/one/experiment-1/:questionId', component: () => import('@/features/modules/ExperimentOne.vue'), meta: { roles: ['student','teacher','admin'] } },
+      { path: 'student/modules/:moduleId(one|two|three)', component: () => import('@/features/modules/ModuleHub.vue'), meta: { roles: ['student','teacher','admin'] } },
+
       {
         path: '',
         redirect: () => {

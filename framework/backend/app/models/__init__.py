@@ -1,4 +1,5 @@
 from app.models.ai_score import AiScore
+from app.models.module_one import ModuleOneAttempt, ModuleOneEvent
 from app.models.device_state import DeviceState
 from app.models.exercise import Exercise
 from app.models.exercise_session import ExerciseSession

@@ -8,7 +8,7 @@
       :style="{ writingMode: label.orientation === 1 ? 'vertical-rl' : undefined }">{{ label.text }}</text>
 
     <g class="section-layer">
-      <g v-for="section in station.sections" :key="section.id" class="section-item"
+      <g v-for="section in station.sections" :key="section.id" class="section-item" :class="{ highlighted: highlight.includes(section.name) }"
         tabindex="0" role="button" :aria-label="`${section.name} 区段，${sectionText(section.name)}`"
         @click="emit('inspect', '区段', section.name, sectionText(section.name))"
         @keydown.enter="emit('inspect', '区段', section.name, sectionText(section.name))">
@@ -24,7 +24,7 @@
     </g>
 
     <g class="switch-layer">
-      <g v-for="point in station.switches" :key="point.id" tabindex="0" role="button"
+      <g v-for="point in station.switches" :key="point.id" :class="{ highlighted: highlight.includes(point.id) }" tabindex="0" role="button"
         :aria-label="`${point.name} 号道岔，${switchText(point.id)}`"
         @click="emit('inspect', '道岔', point.name, switchText(point.id))"
         @keydown.enter="emit('inspect', '道岔', point.name, switchText(point.id))">
@@ -55,7 +55,7 @@
 
     <g class="signal-layer">
       <g v-for="signal in station.signals" :key="signal.id" :transform="`translate(${signal.x},${signal.y})`"
-        class="signal-item" :class="{ clickable: shuntButton(signal.name) }"
+        class="signal-item" :class="{ highlighted: highlight.includes(signal.name), clickable: shuntButton(signal.name) }"
         :tabindex="shuntButton(signal.name) ? 0 : undefined"
         :role="shuntButton(signal.name) ? 'button' : undefined"
         :aria-label="signalAria(signal)"
@@ -76,7 +76,7 @@
 
     <g class="button-layer">
       <g v-for="button in visibleButtons" :key="button.id" :transform="`translate(${button.drawX},${button.drawY})`"
-        class="station-button" :class="{ disabled: button.type === 0 || button.type === 1,
+        class="station-button" :class="{ disabled: !allowAllButtons && (button.type === 0 || button.type === 1),
           selected: selected.includes(button.name) }"
         tabindex="0" role="button" :aria-label="`${button.name}，${buttonPurpose(button)}`"
         @click="onButtonClick(button)" @keydown.enter="onButtonClick(button)">
@@ -91,10 +91,10 @@
 
     <g class="switch-button-layer">
       <g v-for="item in station.switch_buttons" :key="item.name"
-        :transform="`translate(${item.x},${item.y + 75})`" class="switch-button">
+        :transform="`translate(${item.x},${item.y + 75})`" class="switch-button" tabindex="0" role="button" :aria-label="`选择 ${item.name} 道岔组`" @click="emit('group', item.name)" @keydown.enter="emit('group', item.name)">
         <rect x="-26" y="-13" width="52" height="26" rx="3" fill="#152534" stroke="#426889" />
         <text x="0" y="5" text-anchor="middle">{{ item.name }}</text>
-        <title>{{ item.name }} 道岔组，第一阶段仅显示位置，不提供单独操纵</title>
+        <title>{{ item.name }} 道岔组，可在题目操作面板选择并操纵</title>
       </g>
     </g>
   </svg>
@@ -107,8 +107,10 @@ const props = defineProps({
   station: { type: Object, required: true },
   snapshot: { type: Object, default: null },
   selected: { type: Array, default: () => [] },
+  highlight: { type: Array, default: () => [] },
+  allowAllButtons: Boolean,
 })
-const emit = defineEmits(['press', 'inspect', 'disabled'])
+const emit = defineEmits(['press', 'inspect', 'disabled', 'group'])
 
 const shuntNames = computed(() => Object.fromEntries(props.station.buttons
   .filter(button => button.type === 3 && button.signal)
@@ -135,7 +137,7 @@ function onSignalClick(signal) {
   else emit('inspect', '信号机', signal.name, signalAspectText(signal))
 }
 function onButtonClick(button) {
-  if (button.type === 0 || button.type === 1) emit('disabled', `${button.name} 属于通过或引导进路，本阶段未开放`)
+  if (!props.allowAllButtons && (button.type === 0 || button.type === 1)) emit('disabled', `${button.name} 属于通过或引导进路，本阶段未开放`)
   else emit('press', button.name)
 }
 function buttonPurpose(button) {
@@ -151,7 +153,7 @@ function sectionColor(name) {
 }
 function sectionText(name) {
   const state = props.snapshot?.sections?.[name]
-  return state?.occupied ? '占用' : state?.locked ? '进路锁闭' : '空闲'
+  return state?.occupied ? (state.occupancy_kind === 'fault' ? '故障占用' : '车列占用') : state?.locked ? '进路锁闭' : '空闲'
 }
 function bladeColor(id) { return props.snapshot?.switches?.[id]?.position === 1 ? '#f4ca47' : '#65e344' }
 function blade(point) {
@@ -166,7 +168,7 @@ function blade(point) {
 }
 function switchText(id) {
   const state = props.snapshot?.switches?.[id]
-  return `${state?.position === 1 ? '反位' : '定位'}，${state?.locked ? '锁闭' : '未锁闭'}`
+  return `${state?.position === 1 ? '反位' : '定位'}，${state?.represented === false ? '无表示' : '表示正常'}，${state?.locked ? '进路锁闭' : '无进路锁'}${state?.manual_locked ? '，单锁' : ''}${state?.sealed ? '，封闭' : ''}`
 }
 function signalSide(signal) { return signal.orientation === 1 || signal.orientation === 2 ? 1 : -1 }
 function nearX(signal) { return signalSide(signal) < 0 ? 8 : -8 }
@@ -198,6 +200,8 @@ function signalAria(signal) {
 
 <style scoped>
 .station-diagram { display: block; width: 100%; height: 100%; min-width: 930px; background: #05090e; }
+.highlighted { filter: drop-shadow(0 0 6px #ffb938); }
+.highlighted .section-label,.highlighted .switch-label,.highlighted .signal-label { fill:#ffd45c;font-weight:bold; }
 .station-title { fill: #eaf1f6; font: 30px "STKaiti", "KaiTi", serif; letter-spacing: 5px; }
 .direction-label { fill: #aab6c3; font: 14px "Microsoft YaHei", sans-serif; }
 .section-item, .switch-layer g { cursor: help; }
