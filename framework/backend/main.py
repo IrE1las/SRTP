@@ -8,6 +8,7 @@ from app.api import shunting_data, shunting_questions
 from app.api import lab_topics
 from app.api import management
 from app.api import simulation_console
+from app.api import module_one_experiment1
 from app.core.database import Base, SessionLocal, engine
 from app.core.security import get_password_hash
 from app.models.user import User
@@ -83,3 +84,4 @@ app.include_router(shunting_questions.router, prefix="/api/exam/shunting", tags=
 app.include_router(lab_topics.router, prefix="/api/lab-topics", tags=["lab-topics"])
 app.include_router(management.router, prefix="/api/management", tags=["management"])
 app.include_router(simulation_console.router, prefix="/api/simulation-console", tags=["simulation-console"])
+app.include_router(module_one_experiment1.router, prefix="/api", tags=["module-one"])

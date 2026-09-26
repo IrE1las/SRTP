@@ -1,5 +1,6 @@
 import { Clock, Cpu, DataAnalysis, EditPen, Files, Guide, HomeFilled, Monitor, School, SetUp, Share, UserFilled } from '@element-plus/icons-vue'
 const study = { title: '学习空间', items: [
+  { title: '三模块实验中心', path: '/student/modules', icon: Guide },
   { title: '学习概览', path: '/student/dashboard', icon: HomeFilled },
   { title: '练习大厅', path: '/student/lobby', icon: School },
   { title: '实验专题', path: '/student/lab-topics', icon: Guide },
@@ -13,6 +14,7 @@ const diagnosis = { title: '专项诊断', items: [
   { title: '条件区段', path: '/student/interlocking-exam-conditional', icon: Files, number: '04' },
 ] }
 const teaching = { title: '教学工作台', items: [
+  { title: '三模块实验与回放', path: '/student/modules', icon: Guide },
   { title: '仿真操作台', path: '/student/simulation-console', icon: Monitor },
   { title: '批阅中心', path: '/teacher/grading', icon: EditPen },
   { title: '实验专题预览', path: '/teacher/lab-topics', icon: Guide },
@@ -35,5 +37,5 @@ export function navigationGroups(role) {
 }
 export function pageLabel(path, role) {
   return navigationGroups(role).flatMap(group => group.items).find(item => item.path === path)?.title
-    || (path.startsWith('/admin/questions/') ? '编辑题目' : path.startsWith('/student/exercises/') ? '进路实训' : path.startsWith('/student/history/') ? '练习回放' : path.startsWith('/student/shunting-questions') ? '原图调车题库' : path.endsWith('/edit') ? '编辑练习' : '实训工作台')
+    || (path.startsWith('/student/modules') ? '三模块实验中心' : path.startsWith('/admin/questions/') ? '编辑题目' : path.startsWith('/student/exercises/') ? '进路实训' : path.startsWith('/student/history/') ? '练习回放' : path.startsWith('/student/shunting-questions') ? '原图调车题库' : path.endsWith('/edit') ? '编辑练习' : '实训工作台')
 }
