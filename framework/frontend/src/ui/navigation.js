@@ -1,8 +1,9 @@
-import { Clock, Cpu, DataAnalysis, EditPen, Files, Guide, HomeFilled, School, SetUp, Share, UserFilled } from '@element-plus/icons-vue'
+import { Clock, Cpu, DataAnalysis, EditPen, Files, Guide, HomeFilled, Monitor, School, SetUp, Share, UserFilled } from '@element-plus/icons-vue'
 const study = { title: '学习空间', items: [
   { title: '学习概览', path: '/student/dashboard', icon: HomeFilled },
   { title: '练习大厅', path: '/student/lobby', icon: School },
   { title: '实验专题', path: '/student/lab-topics', icon: Guide },
+  { title: '仿真操作台', path: '/student/simulation-console', icon: Monitor },
   { title: '练习历史', path: '/student/history', icon: Clock },
 ] }
 const diagnosis = { title: '专项诊断', items: [
@@ -12,6 +13,7 @@ const diagnosis = { title: '专项诊断', items: [
   { title: '条件区段', path: '/student/interlocking-exam-conditional', icon: Files, number: '04' },
 ] }
 const teaching = { title: '教学工作台', items: [
+  { title: '仿真操作台', path: '/student/simulation-console', icon: Monitor },
   { title: '批阅中心', path: '/teacher/grading', icon: EditPen },
   { title: '实验专题预览', path: '/teacher/lab-topics', icon: Guide },
   { title: '教学统计', path: '/teacher/dashboard', icon: DataAnalysis },
@@ -29,7 +31,7 @@ const admin = { title: '平台管理', items: [
 ] }
 export const roleLabels = { student: '学生', teacher: '教师', admin: '管理员' }
 export function navigationGroups(role) {
-  return role === 'admin' ? [contentManagement, study, diagnosis, {...teaching,items:teaching.items.filter(i=>!['/teacher/grading','/teacher/lab-topics'].includes(i.path))}, admin] : role === 'teacher' ? [teaching] : role === 'student' ? [study, diagnosis] : []
+  return role === 'admin' ? [contentManagement, study, diagnosis, {...teaching,items:teaching.items.filter(i=>!['/teacher/grading','/teacher/lab-topics','/student/simulation-console'].includes(i.path))}, admin] : role === 'teacher' ? [teaching] : role === 'student' ? [study, diagnosis] : []
 }
 export function pageLabel(path, role) {
   return navigationGroups(role).flatMap(group => group.items).find(item => item.path === path)?.title

@@ -57,6 +57,12 @@ const routes = [
         meta: { requiresAuth: true, roles: ['student', 'teacher'] },
       },
       {
+        path: 'student/simulation-console',
+        name: 'SimulationConsole',
+        component: () => import('@/features/simulationConsole/SimulationConsole.vue'),
+        meta: { requiresAuth: true, roles: ['student', 'teacher', 'admin'] },
+      },
+      {
         path: 'teacher/lab-topics',
         name: 'TeacherLabTopics',
         component: () => import('@/views/student/LabTopics.vue'),
