@@ -1,4 +1,4 @@
-"""Isolated data.xls station simulation console API."""
+"""Original-application console with a separately preserved teaching profile."""
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
@@ -6,15 +6,16 @@ from typing import Literal
 
 from app.api.deps import require_roles
 from app.models.user import User
-from app.services.simulation_console.runtime import SimulationError, SimulationService, simulation_service
+from app.services.simulation_console.runtime import SimulationError, simulation_service
 from app.services.simulation_console.station import public_station_package
 from app.services.simulation_console.reference_station import reference_station_package
+from app.services.simulation_console.reference_runtime import ReferenceSimulationService
 from app.services.simulation_console.console_commands import operate
 
 
 router = APIRouter()
 AnyRole = Depends(require_roles("student", "teacher", "admin"))
-reference_service = SimulationService(reference_station_package())
+reference_service = ReferenceSimulationService(reference_station_package())
 
 
 def service_for(session_id):
@@ -48,7 +49,10 @@ class ConsoleCommandRequest(BaseModel):
                   'SET_SWITCH_INDICATION', 'RESTORE_SWITCH_INDICATION',
                   'SET_SECTION_OCCUPANCY', 'CLEAR_SECTION_OCCUPANCY',
                   'CANCEL_ROUTE', 'REPEAT_OPEN_SIGNAL', 'MANUAL_UNLOCK_ROUTE',
-                  'SIGNAL_SEAL', 'SIGNAL_UNSEAL', 'SIGNAL_LIGHT_ON', 'SIGNAL_LIGHT_OFF']
+                  'SIGNAL_SEAL', 'SIGNAL_UNSEAL', 'SIGNAL_LIGHT_ON', 'SIGNAL_LIGHT_OFF',
+                  'SECTION_FAULT_UNLOCK', 'GUIDE_ARM', 'GUIDE_MAINTAIN', 'GUIDE_TOTAL_LOCK', 'GUIDE_TOTAL_UNLOCK',
+                  'BLOCK_REQUEST', 'BLOCK_PEER_ACCEPT', 'BLOCK_RESET', 'BLOCK_ACCIDENT_RESET',
+                  'BLOCK_DEPARTURE_AUX', 'BLOCK_RECEPTION_AUX', 'BLOCK_TOTAL_AUX']
     target: str = Field(min_length=1, max_length=80)
     payload: dict = Field(default_factory=dict)
     pin: str | None = Field(default=None, max_length=32)
@@ -109,7 +113,7 @@ def advance_train(session_id: str, request: StepRequest,
 @router.post('/sessions/{session_id}/commands')
 def console_command(session_id: str, request: ConsoleCommandRequest, current_user: User = AnyRole) -> dict:
     if request.type in {'SET_SWITCH_INDICATION', 'RESTORE_SWITCH_INDICATION',
-                        'SET_SECTION_OCCUPANCY', 'CLEAR_SECTION_OCCUPANCY'} and current_user.role == 'student':
-        raise HTTPException(status_code=403, detail='只有教师或管理员可设置设备故障和模拟占用')
+                        'SET_SECTION_OCCUPANCY', 'CLEAR_SECTION_OCCUPANCY', 'BLOCK_PEER_ACCEPT'} and current_user.role == 'student':
+        raise HTTPException(status_code=403, detail='只有教师或管理员可模拟设备故障、占用和邻站输入')
     service = service_for(session_id)
     return _call(operate, service, session_id, current_user.id, request.model_dump(exclude={'version'}), request.version)

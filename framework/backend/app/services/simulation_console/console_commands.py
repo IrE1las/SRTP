@@ -6,7 +6,9 @@ from .commands import execute
 from .runtime import SimulationError
 
 
-SEALED_COMMANDS = {'MANUAL_UNLOCK_ROUTE', 'SIGNAL_SEAL', 'SIGNAL_UNSEAL', 'SIGNAL_LIGHT_OFF'}
+SEALED_COMMANDS = {'MANUAL_UNLOCK_ROUTE', 'SIGNAL_SEAL', 'SIGNAL_UNSEAL', 'SIGNAL_LIGHT_OFF',
+                   'SECTION_FAULT_UNLOCK', 'GUIDE_ARM', 'GUIDE_TOTAL_LOCK', 'GUIDE_TOTAL_UNLOCK',
+                   'BLOCK_ACCIDENT_RESET', 'BLOCK_TOTAL_AUX', 'BLOCK_DEPARTURE_AUX', 'BLOCK_RECEPTION_AUX'}
 
 
 def operate(service, session_id, owner_id, command, version):
@@ -18,6 +20,16 @@ def operate(service, session_id, owner_id, command, version):
         kind, target = command['type'], command.get('target', '')
         if kind in SEALED_COMMANDS and command.get('pin') != os.getenv('SIMULATOR_TRAINING_PIN', '0000'):
             return service._reject(session, '教学操作口令不正确，命令未执行', reason_code='INVALID_PIN')
+        if hasattr(service, 'operate_reference'):
+            result = service.operate_reference(session, command)
+            if result is not None:
+                return result
+            if kind in {'SWITCH_TOTAL_NORMAL', 'SWITCH_TOTAL_REVERSE'}:
+                throats = {s['throat'] for s in service.package['signals']
+                           if s['name'] in service._state(session)['guide_locks']}
+                ids = target.split('/')
+                if any(service.switch_defs.get(sid, {}).get('throat') in throats for sid in ids):
+                    return service._reject(session, '引导总锁闭期间不能转换该咽喉道岔', reason_code='GUIDE_TOTAL_LOCKED')
         if kind in {'SIGNAL_SEAL', 'SIGNAL_UNSEAL', 'SIGNAL_LIGHT_ON', 'SIGNAL_LIGHT_OFF'}:
             state = session.signals.get(target)
             if state is None:

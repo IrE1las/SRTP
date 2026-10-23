@@ -91,20 +91,42 @@ def decode_routes(data):
     return result
 
 
+def decode_topology(data):
+    """Keep every named block, including mixed-case controls without Name fields.
+
+    Splitting only on uppercase headers merges AutoBlock/ZXJ_Control into the
+    preceding COUPLE record and silently destroys the original station rules.
+    """
+    entries, blocks = {}, []
+    current = None
+    for number, raw in enumerate(data.decode('gb18030').splitlines(), 1):
+        text = raw.split(';', 1)[0].strip()
+        header = re.fullmatch(r'([A-Za-z][A-Za-z0-9_]*_\d+):', text)
+        if header:
+            current = {'id': header[1], 'line': number, 'fields': {}}
+            blocks.append(current)
+        elif current is not None and '=' in text:
+            key, value = text.split('=', 1)
+            current['fields'][key.strip()] = value.strip()
+    for block in blocks:
+        fields = block['fields']
+        if fields.get('Name'):
+            if fields['Name'] in entries:
+                raise ValueError(f'Duplicate topology object: {fields["Name"]}')
+            entries[fields['Name']] = fields
+    return entries, blocks
+
+
 def import_station(source, output, assets):
     files = {name: (source/'SDM'/name).read_bytes() for name in ['SWJDATA.dat', 'Route.txt', 'Code.txt', 'Config.txt']}
     geometry = decode_geometry(files['SWJDATA.dat'])
     topology = (source/'联锁机'/'STADATA.TXT').read_bytes()
-    entries = {}
-    for block in re.split(r'(?m)^\s*[A-Z_]+_\d+:\s*$', topology.decode('gb18030')):
-        fields = dict(re.findall(r'(?m)^\s*(\w+)\s*=\s*([^;\r\n]+)', block))
-        fields = {key: value.strip() for key, value in fields.items()}
-        if fields.get('Name'):
-            entries[fields['Name']] = fields
+    entries, controls = decode_topology(topology)
     package = {'provenance': {'format': 'SDM native station data',
                              'sha256': {name: hashlib.sha256(data).hexdigest() for name, data in files.items()},
                              'topology_sha256': hashlib.sha256(topology).hexdigest()},
                'geometry': geometry, 'routes': decode_routes(files['Route.txt']), 'topology': entries,
+               'topology_blocks': controls,
                'config': files['Config.txt'].decode('gb18030')}
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(package, ensure_ascii=False, indent=2)+'\n', encoding='utf-8', newline='\n')

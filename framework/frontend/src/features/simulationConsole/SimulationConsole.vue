@@ -4,7 +4,7 @@
       <div><p class="eyebrow">COMPUTER BASED INTERLOCKING</p><h1>联锁仿真操作台</h1>
         <p>选择始端与终端办理进路；先按功能按钮，再选择对应设备。红色提示说明操作未通过的原因。</p></div>
       <label class="source-picker">站场<select v-model="source" :disabled="busy || loading" @change="changeSource">
-        <option value="reference">标准站 · 软件复刻</option><option value="workbook">联锁测试站 · 教学数据</option>
+        <option value="reference">标准站 · 原软件独立复刻</option><option value="workbook">独立教学站 · 原有数据</option>
       </select></label>
     </div>
     <div ref="consoleRoot" class="console-shell" v-loading="loading">
@@ -19,7 +19,7 @@
       <div v-if="replaying" class="replay-bar"><strong>只读回放</strong><input v-model.number="replayIndex" type="range" min="0" :max="Math.max(0,replayFrames.length-1)" aria-label="回放时间轴" /><span>{{ replayIndex+1 }} / {{ replayFrames.length }}</span><button @click="closeReplay">结束回放</button></div>
       <div class="console-body"><div v-if="station" class="stage-wrap">
         <ReferenceStationDiagram v-if="source === 'reference'" :station="station" :snapshot="displaySnapshot" :selected="displaySnapshot?.selected_buttons || []" :targeting="pending?.target"
-          @press="pressButton" @inspect="inspectDevice" @group="selectGroup" @signal="selectSignal" @unsupported="notify" />
+          @press="pressButton" @inspect="inspectDevice" @group="selectGroup" @signal="selectSignal" @block="chooseCommand" />
         <StationDiagram v-else :station="station" :snapshot="displaySnapshot" :selected="displaySnapshot?.selected_buttons || []" @press="pressButton" @inspect="inspectDevice" @group="selectGroup" @disabled="notify" />
         <section class="alarm-region" :class="{ alarming: alarms.length }" aria-label="报警信息区" aria-live="polite">
           <header>报警信息 <button @click="acknowledgeAlarms" title="确认已阅读的报警，记录仍保留在回放中">确认</button></header>
@@ -33,12 +33,13 @@
           <p>操纵道岔：先按“总定位 / 总反位 / 单锁 / 单解”，再点道岔编号；双动道岔整组执行。</p>
           <p>总取消、总人解和重开信号：先按功能按钮，再点原进路的始端信号。功能按钮 15 秒未选择目标自动复原。</p>
           <p>带铅封操作须输入教学口令，默认 0000。人工解锁期间信号关闭、锁闭保持，倒计时完成且区段空闲后释放。</p>
-          <p>空闲浅蓝，锁闭白色，占用红色；定位绿色，反位黄色，失表示红闪。区间辅助和未核验功能暂不开放。</p>
-          <p v-if="source === 'reference'">本站提供 {{ station.counts.ready_routes }} 条已交叉核对进路；其余 {{ station.counts.blocked_routes }} 条保留在核对清单中。</p>
+          <p>空闲浅蓝，锁闭白色，占用红色；定位绿色，反位黄色，失表示红闪。</p>
+          <p v-if="source === 'reference'">本站独立使用原软件 {{ station.counts.candidate_routes }} 条进路定义。通过按钮以 TA 标识；同按钮多路径按可用条件选排。引导须先将道岔就位，选择进站始端和接车终端，并每 15 秒内办理引导保持。</p>
+          <p v-if="source === 'reference'">区故解先确认区段恢复空闲，再按功能、输入口令、点击区段。区间请求后，由教师在设备练习中模拟邻站同意。</p>
         </div>
       </div></div>
       <div class="function-region" aria-label="常用功能按钮区">
-        <button v-for="command in COMMANDS" :key="command.label" class="function-button" :class="{ sealed: command.sealed, pressed: pending?.type === command.type && !command.unavailable }"
+        <button v-for="command in visibleCommands" :key="command.label" class="function-button" :class="{ sealed: command.sealed, pressed: pending?.type === command.type && !command.unavailable }"
           :disabled="busy || replaying || stale || !!command.unavailable" :title="command.unavailable || command.label" :aria-pressed="pending?.type === command.type && !command.unavailable" @click="chooseCommand(command)">
           <img :src="`/simulator-reference/menubitmap/${command.icon}.png`" alt="" />{{ command.label }}
         </button>
@@ -52,18 +53,23 @@
       <div><strong>设备练习</strong><span>先在站场点击设备；故障与占用仅教师、管理员可设置。</span></div><p>{{ inspected ? `${inspected.type} ${inspected.name}：${inspectedState}` : '尚未选择设备' }}</p>
       <template v-if="inspected?.type === '道岔' && canControlTrain"><button @click="inject('SET_SWITCH_INDICATION', inspected.name)">设置失表示</button><button @click="inject('RESTORE_SWITCH_INDICATION', inspected.name)">恢复表示</button></template>
       <template v-if="inspected?.type === '区段' && canControlTrain"><button @click="inject('SET_SECTION_OCCUPANCY', inspected.name, { kind:'vehicle' })">车列占用</button><button @click="inject('SET_SECTION_OCCUPANCY', inspected.name, { kind:'fault' })">故障占用</button><button @click="inject('CLEAR_SECTION_OCCUPANCY', inspected.name)">恢复空闲</button></template>
+      <div v-if="source === 'reference'"><p>闭塞采用本地邻站模拟，设备状态与各区间分别保存。</p></div>
+      <div v-for="block in source === 'reference' ? Object.values(displaySnapshot?.blocks || {}) : []" :key="block.signal">
+        <span>{{ block.signal }} · {{ block.phase === 'permitted' ? '已许可' : block.phase === 'idle' ? '未闭塞' : '等待邻站' }}</span>
+        <button v-if="canControlTrain" :disabled="!['requested','awaiting_peer'].includes(block.phase)" @click="inject('BLOCK_PEER_ACCEPT', block.signal)">模拟邻站同意</button>
+      </div>
       <label>新会话区间许可<select v-model="intervalAvailable"><option :value="true">已具备</option><option :value="false">未具备（条件反例）</option></select></label><button @click="newSession" :disabled="busy || replaying">{{ confirmNew ? '确认新建会话' : '新建仿真会话' }}</button>
     </div>
     <section class="activity-panel" v-if="station && showActivity"><div class="activity-heading"><strong>活动进路</strong><span>仅教师或管理员推进仿真车辆；观察占用、信号关闭及正常解锁。</span></div>
       <p v-if="!activeRoutes.length" class="empty-route">暂无活动进路。{{ source === 'reference' ? '调车示例：D3 → D7。' : '接车示例：XNLA → S5LA。' }}</p>
       <div class="route-cards"><div v-for="route in activeRoutes" :key="route.id" class="route-card"><strong>{{ routeName(route.route_id) }}</strong><span>{{ statusText(route) }}</span><button :disabled="busy || replaying || stale || !canControlTrain || ['clearing','manual_unlocking','closed_locked'].includes(route.status)" @click="advance(route.id)">{{ canControlTrain ? '仿真行车 · 推进一步' : '由教师控制仿真行车' }}</button></div></div>
     </section>
-    <section v-if="showRoutes && station" class="route-audit"><div class="activity-heading"><strong>进路与交叉核对</strong><span>可办理 {{ station.counts.ready_routes }} · 待核对 {{ station.counts.blocked_routes }} · 共 {{ station.counts.candidate_routes }}</span></div>
+    <section v-if="showRoutes && station" class="route-audit"><div class="activity-heading"><strong>{{ source === 'reference' ? '原软件进路与来源' : '教学站进路与核对' }}</strong><span>可解析办理 {{ station.counts.ready_routes }} · 数据异常 {{ station.counts.blocked_routes }} · 共 {{ station.counts.candidate_routes }}</span></div>
       <p v-if="!station.routes">学生可在站场自由操作；完整进路条件和核对清单由教师查看。</p>
-      <template v-else><label>查找进路<input v-model="routeQuery" placeholder="如 XD、D3、S5" /></label><div class="audit-scroll"><table><thead><tr><th>进路</th><th>按钮顺序</th><th>状态 / 待核对原因</th></tr></thead><tbody><tr v-for="route in filteredRoutes" :key="route.id"><td>{{ route.name || route.id }}</td><td>{{ route.button_sequence.join(' → ') }}</td><td :class="{ 'audit-blocked':route.status!=='ready' }">{{ route.status === 'ready' ? '可办理' : route.reasons.join('；') }}</td></tr></tbody></table></div></template>
+      <template v-else><label>查找进路<input v-model="routeQuery" placeholder="如 XD、D3、S5" /></label><div class="audit-scroll"><table><thead><tr><th>进路</th><th>按钮顺序</th><th>状态 / 来源</th></tr></thead><tbody><tr v-for="route in filteredRoutes" :key="route.id"><td>{{ route.name || route.id }}</td><td>{{ route.button_sequence.join(' → ') }}</td><td :class="{ 'audit-blocked':route.status!=='ready' }">{{ route.status === 'ready' ? '可办理' : route.reasons.join('；') }}<template v-if="source === 'reference'"> · 原文件第 {{ route.source_row }} 行<span v-for="warning in route.warnings" :key="warning">；{{ warning }}</span></template></td></tr></tbody></table></div></template>
     </section>
     </div>
-    <p class="under-note">显示与操作顺序参照 TB/T 3578—2022；软件复刻站场使用恢复出的设备几何和图片。区故解、引导及区间辅助尚未完成条件核验，当前未开放。会话与最近回放保存在后端内存，重启后需新建会话。</p>
+    <p class="under-note">软件复刻站场独立使用原应用进路、拓扑和资源；其他实验、例题及评分数据保持独立。显示与操作参照 TB/T 3578—2022；区间采用本地邻站模拟。会话与最近回放保存在后端内存，重启后需新建。</p>
   </div>
 </template>
 
@@ -84,6 +90,7 @@ let poller, ticker
 let commandQueue=Promise.resolve()
 const storageKey=computed(()=>`srtp-console-${source.value}-${userStore.user?.id || 'anonymous'}`)
 const canControlTrain=computed(()=>['teacher','admin'].includes(userStore.role))
+const visibleCommands=computed(()=>COMMANDS.filter(c=>!c.referenceOnly || source.value==='reference'))
 const displaySnapshot=computed(()=>replaying.value ? replayFrames.value[replayIndex.value] : snapshot.value)
 const activeRoutes=computed(()=>(displaySnapshot.value?.routes || []).filter(r=>!['released','cancelled'].includes(r.status)))
 const alarms=computed(()=>(displaySnapshot.value?.events || []).filter(e=>e.version>acknowledged.value && (e.kind==='rejected' || ['SET_SWITCH_INDICATION','signal_close'].includes(e.kind))).slice(-8).reverse())
@@ -100,9 +107,9 @@ const inspectedState=computed(()=>{
 })
 const notify=message=>ElMessage.info(message)
 const eventTime=value=>new Date(value).toLocaleTimeString('zh-CN',{hour12:false,timeZone:'Asia/Shanghai'})
-const targetLabel=target=>({switch:'道岔编号',signal:'信号机',route:'原进路始端信号'})[target] || '设备'
+const targetLabel=target=>({switch:'道岔编号',signal:'信号机',route:'原进路始端信号',section:'轨道区段'})[target] || '设备'
 const routeName=id=>station.value?.routes?.find(r=>r.id===id)?.name || id
-function statusText(route){return route.status==='manual_unlocking' ? `人工解锁剩余 ${route.manual_remaining_seconds} 秒` : ({signal_open:'信号开放',approaching:'车辆接近',clearing:'出清，等待正常解锁',closed_locked:'信号关闭，保持锁闭'})[route.status] || '车辆运行'}
+function statusText(route){if(route.cancelled_segments?.length)return `已取消 ${route.cancelled_segments.length} 个基本段，其余保持锁闭`;if(route.mode==='guide' && route.guide_remaining_seconds)return `引导开放，保持剩余 ${route.guide_remaining_seconds} 秒`;return route.status==='manual_unlocking' ? `人工解锁剩余 ${route.manual_remaining_seconds} 秒` : ({signal_open:'信号开放',approaching:'车辆接近',clearing:'出清，等待正常解锁',closed_locked:'信号关闭，保持锁闭'})[route.status] || '车辆运行'}
 function onFullscreenChange(){isFullscreen.value=document.fullscreenElement===consoleRoot.value}
 async function toggleFullscreen(){try{if(isFullscreen.value)await document.exitFullscreen();else await consoleRoot.value?.requestFullscreen()}catch{notify('浏览器未允许全屏，可继续在当前窗口操作')}}
 function clearPending(){pending.value=null;pin.value=''}
@@ -117,13 +124,13 @@ async function changeSource(){clearPending();replaying.value=false;station.value
 async function newSession(){if(!confirmNew.value){confirmNew.value=true;notify('再点一次新建独立会话，旧会话不会被解锁');return}busy.value=true;try{clearPending();await startNewSession()}finally{busy.value=false}}
 function runCommand(action){commandQueue=commandQueue.then(async()=>{if(!snapshot.value || replaying.value || stale.value)return;busy.value=true;try{const response=await action(snapshot.value.session_id,snapshot.value.version);snapshot.value=response.snapshot;if(!response.accepted)ElMessage.warning(response.message)}catch{try{snapshot.value=await getSimulationSnapshot(snapshot.value.session_id);ElMessage.warning('操作未完成，已刷新状态，请重新选择')}catch{stale.value=true}}finally{busy.value=false}});return commandQueue}
 async function pressButton(button){if(pending.value){const signal=station.value.buttons.find(b=>b.name===button)?.signal;if(signal)await selectSignal(signal);return}await runCommand((id,version)=>pressStationButton(id,button,version))}
-async function chooseCommand(command){if(command.unavailable || replaying.value)return;clearPending();if(command.type==='CLEAR_SELECTION'){await runCommand((id,version)=>clearStationSelection(id,version));return}if(command.sealed){pinCommand.value=command;await nextTick();pinInput.value?.focus()}else pending.value={...command,deadline:Date.now()+15000}}
-function confirmPin(){if(!pin.value){notify('请输入教学操作口令');return}pending.value={...pinCommand.value,pin:pin.value,deadline:Date.now()+15000};pin.value='';pinCommand.value=null}
+async function chooseCommand(command){if(command.unavailable || replaying.value)return;clearPending();if(command.type==='CLEAR_SELECTION'){await runCommand((id,version)=>clearStationSelection(id,version));return}if(command.sealed){pinCommand.value=command;await nextTick();pinInput.value?.focus()}else{pending.value={...command,deadline:Date.now()+15000};if(command.fixedTarget)await executeTarget(command.fixedTarget)}}
+function confirmPin(){if(!pin.value){notify('请输入教学操作口令');return}const target=pinCommand.value.fixedTarget;pending.value={...pinCommand.value,pin:pin.value,deadline:Date.now()+15000};pin.value='';pinCommand.value=null;if(target)executeTarget(target)}
 function cancelPin(){pinCommand.value=null;pin.value='';clearPending()}
-async function executeTarget(target){const command=pending.value;if(!command)return;if(command.deadline<=Date.now()){clearPending();return}clearPending();await runCommand((id,version)=>operateConsole(id,{type:command.type,target,pin:command.pin},version))}
+async function executeTarget(target,payload={}){const command=pending.value;if(!command)return;if(command.deadline<=Date.now()){clearPending();return}clearPending();await runCommand((id,version)=>operateConsole(id,{type:command.type,target,pin:command.pin,payload},version))}
 async function selectGroup(id){if(pending.value?.target==='switch')await executeTarget(id);else if(pending.value)notify(`请点击${targetLabel(pending.value.target)}`)}
-async function selectSignal(name){if(!pending.value)return;if(pending.value.target==='signal'){await executeTarget(name);return}if(pending.value.target==='route'){const route=activeRoutes.value.find(r=>r.signal===name);if(route)await executeTarget(route.id);else notify(`${name} 没有仍锁闭的原进路`)}else notify('请点击道岔编号')}
-function inspectDevice(type,name,state){inspected.value={type,name,state};if(source.value==='workbook' && type==='信号机' && pending.value)selectSignal(name);if(source.value==='workbook' && type==='道岔' && pending.value?.target==='switch')selectGroup(name)}
+async function selectSignal(name){if(!pending.value)return;if(pending.value.target==='signal'){await executeTarget(name);return}if(pending.value.target==='route'){const route=activeRoutes.value.find(r=>r.signal===name || r.segment_signals?.includes(name));if(route)await executeTarget(route.id,{signal:name});else notify(`${name} 没有仍锁闭的原进路`)}else notify(`请点击${targetLabel(pending.value.target)}`)}
+function inspectDevice(type,name,state){inspected.value={type,name,state};if(type==='区段' && pending.value?.target==='section'){executeTarget(name);return}if(source.value==='workbook' && type==='信号机' && pending.value)selectSignal(name);if(source.value==='workbook' && type==='道岔' && pending.value?.target==='switch')selectGroup(name)}
 async function inject(type,target,payload={}){await runCommand((id,version)=>operateConsole(id,{type,target,payload},version))}
 async function advance(instance){await runCommand((id,version)=>advanceSimulationTrain(id,instance,version))}
 function acknowledgeAlarms(){acknowledged.value=displaySnapshot.value?.version || 0}

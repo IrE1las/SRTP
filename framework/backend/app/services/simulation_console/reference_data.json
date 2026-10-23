@@ -8701,47 +8701,2089 @@
       "ZCJType": "0",
       "GJJType": "0"
     },
-    "SemiBlock_XD": {
-      "Name": "SemiBlock_XD",
+    "COPD18": {
+      "Name": "COPD18",
       "ASide": "D18",
       "BSide": "0XFFFF",
       "Type": "0X11",
       "KeepWagon": "0X68",
       "Section": "D18G",
       "ZCJType": "0",
-      "GJJType": "0",
-      "Signal": "XD",
+      "GJJType": "0"
+    },
+    "AutoBlock_X": {
+      "Name": "AutoBlock_X",
+      "Signal": "X",
       "Throat": "0x1",
-      "REVERSE": "0",
-      "StartSignal": "SF",
-      "EndSignal": "X",
-      "PointNumber": "0x4",
-      "OwnSignal": "X5",
-      "Condition": "0",
-      "ConditionType": "0",
-      "ConditionValue": "0",
-      "OutputIndex": "0x82",
-      "Condition_1": "0X0b",
-      "ConditionChar_1": "0",
-      "Condition_2": "0",
-      "ConditionChar_2": "0",
-      "Condition_3": "0",
-      "ConditionChar_3": "0",
-      "ConditionType_1": "0",
-      "ConditionValue_1": "0x0b",
-      "ConditionType_2": "0",
-      "ConditionValue_2": "0",
-      "ConditionType_3": "0",
-      "ConditionValue_3": "0",
-      "Character": "0x66",
-      "Entry": "XZ",
-      "Exit": "D102",
-      "PointNum": "0X2",
-      "Point1": "C104",
-      "Position1": "0X18",
-      "Point2": "C102",
-      "Position2": "0X81"
+      "REVERSE": "1"
+    },
+    "AutoBlock_XF": {
+      "Name": "AutoBlock_XF",
+      "Signal": "XF",
+      "Throat": "0x1",
+      "REVERSE": "0"
+    },
+    "AutoBlock_S": {
+      "Name": "AutoBlock_S",
+      "Signal": "S",
+      "Throat": "0x2",
+      "REVERSE": "1"
+    },
+    "AutoBlock_SF": {
+      "Name": "AutoBlock_SF",
+      "Signal": "SF",
+      "Throat": "0x2",
+      "REVERSE": "0"
+    },
+    "SemiBlock_XD": {
+      "Name": "SemiBlock_XD",
+      "Signal": "XD",
+      "Throat": "0x1"
     }
   },
+  "topology_blocks": [
+    {
+      "id": "SIGNAL_1",
+      "line": 3,
+      "fields": {
+        "Name": "D1",
+        "ASide": "IIAG",
+        "BSide": "DG1",
+        "SignalType": "0X0024",
+        "Direction": "0X3C",
+        "Throat": "0x1",
+        "ProLongFilament": "0",
+        "ApproachSection": "IIAG",
+        "TrainRouteExit": "0",
+        "RJDelay": "30",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_2",
+      "line": 18,
+      "fields": {
+        "Name": "D3",
+        "ASide": "IAG",
+        "BSide": "DG5",
+        "SignalType": "0X0024",
+        "Direction": "0X3C",
+        "Throat": "0x1",
+        "ProLongFilament": "0",
+        "ApproachSection": "IAG",
+        "TrainRouteExit": "0",
+        "RJDelay": "30",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_3",
+      "line": 33,
+      "fields": {
+        "Name": "D5",
+        "ASide": "WG1-19",
+        "BSide": "C1",
+        "SignalType": "0X0058",
+        "Direction": "0XE2",
+        "Throat": "0x1",
+        "ProLongFilament": "0",
+        "ApproachSection": "WG1-19",
+        "TrainRouteExit": "0",
+        "RJDelay": "30",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_4",
+      "line": 48,
+      "fields": {
+        "Name": "D7",
+        "ASide": "D9",
+        "BSide": "DG3",
+        "SignalType": "0X0012",
+        "Direction": "0XE2",
+        "Throat": "0x1",
+        "ProLongFilament": "0",
+        "ApproachSection": "DG9-15",
+        "TrainRouteExit": "0",
+        "RJDelay": "30",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_5",
+      "line": 63,
+      "fields": {
+        "Name": "D9",
+        "ASide": "D7",
+        "BSide": "C15",
+        "SignalType": "0X0012",
+        "Direction": "0X3C",
+        "Throat": "0x1",
+        "ProLongFilament": "0",
+        "ApproachSection": "DG3",
+        "TrainRouteExit": "0",
+        "RJDelay": "30",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_6",
+      "line": 78,
+      "fields": {
+        "Name": "D11",
+        "ASide": "DG7",
+        "BSide": "C11",
+        "SignalType": "0X0024",
+        "Direction": "0X3C",
+        "Throat": "0x1",
+        "ProLongFilament": "0",
+        "ApproachSection": "DG7",
+        "TrainRouteExit": "0",
+        "RJDelay": "30",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_7",
+      "line": 93,
+      "fields": {
+        "Name": "D13",
+        "ASide": "C9",
+        "BSide": "DG17-23",
+        "SignalType": "0X0024",
+        "Direction": "0X3C",
+        "Throat": "0x1",
+        "ProLongFilament": "0",
+        "ApproachSection": "DG9-15",
+        "TrainRouteExit": "0",
+        "RJDelay": "30",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_8",
+      "line": 108,
+      "fields": {
+        "Name": "D15",
+        "ASide": "WG1-19",
+        "BSide": "C19",
+        "SignalType": "0X0058",
+        "Direction": "0X3C",
+        "Throat": "0x1",
+        "ProLongFilament": "0",
+        "ApproachSection": "WG1-19",
+        "TrainRouteExit": "0",
+        "RJDelay": "30",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_9",
+      "line": 123,
+      "fields": {
+        "Name": "D2",
+        "ASide": "COPD2",
+        "BSide": "DG2",
+        "SignalType": "0X0068",
+        "Direction": "0XE2",
+        "Throat": "0x2",
+        "ProLongFilament": "0",
+        "ApproachSection": "D2G",
+        "TrainRouteExit": "0",
+        "RJDelay": "30",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_10",
+      "line": 139,
+      "fields": {
+        "Name": "D4",
+        "ASide": "WG2-20",
+        "BSide": "C2",
+        "SignalType": "0X0058",
+        "Direction": "0X3C",
+        "Throat": "0x2",
+        "ProLongFilament": "0",
+        "ApproachSection": "WG2-20",
+        "TrainRouteExit": "0",
+        "RJDelay": "30",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_11",
+      "line": 154,
+      "fields": {
+        "Name": "D6",
+        "ASide": "IIBG",
+        "BSide": "C12",
+        "SignalType": "0X0024",
+        "Direction": "0XE2",
+        "Throat": "0x2",
+        "ProLongFilament": "0",
+        "ApproachSection": "IIBG",
+        "TrainRouteExit": "0",
+        "RJDelay": "30",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_12",
+      "line": 169,
+      "fields": {
+        "Name": "D8",
+        "ASide": "DG4",
+        "BSide": "C8",
+        "SignalType": "0X0024",
+        "Direction": "0XE2",
+        "Throat": "0x2",
+        "ProLongFilament": "0",
+        "ApproachSection": "DG4",
+        "TrainRouteExit": "0",
+        "RJDelay": "30",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_13",
+      "line": 185,
+      "fields": {
+        "Name": "D10",
+        "ASide": "D12",
+        "BSide": "C10",
+        "SignalType": "0X0012",
+        "Direction": "0X3C",
+        "Throat": "0x2",
+        "ProLongFilament": "0",
+        "ApproachSection": "DG16-18",
+        "TrainRouteExit": "0",
+        "RJDelay": "30",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_14",
+      "line": 201,
+      "fields": {
+        "Name": "D12",
+        "ASide": "D10",
+        "BSide": "DG16-18",
+        "SignalType": "0X0012",
+        "Direction": "0XE2",
+        "Throat": "0x2",
+        "ProLongFilament": "0",
+        "ApproachSection": "DG8-10",
+        "TrainRouteExit": "0",
+        "RJDelay": "30",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_15",
+      "line": 216,
+      "fields": {
+        "Name": "D14",
+        "ASide": "WG2-20",
+        "BSide": "C20",
+        "SignalType": "0X0058",
+        "Direction": "0XE2",
+        "Throat": "0x2",
+        "ProLongFilament": "0",
+        "ApproachSection": "WG2-20",
+        "TrainRouteExit": "0",
+        "RJDelay": "30",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_16",
+      "line": 232,
+      "fields": {
+        "Name": "D16",
+        "ASide": "DG20",
+        "BSide": "DG22",
+        "SignalType": "0X0024",
+        "Direction": "0XE2",
+        "Throat": "0x2",
+        "ProLongFilament": "0",
+        "ApproachSection": "DG20",
+        "TrainRouteExit": "0",
+        "RJDelay": "30",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_17",
+      "line": 247,
+      "fields": {
+        "Name": "D18",
+        "ASide": "COPD18",
+        "BSide": "C22",
+        "SignalType": "0X0068",
+        "Direction": "0X3C",
+        "Throat": "0x2",
+        "ProLongFilament": "0",
+        "ApproachSection": "D18G",
+        "TrainRouteExit": "0",
+        "RJDelay": "30",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_18",
+      "line": 264,
+      "fields": {
+        "Name": "SI",
+        "ASide": "GI",
+        "BSide": "C23",
+        "SignalType": "0X5328",
+        "Direction": "0XE2",
+        "Throat": "0x1",
+        "ProLongFilament": "0XFF",
+        "ApproachSection": "GI",
+        "TrainRouteExit": "0",
+        "RJDelay": "180",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_19",
+      "line": 280,
+      "fields": {
+        "Name": "SII",
+        "ASide": "GII",
+        "BSide": "C27",
+        "SignalType": "0X5328",
+        "Direction": "0XE2",
+        "Throat": "0x1",
+        "ProLongFilament": "0XFF",
+        "ApproachSection": "GII",
+        "TrainRouteExit": "0",
+        "RJDelay": "180",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_20",
+      "line": 295,
+      "fields": {
+        "Name": "SIII",
+        "ASide": "GIII",
+        "BSide": "DG25",
+        "SignalType": "0X5328",
+        "Direction": "0XE2",
+        "Throat": "0x1",
+        "ProLongFilament": "0XFF",
+        "ApproachSection": "GIII",
+        "TrainRouteExit": "0",
+        "RJDelay": "180",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_21",
+      "line": 310,
+      "fields": {
+        "Name": "S4",
+        "ASide": "G4",
+        "BSide": "C27",
+        "SignalType": "0x5328",
+        "Direction": "0XE2",
+        "Throat": "0x1",
+        "ProLongFilament": "0",
+        "ApproachSection": "G4",
+        "TrainRouteExit": "0",
+        "RJDelay": "30",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_22",
+      "line": 326,
+      "fields": {
+        "Name": "S5",
+        "ASide": "G5",
+        "BSide": "C21FCX",
+        "SignalType": "0x5328",
+        "Direction": "0XE2",
+        "Throat": "0x1",
+        "ProLongFilament": "0",
+        "ApproachSection": "G5",
+        "TrainRouteExit": "0",
+        "RJDelay": "30",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_23",
+      "line": 341,
+      "fields": {
+        "Name": "XD",
+        "ASide": "COPXD",
+        "BSide": "C7",
+        "SignalType": "0X5D68",
+        "Direction": "0X3C",
+        "Throat": "0x1",
+        "ProLongFilament": "0",
+        "ApproachSection": "YXDG",
+        "TrainRouteExit": "0",
+        "RJDelay": "180",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0x11D",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_24",
+      "line": 356,
+      "fields": {
+        "Name": "X",
+        "ASide": "COPX",
+        "BSide": "IAG",
+        "SignalType": "0X5D68",
+        "Direction": "0X3C",
+        "Throat": "0x1",
+        "ProLongFilament": "0",
+        "ApproachSection": "YXG",
+        "TrainRouteExit": "0",
+        "RJDelay": "180",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0x11B",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_25",
+      "line": 371,
+      "fields": {
+        "Name": "XF",
+        "ASide": "COPXF",
+        "BSide": "IIAG",
+        "SignalType": "0X5D68",
+        "Direction": "0X3C",
+        "Throat": "0x1",
+        "ProLongFilament": "0",
+        "ApproachSection": "YXFG",
+        "TrainRouteExit": "0",
+        "RJDelay": "180",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0x11D",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_26",
+      "line": 387,
+      "fields": {
+        "Name": "XI",
+        "ASide": "GI",
+        "BSide": "C18ADD",
+        "SignalType": "0X5328",
+        "Direction": "0X3C",
+        "Throat": "0x2",
+        "ProLongFilament": "0XFF",
+        "ApproachSection": "GI",
+        "TrainRouteExit": "0",
+        "RJDelay": "180",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_27",
+      "line": 402,
+      "fields": {
+        "Name": "XII",
+        "ASide": "GII",
+        "BSide": "C14",
+        "SignalType": "0X5328",
+        "Direction": "0X3C",
+        "Throat": "0x2",
+        "ProLongFilament": "0XFF",
+        "ApproachSection": "GII",
+        "TrainRouteExit": "0",
+        "RJDelay": "180",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_28",
+      "line": 418,
+      "fields": {
+        "Name": "XIII",
+        "ASide": "GIII",
+        "BSide": "C18",
+        "SignalType": "0x5328",
+        "Direction": "0X3C",
+        "Throat": "0x2",
+        "ProLongFilament": "0XFF",
+        "ApproachSection": "GIII",
+        "TrainRouteExit": "0",
+        "RJDelay": "30",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_29",
+      "line": 434,
+      "fields": {
+        "Name": "X4",
+        "ASide": "G4",
+        "BSide": "C14",
+        "SignalType": "0x5328",
+        "Direction": "0X3C",
+        "Throat": "0x2",
+        "ProLongFilament": "0",
+        "ApproachSection": "G4",
+        "TrainRouteExit": "0",
+        "RJDelay": "30",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_30",
+      "line": 450,
+      "fields": {
+        "Name": "X5",
+        "ASide": "G5",
+        "BSide": "C22",
+        "SignalType": "0x5328",
+        "Direction": "0X3C",
+        "Throat": "0x2",
+        "ProLongFilament": "0",
+        "ApproachSection": "G5",
+        "TrainRouteExit": "0",
+        "RJDelay": "30",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_31",
+      "line": 465,
+      "fields": {
+        "Name": "SF",
+        "ASide": "COPSF",
+        "BSide": "C4",
+        "SignalType": "0X5D68",
+        "Direction": "0XE2",
+        "Throat": "0x2",
+        "ProLongFilament": "0",
+        "ApproachSection": "YSFG",
+        "TrainRouteExit": "0",
+        "RJDelay": "180",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0x11F",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "SIGNAL_32",
+      "line": 481,
+      "fields": {
+        "Name": "S",
+        "ASide": "COPS",
+        "BSide": "IIBG",
+        "SignalType": "0X5D68",
+        "Direction": "0XE2",
+        "Throat": "0x2",
+        "ProLongFilament": "0",
+        "ApproachSection": "YSG",
+        "TrainRouteExit": "0",
+        "RJDelay": "180",
+        "TrackPoint": "0",
+        "CoupleBlockTrain": "0x121",
+        "CoupleBlockShunt": "0"
+      }
+    },
+    {
+      "id": "POINT_1",
+      "line": 497,
+      "fields": {
+        "Name": "C1",
+        "ASide": "DG1",
+        "BSide": "D5",
+        "CSide": "C3FCX",
+        "Direction": "0XE2",
+        "CouplePoint": "C3",
+        "Section": "DG1",
+        "MainLinePoint": "0X18",
+        "TrackPoint": "0",
+        "Throat": "0x1"
+      }
+    },
+    {
+      "id": "POINT_2",
+      "line": 510,
+      "fields": {
+        "Name": "C3",
+        "ASide": "DG3",
+        "BSide": "C5",
+        "CSide": "C3FCX",
+        "Direction": "0X3C",
+        "CouplePoint": "C1",
+        "Section": "DG3",
+        "MainLinePoint": "0X18",
+        "TrackPoint": "0",
+        "Throat": "0x1"
+      }
+    },
+    {
+      "id": "POINT_3",
+      "line": 522,
+      "fields": {
+        "Name": "C5",
+        "ASide": "DG5",
+        "BSide": "C3",
+        "CSide": "C5FCX",
+        "Direction": "0XE2",
+        "CouplePoint": "C7",
+        "Section": "DG5",
+        "MainLinePoint": "0X18",
+        "TrackPoint": "0",
+        "Throat": "0x1"
+      }
+    },
+    {
+      "id": "POINT_4",
+      "line": 534,
+      "fields": {
+        "Name": "C7",
+        "ASide": "DG7",
+        "BSide": "XD",
+        "CSide": "C5FCX",
+        "Direction": "0X3C",
+        "CouplePoint": "C5",
+        "Section": "DG7",
+        "MainLinePoint": "0X18",
+        "TrackPoint": "0",
+        "Throat": "0x1"
+      }
+    },
+    {
+      "id": "POINT_5",
+      "line": 546,
+      "fields": {
+        "Name": "C9",
+        "ASide": "DG9-15",
+        "BSide": "D13",
+        "CSide": "C11",
+        "Direction": "0XE2",
+        "CouplePoint": "C11",
+        "Section": "DG9-15",
+        "MainLinePoint": "0X18",
+        "TrackPoint": "0",
+        "Throat": "0x1"
+      }
+    },
+    {
+      "id": "POINT_6",
+      "line": 558,
+      "fields": {
+        "Name": "C11",
+        "ASide": "DG11-13",
+        "BSide": "D11",
+        "CSide": "C9",
+        "Direction": "0X3C",
+        "CouplePoint": "C9",
+        "Section": "DG11-13",
+        "MainLinePoint": "0X18",
+        "TrackPoint": "0",
+        "Throat": "0x1"
+      }
+    },
+    {
+      "id": "POINT_7",
+      "line": 570,
+      "fields": {
+        "Name": "C13",
+        "ASide": "DG11-13",
+        "BSide": "DG21",
+        "CSide": "C15",
+        "Direction": "0XE2",
+        "CouplePoint": "C15",
+        "Section": "DG11-13",
+        "MainLinePoint": "0X18",
+        "TrackPoint": "0",
+        "Throat": "0x1"
+      }
+    },
+    {
+      "id": "POINT_8",
+      "line": 582,
+      "fields": {
+        "Name": "C15",
+        "ASide": "DG9-15",
+        "BSide": "D9",
+        "CSide": "C13",
+        "Direction": "0X3C",
+        "CouplePoint": "C13",
+        "Section": "DG9-15",
+        "MainLinePoint": "0X18",
+        "TrackPoint": "0",
+        "Throat": "0x1"
+      }
+    },
+    {
+      "id": "POINT_9",
+      "line": 594,
+      "fields": {
+        "Name": "C17",
+        "ASide": "DG17-23",
+        "BSide": "C23",
+        "CSide": "C23ADD",
+        "Direction": "0XE2",
+        "CouplePoint": "C19",
+        "Section": "DG17-23",
+        "MainLinePoint": "0X18",
+        "TrackPoint": "0",
+        "Throat": "0x1"
+      }
+    },
+    {
+      "id": "POINT_10",
+      "line": 607,
+      "fields": {
+        "Name": "C19",
+        "ASide": "DG19-27",
+        "BSide": "D15",
+        "CSide": "C23ADD",
+        "Direction": "0X3C",
+        "CouplePoint": "C17",
+        "Section": "DG19-27",
+        "MainLinePoint": "0X18",
+        "TrackPoint": "0",
+        "Throat": "0x1"
+      }
+    },
+    {
+      "id": "POINT_11",
+      "line": 619,
+      "fields": {
+        "Name": "C21",
+        "ASide": "DG21",
+        "BSide": "C25",
+        "CSide": "C21FCX",
+        "Direction": "0XE2",
+        "CouplePoint": "0",
+        "Section": "DG21",
+        "MainLinePoint": "0X18",
+        "TrackPoint": "0",
+        "Throat": "0x1"
+      }
+    },
+    {
+      "id": "POINT_12",
+      "line": 631,
+      "fields": {
+        "Name": "C23",
+        "ASide": "C17",
+        "BSide": "SI",
+        "CSide": "C25FCX",
+        "Direction": "0XE2",
+        "CouplePoint": "C25",
+        "Section": "DG17-23",
+        "MainLinePoint": "0X18",
+        "TrackPoint": "0",
+        "Throat": "0x1"
+      }
+    },
+    {
+      "id": "POINT_13",
+      "line": 643,
+      "fields": {
+        "Name": "C25",
+        "ASide": "DG25",
+        "BSide": "C21",
+        "CSide": "C25FCX",
+        "Direction": "0X3C",
+        "CouplePoint": "C23",
+        "Section": "DG25",
+        "MainLinePoint": "0X18",
+        "TrackPoint": "0",
+        "Throat": "0x1"
+      }
+    },
+    {
+      "id": "POINT_14",
+      "line": 655,
+      "fields": {
+        "Name": "C27",
+        "ASide": "DG19-27",
+        "BSide": "SII",
+        "CSide": "S4",
+        "Direction": "0XE2",
+        "CouplePoint": "0",
+        "Section": "DG19-27",
+        "MainLinePoint": "0X18",
+        "TrackPoint": "0",
+        "Throat": "0x1"
+      }
+    },
+    {
+      "id": "POINT_15",
+      "line": 667,
+      "fields": {
+        "Name": "C2",
+        "ASide": "DG2",
+        "BSide": "D4",
+        "CSide": "C4",
+        "Direction": "0X3C",
+        "CouplePoint": "C4",
+        "Section": "DG2",
+        "MainLinePoint": "0",
+        "TrackPoint": "0",
+        "Throat": "0x2"
+      }
+    },
+    {
+      "id": "POINT_16",
+      "line": 679,
+      "fields": {
+        "Name": "C4",
+        "ASide": "DG4",
+        "BSide": "SF",
+        "CSide": "C2",
+        "Direction": "0XE2",
+        "CouplePoint": "C2",
+        "Section": "DG4",
+        "MainLinePoint": "0X18",
+        "TrackPoint": "0",
+        "Throat": "0x2"
+      }
+    },
+    {
+      "id": "POINT_17",
+      "line": 691,
+      "fields": {
+        "Name": "C6",
+        "ASide": "DG6-12",
+        "BSide": "DG14",
+        "CSide": "C8",
+        "Direction": "0X3C",
+        "CouplePoint": "C8",
+        "Section": "DG6-12",
+        "MainLinePoint": "0X18",
+        "TrackPoint": "0",
+        "Throat": "0x2"
+      }
+    },
+    {
+      "id": "POINT_18",
+      "line": 703,
+      "fields": {
+        "Name": "C8",
+        "ASide": "DG8-10",
+        "BSide": "D8",
+        "CSide": "C6",
+        "Direction": "0XE2",
+        "CouplePoint": "C6",
+        "Section": "DG8-10",
+        "MainLinePoint": "0X18",
+        "TrackPoint": "0",
+        "Throat": "0x2"
+      }
+    },
+    {
+      "id": "POINT_19",
+      "line": 715,
+      "fields": {
+        "Name": "C10",
+        "ASide": "DG8-10",
+        "BSide": "D10",
+        "CSide": "C12",
+        "Direction": "0X3C",
+        "CouplePoint": "C12",
+        "Section": "DG8-10",
+        "MainLinePoint": "0X18",
+        "TrackPoint": "0",
+        "Throat": "0x2"
+      }
+    },
+    {
+      "id": "POINT_20",
+      "line": 727,
+      "fields": {
+        "Name": "C12",
+        "ASide": "DG6-12",
+        "BSide": "D6",
+        "CSide": "C10",
+        "Direction": "0XE2",
+        "CouplePoint": "C10",
+        "Section": "DG6-12",
+        "MainLinePoint": "0X18",
+        "TrackPoint": "0",
+        "Throat": "0x2"
+      }
+    },
+    {
+      "id": "POINT_21",
+      "line": 739,
+      "fields": {
+        "Name": "C14",
+        "ASide": "DG14",
+        "BSide": "XII",
+        "CSide": "X4",
+        "Direction": "0X3C",
+        "CouplePoint": "0",
+        "Section": "DG14",
+        "MainLinePoint": "0X18",
+        "TrackPoint": "0",
+        "Throat": "0x2"
+      }
+    },
+    {
+      "id": "POINT_22",
+      "line": 751,
+      "fields": {
+        "Name": "C16",
+        "ASide": "DG16-18",
+        "BSide": "C18ADD",
+        "CSide": "C18",
+        "Direction": "0X3C",
+        "CouplePoint": "0",
+        "Section": "DG16-18",
+        "MainLinePoint": "0X18",
+        "TrackPoint": "0",
+        "Throat": "0x2"
+      }
+    },
+    {
+      "id": "POINT_23",
+      "line": 763,
+      "fields": {
+        "Name": "C18",
+        "ASide": "C16",
+        "BSide": "XIII",
+        "CSide": "C20",
+        "Direction": "0X3C",
+        "CouplePoint": "C20",
+        "Section": "DG16-18",
+        "MainLinePoint": "0X18",
+        "TrackPoint": "0",
+        "Throat": "0x2"
+      }
+    },
+    {
+      "id": "POINT_24",
+      "line": 775,
+      "fields": {
+        "Name": "C20",
+        "ASide": "DG20",
+        "BSide": "D14",
+        "CSide": "C18",
+        "Direction": "0XE2",
+        "CouplePoint": "C18",
+        "Section": "DG20",
+        "MainLinePoint": "0",
+        "TrackPoint": "0",
+        "Throat": "0x2"
+      }
+    },
+    {
+      "id": "POINT_25",
+      "line": 787,
+      "fields": {
+        "Name": "C22",
+        "ASide": "DG22",
+        "BSide": "X5",
+        "CSide": "D18",
+        "Direction": "0X3C",
+        "CouplePoint": "0",
+        "Section": "DG22",
+        "MainLinePoint": "0",
+        "TrackPoint": "0",
+        "Throat": "0x2"
+      }
+    },
+    {
+      "id": "TRACK_1",
+      "line": 799,
+      "fields": {
+        "Name": "DG1",
+        "ASide": "C1",
+        "BSide": "D1",
+        "TrackType": "0",
+        "PowerThroat": "0X11",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_2",
+      "line": 809,
+      "fields": {
+        "Name": "DG3",
+        "ASide": "D7",
+        "BSide": "C3",
+        "TrackType": "0",
+        "PowerThroat": "0X11",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_3",
+      "line": 818,
+      "fields": {
+        "Name": "DG5",
+        "ASide": "C5",
+        "BSide": "D3",
+        "TrackType": "0",
+        "PowerThroat": "0X11",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_4",
+      "line": 827,
+      "fields": {
+        "Name": "DG7",
+        "ASide": "D11",
+        "BSide": "C7",
+        "TrackType": "0",
+        "PowerThroat": "0X11",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_5",
+      "line": 836,
+      "fields": {
+        "Name": "DG11-13",
+        "ASide": "C13",
+        "BSide": "C11",
+        "TrackType": "0",
+        "PowerThroat": "0X11",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_6",
+      "line": 845,
+      "fields": {
+        "Name": "DG9-15",
+        "ASide": "C9",
+        "BSide": "C15",
+        "TrackType": "0",
+        "PowerThroat": "0X11",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_7",
+      "line": 854,
+      "fields": {
+        "Name": "DG21",
+        "ASide": "C21",
+        "BSide": "C13",
+        "TrackType": "0",
+        "PowerThroat": "0X11",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_8",
+      "line": 864,
+      "fields": {
+        "Name": "DG17-23",
+        "ASide": "C17",
+        "BSide": "D13",
+        "TrackType": "0",
+        "PowerThroat": "0X11",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_9",
+      "line": 873,
+      "fields": {
+        "Name": "DG19-27",
+        "ASide": "C27",
+        "BSide": "C19",
+        "TrackType": "0",
+        "PowerThroat": "0X11",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_10",
+      "line": 882,
+      "fields": {
+        "Name": "DG25",
+        "ASide": "SIII",
+        "BSide": "C25",
+        "TrackType": "0",
+        "PowerThroat": "0X11",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_11",
+      "line": 891,
+      "fields": {
+        "Name": "DG2",
+        "ASide": "D2",
+        "BSide": "C2",
+        "TrackType": "0",
+        "PowerThroat": "0X22",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_12",
+      "line": 901,
+      "fields": {
+        "Name": "DG4",
+        "ASide": "C4",
+        "BSide": "D8",
+        "TrackType": "0",
+        "PowerThroat": "0X22",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_13",
+      "line": 910,
+      "fields": {
+        "Name": "DG8-10",
+        "ASide": "C8",
+        "BSide": "C10",
+        "TrackType": "0",
+        "PowerThroat": "0X22",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_14",
+      "line": 920,
+      "fields": {
+        "Name": "DG6-12",
+        "ASide": "C12",
+        "BSide": "C6",
+        "TrackType": "0",
+        "PowerThroat": "0X22",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_15",
+      "line": 930,
+      "fields": {
+        "Name": "DG14",
+        "ASide": "C6",
+        "BSide": "C14",
+        "TrackType": "0",
+        "PowerThroat": "0X22",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_16",
+      "line": 940,
+      "fields": {
+        "Name": "DG16-18",
+        "ASide": "D12",
+        "BSide": "C16",
+        "TrackType": "0",
+        "PowerThroat": "0X22",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_17",
+      "line": 950,
+      "fields": {
+        "Name": "DG20",
+        "ASide": "C20",
+        "BSide": "D16",
+        "TrackType": "0",
+        "PowerThroat": "0X22",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_18",
+      "line": 959,
+      "fields": {
+        "Name": "DG22",
+        "ASide": "D16",
+        "BSide": "C22",
+        "TrackType": "0",
+        "PowerThroat": "0X22",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_19",
+      "line": 968,
+      "fields": {
+        "Name": "GI",
+        "ASide": "XI",
+        "BSide": "SI",
+        "TrackType": "0X49",
+        "PowerThroat": "0X10",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_20",
+      "line": 978,
+      "fields": {
+        "Name": "GII",
+        "ASide": "XII",
+        "BSide": "SII",
+        "TrackType": "0X49",
+        "PowerThroat": "0X10",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_21",
+      "line": 988,
+      "fields": {
+        "Name": "GIII",
+        "ASide": "XIII",
+        "BSide": "SIII",
+        "TrackType": "0X49",
+        "PowerThroat": "0X10",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_22",
+      "line": 998,
+      "fields": {
+        "Name": "G4",
+        "ASide": "X4",
+        "BSide": "S4",
+        "TrackType": "0X49",
+        "PowerThroat": "0X10",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_23",
+      "line": 1008,
+      "fields": {
+        "Name": "G5",
+        "ASide": "X5",
+        "BSide": "S5",
+        "TrackType": "0X49",
+        "PowerThroat": "0X10",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_24",
+      "line": 1017,
+      "fields": {
+        "Name": "YXDG",
+        "ASide": "XD",
+        "BSide": "0XFFFF",
+        "TrackType": "0X89",
+        "PowerThroat": "0X11",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_25",
+      "line": 1026,
+      "fields": {
+        "Name": "IAG",
+        "ASide": "D3",
+        "BSide": "X",
+        "TrackType": "0X59",
+        "PowerThroat": "0X11",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_26",
+      "line": 1035,
+      "fields": {
+        "Name": "IIAG",
+        "ASide": "D1",
+        "BSide": "XF",
+        "TrackType": "0X59",
+        "PowerThroat": "0X11",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_27",
+      "line": 1044,
+      "fields": {
+        "Name": "WG1-19",
+        "ASide": "D15",
+        "BSide": "D5",
+        "TrackType": "0X59",
+        "PowerThroat": "0X11",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_28",
+      "line": 1053,
+      "fields": {
+        "Name": "WG2-20",
+        "ASide": "D4",
+        "BSide": "D14",
+        "TrackType": "0X59",
+        "PowerThroat": "0X22",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_29",
+      "line": 1063,
+      "fields": {
+        "Name": "D2G",
+        "ASide": "D2",
+        "BSide": "0XFFFF",
+        "TrackType": "0X89",
+        "PowerThroat": "0X22",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_30",
+      "line": 1073,
+      "fields": {
+        "Name": "IIBG",
+        "ASide": "S",
+        "BSide": "D6",
+        "TrackType": "0X59",
+        "PowerThroat": "0X22",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_31",
+      "line": 1082,
+      "fields": {
+        "Name": "YXG",
+        "ASide": "X",
+        "BSide": "0XFFFF",
+        "TrackType": "0X89",
+        "PowerThroat": "0X11",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_32",
+      "line": 1091,
+      "fields": {
+        "Name": "YXFG",
+        "ASide": "XF",
+        "BSide": "0XFFFF",
+        "TrackType": "0X89",
+        "PowerThroat": "0X11",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_33",
+      "line": 1101,
+      "fields": {
+        "Name": "YSFG",
+        "ASide": "SF",
+        "BSide": "0XFFFF",
+        "TrackType": "0X89",
+        "PowerThroat": "0X22",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_34",
+      "line": 1110,
+      "fields": {
+        "Name": "YSG",
+        "ASide": "S",
+        "BSide": "0XFFFF",
+        "TrackType": "0X89",
+        "PowerThroat": "0X22",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "TRACK_35",
+      "line": 1120,
+      "fields": {
+        "Name": "D18G",
+        "ASide": "D18",
+        "BSide": "0xFFFF",
+        "TrackType": "0X89",
+        "PowerThroat": "0X22",
+        "TrackSpecial": "0",
+        "SmallSectionNum": "0x1"
+      }
+    },
+    {
+      "id": "ADD_1",
+      "line": 1130,
+      "fields": {
+        "Name": "C23ADD",
+        "ASide": "C19",
+        "BSide": "C17",
+        "AddType": "0",
+        "AddPoint": "C23",
+        "Demand": "0x18",
+        "MainPoint": "C23"
+      }
+    },
+    {
+      "id": "ADD_2",
+      "line": 1139,
+      "fields": {
+        "Name": "C18ADD",
+        "ASide": "C16",
+        "BSide": "XI",
+        "AddType": "0",
+        "AddPoint": "C18",
+        "Demand": "0x18",
+        "MainPoint": "0"
+      }
+    },
+    {
+      "id": "ENCROACH_1",
+      "line": 1149,
+      "fields": {
+        "Name": "C3FCX",
+        "ASide": "C3",
+        "BSide": "C1",
+        "EncroachType": "0",
+        "EncroachSection": "DG5",
+        "FstPoint": "C5",
+        "FstCondition": "0x81",
+        "SecondPoint": "C7",
+        "SecondCondition": "0x81",
+        "EncroachDirection": "0"
+      }
+    },
+    {
+      "id": "ENCROACH_2",
+      "line": 1161,
+      "fields": {
+        "Name": "C5FCX",
+        "ASide": "C7",
+        "BSide": "C5",
+        "EncroachType": "0",
+        "EncroachSection": "DG3",
+        "FstPoint": "C3",
+        "FstCondition": "0x81",
+        "SecondPoint": "C1",
+        "SecondCondition": "0x81",
+        "EncroachDirection": "0"
+      }
+    },
+    {
+      "id": "ENCROACH_3",
+      "line": 1173,
+      "fields": {
+        "Name": "C21FCX",
+        "ASide": "S5",
+        "BSide": "C21",
+        "EncroachType": "0",
+        "EncroachSection": "DG25",
+        "FstPoint": "C25",
+        "FstCondition": "0x81",
+        "SecondPoint": "0",
+        "SecondCondition": "0",
+        "EncroachDirection": "0"
+      }
+    },
+    {
+      "id": "ENCROACH_4",
+      "line": 1185,
+      "fields": {
+        "Name": "C25FCX",
+        "ASide": "C25",
+        "BSide": "C23",
+        "EncroachType": "0",
+        "EncroachSection": "DG21",
+        "FstPoint": "C25",
+        "FstCondition": "0x81",
+        "SecondPoint": "C23",
+        "SecondCondition": "0x81",
+        "EncroachDirection": "0"
+      }
+    },
+    {
+      "id": "COUPLE_1",
+      "line": 1197,
+      "fields": {
+        "Name": "COPX",
+        "ASide": "X",
+        "BSide": "0XFFFF",
+        "Type": "0X44",
+        "KeepWagon": "0X68",
+        "Section": "YXG",
+        "ZCJType": "0xa5",
+        "GJJType": "0"
+      }
+    },
+    {
+      "id": "COUPLE_2",
+      "line": 1208,
+      "fields": {
+        "Name": "COPXF",
+        "ASide": "XF",
+        "BSide": "0XFFFF",
+        "Type": "0X44",
+        "KeepWagon": "0X68",
+        "Section": "YXFG",
+        "ZCJType": "0xa5",
+        "GJJType": "0"
+      }
+    },
+    {
+      "id": "COUPLE_3",
+      "line": 1220,
+      "fields": {
+        "Name": "COPXD",
+        "ASide": "XD",
+        "BSide": "0XFFFF",
+        "Type": "0X33",
+        "KeepWagon": "0X68",
+        "Section": "YXDG",
+        "ZCJType": "0",
+        "GJJType": "0"
+      }
+    },
+    {
+      "id": "COUPLE_4",
+      "line": 1231,
+      "fields": {
+        "Name": "COPS",
+        "ASide": "S",
+        "BSide": "0XFFFF",
+        "Type": "0X44",
+        "KeepWagon": "0X68",
+        "Section": "YSG",
+        "ZCJType": "0xa5",
+        "GJJType": "0"
+      }
+    },
+    {
+      "id": "COUPLE_5",
+      "line": 1242,
+      "fields": {
+        "Name": "COPSF",
+        "ASide": "SF",
+        "BSide": "0XFFFF",
+        "Type": "0X44",
+        "KeepWagon": "0X68",
+        "Section": "YSFG",
+        "ZCJType": "0",
+        "GJJType": "0"
+      }
+    },
+    {
+      "id": "COUPLE_6",
+      "line": 1253,
+      "fields": {
+        "Name": "COPD2",
+        "ASide": "D2",
+        "BSide": "0XFFFF",
+        "Type": "0X11",
+        "KeepWagon": "0X68",
+        "Section": "D2G",
+        "ZCJType": "0",
+        "GJJType": "0"
+      }
+    },
+    {
+      "id": "COUPLE_7",
+      "line": 1264,
+      "fields": {
+        "Name": "COPD18",
+        "ASide": "D18",
+        "BSide": "0XFFFF",
+        "Type": "0X11",
+        "KeepWagon": "0X68",
+        "Section": "D18G",
+        "ZCJType": "0",
+        "GJJType": "0"
+      }
+    },
+    {
+      "id": "AutoBlock_1",
+      "line": 1275,
+      "fields": {
+        "Name": "AutoBlock_X",
+        "Signal": "X",
+        "Throat": "0x1",
+        "REVERSE": "1"
+      }
+    },
+    {
+      "id": "AutoBlock_2",
+      "line": 1281,
+      "fields": {
+        "Name": "AutoBlock_XF",
+        "Signal": "XF",
+        "Throat": "0x1",
+        "REVERSE": "0"
+      }
+    },
+    {
+      "id": "AutoBlock_3",
+      "line": 1287,
+      "fields": {
+        "Name": "AutoBlock_S",
+        "Signal": "S",
+        "Throat": "0x2",
+        "REVERSE": "1"
+      }
+    },
+    {
+      "id": "AutoBlock_4",
+      "line": 1293,
+      "fields": {
+        "Name": "AutoBlock_SF",
+        "Signal": "SF",
+        "Throat": "0x2",
+        "REVERSE": "0"
+      }
+    },
+    {
+      "id": "SemiBlock_1",
+      "line": 1299,
+      "fields": {
+        "Name": "SemiBlock_XD",
+        "Signal": "XD",
+        "Throat": "0x1"
+      }
+    },
+    {
+      "id": "ZXJ_Control_1",
+      "line": 1304,
+      "fields": {
+        "StartSignal": "X",
+        "EndSignal": "SI",
+        "PointNumber": "0x6"
+      }
+    },
+    {
+      "id": "ZXJ_Control_2",
+      "line": 1309,
+      "fields": {
+        "StartSignal": "XF",
+        "EndSignal": "SII",
+        "PointNumber": "0x3"
+      }
+    },
+    {
+      "id": "ZXJ_Control_3",
+      "line": 1314,
+      "fields": {
+        "StartSignal": "XD",
+        "EndSignal": "SIII",
+        "PointNumber": "0x5"
+      }
+    },
+    {
+      "id": "ZXJ_Control_4",
+      "line": 1319,
+      "fields": {
+        "StartSignal": "S",
+        "EndSignal": "XII",
+        "PointNumber": "0x3"
+      }
+    },
+    {
+      "id": "ZXJ_Control_5",
+      "line": 1324,
+      "fields": {
+        "StartSignal": "SF",
+        "EndSignal": "XI",
+        "PointNumber": "0x4"
+      }
+    },
+    {
+      "id": "TXJ_Control_1",
+      "line": 1329,
+      "fields": {
+        "OwnSignal": "X",
+        "EndSignal": "SF",
+        "Condition": "0",
+        "ConditionType": "0",
+        "ConditionValue": "0"
+      }
+    },
+    {
+      "id": "TXJ_Control_2",
+      "line": 1336,
+      "fields": {
+        "OwnSignal": "XF",
+        "EndSignal": "S",
+        "Condition": "0",
+        "ConditionType": "0",
+        "ConditionValue": "0"
+      }
+    },
+    {
+      "id": "TXJ_Control_3",
+      "line": 1343,
+      "fields": {
+        "OwnSignal": "S",
+        "EndSignal": "XF",
+        "Condition": "0",
+        "ConditionType": "0",
+        "ConditionValue": "0"
+      }
+    },
+    {
+      "id": "TXJ_Control_4",
+      "line": 1350,
+      "fields": {
+        "OwnSignal": "SF",
+        "EndSignal": "X",
+        "Condition": "0",
+        "ConditionType": "0",
+        "ConditionValue": "0"
+      }
+    },
+    {
+      "id": "LUJ_Control_1",
+      "line": 1358,
+      "fields": {
+        "OwnSignal": "X",
+        "Condition": "0",
+        "ConditionType": "0",
+        "ConditionValue": "0"
+      }
+    },
+    {
+      "id": "LUJ_Control_2",
+      "line": 1364,
+      "fields": {
+        "OwnSignal": "S",
+        "Condition": "0",
+        "ConditionType": "0",
+        "ConditionValue": "0"
+      }
+    },
+    {
+      "id": "LUJ_Control_3",
+      "line": 1370,
+      "fields": {
+        "OwnSignal": "XF",
+        "Condition": "0",
+        "ConditionType": "0",
+        "ConditionValue": "0"
+      }
+    },
+    {
+      "id": "LUJ_Control_4",
+      "line": 1376,
+      "fields": {
+        "OwnSignal": "SF",
+        "Condition": "0",
+        "ConditionType": "0",
+        "ConditionValue": "0"
+      }
+    },
+    {
+      "id": "DepatureSignalLJUJ_1",
+      "line": 1383,
+      "fields": {
+        "OwnSignal": "XI",
+        "OutputIndex": "0x65",
+        "Condition_1": "0x115",
+        "ConditionChar_1": "0",
+        "Condition_2": "0",
+        "ConditionChar_2": "0",
+        "Condition_3": "0",
+        "ConditionChar_3": "0"
+      }
+    },
+    {
+      "id": "DepatureSignalLJUJ_2",
+      "line": 1393,
+      "fields": {
+        "OwnSignal": "XII",
+        "OutputIndex": "0x68",
+        "Condition_1": "0x115",
+        "ConditionChar_1": "0",
+        "Condition_2": "0",
+        "ConditionChar_2": "0",
+        "Condition_3": "0",
+        "ConditionChar_3": "0"
+      }
+    },
+    {
+      "id": "DepatureSignalLJUJ_3",
+      "line": 1403,
+      "fields": {
+        "OwnSignal": "XIII",
+        "OutputIndex": "0x6B",
+        "Condition_1": "0x115",
+        "ConditionChar_1": "0",
+        "Condition_2": "0",
+        "ConditionChar_2": "0",
+        "Condition_3": "0",
+        "ConditionChar_3": "0"
+      }
+    },
+    {
+      "id": "DepatureSignalLJUJ_4",
+      "line": 1413,
+      "fields": {
+        "OwnSignal": "X4",
+        "OutputIndex": "0x6e",
+        "Condition_1": "0x115",
+        "ConditionChar_1": "0",
+        "Condition_2": "0",
+        "ConditionChar_2": "0",
+        "Condition_3": "0",
+        "ConditionChar_3": "0"
+      }
+    },
+    {
+      "id": "DepatureSignalLJUJ_5",
+      "line": 1423,
+      "fields": {
+        "OwnSignal": "X5",
+        "OutputIndex": "0x71",
+        "Condition_1": "0x115",
+        "ConditionChar_1": "0",
+        "Condition_2": "0",
+        "ConditionChar_2": "0",
+        "Condition_3": "0",
+        "ConditionChar_3": "0"
+      }
+    },
+    {
+      "id": "RepeatOutput_2",
+      "line": 1434,
+      "fields": {
+        "OutputIndex": "0x62",
+        "Condition_1": "SYG",
+        "ConditionType_1": "0x30",
+        "ConditionValue_1": "0x1",
+        "Condition_2": "0",
+        "ConditionType_2": "0",
+        "ConditionValue_2": "0",
+        "Condition_3": "0",
+        "ConditionType_3": "0",
+        "ConditionValue_3": "0"
+      }
+    },
+    {
+      "id": "RepeatOutput_3",
+      "line": 1447,
+      "fields": {
+        "OutputIndex": "0x63",
+        "Condition_1": "S",
+        "ConditionType_1": "0x10",
+        "ConditionValue_1": "0x55",
+        "Condition_2": "0",
+        "ConditionType_2": "0",
+        "ConditionValue_2": "0",
+        "Condition_3": "0",
+        "ConditionType_3": "0",
+        "ConditionValue_3": "0"
+      }
+    },
+    {
+      "id": "RepeatOutput_4",
+      "line": 1460,
+      "fields": {
+        "OutputIndex": "0x64",
+        "Condition_1": "0X119",
+        "ConditionType_1": "0",
+        "ConditionValue_1": "0x119",
+        "Condition_2": "0",
+        "ConditionType_2": "0",
+        "ConditionValue_2": "0",
+        "Condition_3": "0",
+        "ConditionType_3": "0",
+        "ConditionValue_3": "0"
+      }
+    },
+    {
+      "id": "RepeatOutput_5",
+      "line": 1472,
+      "fields": {
+        "OutputIndex": "0x9c",
+        "Condition_1": "0X0b",
+        "ConditionType_1": "0",
+        "ConditionValue_1": "0x0b",
+        "Condition_2": "0",
+        "ConditionType_2": "0",
+        "ConditionValue_2": "0",
+        "Condition_3": "0",
+        "ConditionType_3": "0",
+        "ConditionValue_3": "0"
+      }
+    },
+    {
+      "id": "Button_1",
+      "line": 1485,
+      "fields": {
+        "OutputIndex": "0x3",
+        "Character": "0x66",
+        "Condition": "0",
+        "ConditionType": "0",
+        "ConditionValue": "0"
+      }
+    },
+    {
+      "id": "Button_2",
+      "line": 1492,
+      "fields": {
+        "OutputIndex": "0x4",
+        "Character": "0x66",
+        "Condition": "0",
+        "ConditionType": "0",
+        "ConditionValue": "0"
+      }
+    },
+    {
+      "id": "Button_3",
+      "line": 1499,
+      "fields": {
+        "OutputIndex": "0x5F",
+        "Character": "0x66",
+        "Condition": "0",
+        "ConditionType": "0",
+        "ConditionValue": "0"
+      }
+    },
+    {
+      "id": "Button_4",
+      "line": 1506,
+      "fields": {
+        "OutputIndex": "0x80",
+        "Character": "0x66",
+        "Condition": "0",
+        "ConditionType": "0",
+        "ConditionValue": "0"
+      }
+    },
+    {
+      "id": "Button_5",
+      "line": 1513,
+      "fields": {
+        "OutputIndex": "0x81",
+        "Character": "0x66",
+        "Condition": "0",
+        "ConditionType": "0",
+        "ConditionValue": "0"
+      }
+    },
+    {
+      "id": "Button_6",
+      "line": 1520,
+      "fields": {
+        "OutputIndex": "0x82",
+        "Character": "0x66",
+        "Condition": "0",
+        "ConditionType": "0",
+        "ConditionValue": "0"
+      }
+    },
+    {
+      "id": "HoldRoute_1",
+      "line": 1527,
+      "fields": {
+        "Entry": "XZ",
+        "Exit": "D102",
+        "PointNum": "0X2",
+        "Point1": "C104",
+        "Position1": "0X18",
+        "Point2": "C102",
+        "Position2": "0X81"
+      }
+    }
+  ],
   "config": "StationMaxX  = 1024\r\nStationMaxY  = 768\r\nTrueScreenX  = 1024\r\nTrueScreenY  = 768\r\n\r\nPosX  = 0\r\nPosY  = 20\r\nTestXY   = 0\r\nLana = 0\r\nDZA=XD\r\nDZA=SF\r\nBA1=11;\r\nMonitorFlag = A\r\nIPAddressA=127.0.0.1\r\n\r\nBEGIN-BLOCK_DATA\r\nBlockType = 0;  0 自动闭塞，1半自动。。。\r\nCode=135;编号\r\nName = X\r\nLeftPT = 0,540;左上角坐标\r\nThroat = 1\r\nbLeft = 1;左边,右边 0\r\nbReverse = 1;反方向发车 针对 type =0\r\nEND-BLOCK_DATA\r\n\r\nBEGIN-BLOCK_DATA\r\nBlockType = 0;\r\nCode=136;编号\r\nName = XF\r\nLeftPT =340,540\r\nThroat = 1\r\nbLeft = 1\r\nbReverse = 0;\r\nEND-BLOCK_DATA\r\n\r\nBEGIN-BLOCK_DATA\r\nBlockType = 0\r\nCode=138;编号\r\nName = SF\r\nLeftPT = 830,540\r\nThroat = 2\r\nbLeft = 0\r\nbReverse = 0\r\nEND-BLOCK_DATA\r\n\r\nBEGIN-BLOCK_DATA\r\nBlockType = 0\r\nCode=137;编号\r\nName = S\r\nLeftPT = 1110,540\r\nThroat = 2\r\nbLeft = 0\r\nbReverse = 1\r\nEND-BLOCK_DATA\r\n\r\nBEGIN-BLOCK_DATA\r\nBlockType = 1\r\nCode=139;编号\r\nName = XD\r\nLeftPT = 0,130\r\nThroat = 1\r\nbLeft = 1\r\nbReverse = 0\r\nEND-BLOCK_DATA\r\n\r\nBEGIN-STATION_BITMAP\r\n  FileName= staname3.bmp\r\n  X = 564\r\n  Y = 47\r\nEND-STATION_BITMAP"
 }

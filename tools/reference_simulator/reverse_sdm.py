@@ -18,7 +18,13 @@ FUNCTIONS = {
 def reverse(executable, output, target='sdm'):
     import r2pipe
     output.mkdir(parents=True,exist_ok=True)
-    functions = FUNCTIONS if target=='sdm' else {'station_loader':0x6e5140, 'signal_reader':0x6e7330, 'point_reader':0x6e77d0}
+    functions = FUNCTIONS if target=='sdm' else {
+        'station_loader':0x6e5140, 'signal_reader':0x6e7330, 'point_reader':0x6e77d0,
+        'additional_protection_reader':0x6e7f80,
+        'clearance_reader':0x6e8310, 'departure_output_reader':0x6e9360,
+        'straight_control_reader':0x6e9dd0, 'lu_control_reader':0x6ea010,
+        'through_control_reader':0x6ea290,
+    }
     evidence={'sha256':hashlib.sha256(executable.read_bytes()).hexdigest(),'target':target,'functions':{}}
     r=r2pipe.open(str(executable),flags=['-2','-e','scr.color=0'])
     try:

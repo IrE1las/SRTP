@@ -12,13 +12,17 @@ export function lampColors(isShunt, aspect, lit = true) {
   if (!lit) return [COLORS.background, COLORS.background]
   if (isShunt) return [aspect === 'B' ? COLORS.white : COLORS.blue]
   return ({ U: [COLORS.background, COLORS.yellow], UU: [COLORS.yellow, COLORS.yellow],
-    L: [COLORS.background, COLORS.green], B: [COLORS.white, COLORS.background] })[aspect]
+    L: [COLORS.background, COLORS.green], B: [COLORS.white, COLORS.background], HB: [COLORS.red, COLORS.white] })[aspect]
     || [COLORS.red, COLORS.background]
 }
 export const COMMANDS = [
   { label: '总取消', type: 'CANCEL_ROUTE', target: 'route', icon: 'QX' },
   { label: '总人解', type: 'MANUAL_UNLOCK_ROUTE', target: 'route', sealed: true, icon: 'RJ' },
-  { label: '区故解', unavailable: '区段故障解锁条件尚未完整核验，暂不开放', sealed: true, icon: 'SGJS' },
+  { label: '区故解', type: 'SECTION_FAULT_UNLOCK', target: 'section', referenceOnly: true, sealed: true, icon: 'SGJS' },
+  { label: '引导', type: 'GUIDE_ARM', target: 'signal', referenceOnly: true, sealed: true, icon: 'SignalYD' },
+  { label: '引导保持', type: 'GUIDE_MAINTAIN', target: 'signal', referenceOnly: true, icon: 'SignalYD' },
+  { label: '引导总锁', type: 'GUIDE_TOTAL_LOCK', target: 'signal', referenceOnly: true, sealed: true, icon: 'DS' },
+  { label: '解除引总锁', type: 'GUIDE_TOTAL_UNLOCK', target: 'signal', referenceOnly: true, sealed: true, icon: 'DJ' },
   { label: '总定位', type: 'SWITCH_TOTAL_NORMAL', target: 'switch', icon: 'ZD' },
   { label: '总反位', type: 'SWITCH_TOTAL_REVERSE', target: 'switch', icon: 'ZF' },
   { label: '清除', type: 'CLEAR_SELECTION', icon: 'ClrBtn' },

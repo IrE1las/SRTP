@@ -8,11 +8,12 @@ import pytest
 
 from app.services.simulation_console import runtime, console_commands
 from app.services.simulation_console.reference_station import reference_station_package
+from app.services.simulation_console.reference_runtime import ReferenceSimulationService
 from app.services.simulation_console.commands import dump_session, load_session
 
 
 def service():
-    return runtime.SimulationService(reference_station_package())
+    return ReferenceSimulationService(reference_station_package())
 
 
 def press(svc, snapshot, buttons):
@@ -35,8 +36,8 @@ def test_native_geometry_is_complete_and_not_a_screenshot_overlay():
     assert sw['point'] == [580,280]
     assert sw['branches'] == [[[620,280]],[[520,280]],[[540,320]]]
     package = reference_station_package()
-    assert package['counts']['ready_routes'] == 116
-    assert package['counts']['blocked_routes'] == 83
+    assert package['counts']['ready_routes'] == 199
+    assert package['counts']['blocked_routes'] == 0
     assert set(s['name'] for s in package['sections']) == set(r['section'] for r in records if r['type']==2) | set(r['name'] for r in records if r['type'] in {3,4})
 
 
@@ -74,13 +75,14 @@ def test_every_enabled_native_route_can_arrange_drive_and_release(monkeypatch):
         assert not any(state['locked'] for state in snapshot['switches'].values())
 
 
-def test_native_data_mismatch_never_opens_signal():
+def test_native_route_previously_blocked_by_unrelated_workbook_can_open():
     svc=service()
     route=next(r for r in svc.package['routes'] if r['name']=='D9>S5')
-    assert route['status']=='blocked'
+    assert route['status']=='ready'
     result=press(svc,svc.new_session(17),route['button_sequence'])
-    assert not result['accepted']
-    assert all(s['aspect'] is None for s in result['snapshot']['signals'].values())
+    assert result['accepted']
+    assert result['snapshot']['signals']['D9']['aspect']=='B'
+    assert route['switches']['13']==route['switches']['15']==0
 
 
 def test_pair_switch_lock_seal_and_occupancy_guards():
