@@ -23,6 +23,8 @@ def dump_session(session):
     # Persist wall-clock deadlines, never process-local monotonic values.
     for route in data["routes"].values():
         route["release_due"] = {k: time() + v - monotonic() for k, v in route["release_due"].items()}
+        if route.get("manual_release_due") is not None:
+            route["manual_release_due"] += time()-monotonic()
     return data
 
 
@@ -36,6 +38,8 @@ def load_session(data):
     for route in session.routes.values():
         route["remaining"] = set(route["remaining"])
         route["release_due"] = {k: monotonic() + v - time() for k, v in route["release_due"].items()}
+        if route.get("manual_release_due") is not None:
+            route["manual_release_due"] += monotonic()-time()
     return session
 
 
@@ -130,6 +134,8 @@ def execute(service, session, command):
         route = session.routes.get(target)
         if not route or route["status"] in {"released", "cancelled"}:
             result = reject("ROUTE_NOT_LOCKED", "请选择仍锁闭的原进路")
+        elif route["status"] == "manual_unlocking":
+            result = reject("UNLOCK_PENDING", "人工解锁延时中，不能总取消或重开信号")
         elif route.get("train_started") or (route["approach_section"] and session.sections[route["approach_section"]]["occupied"]):
             result = reject("APPROACH_LOCKED", "已接近或已行车，不能执行本期的总取消或重复开放")
         elif kind == "CANCEL_ROUTE":

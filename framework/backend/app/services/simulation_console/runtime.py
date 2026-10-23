@@ -2,7 +2,8 @@
 
 This simulator is intentionally separate from the legacy exercise engine.
 Experiment commands extend this same state machine through commands.py.
-Manual unlocking and arbitrary train moves remain unsupported.
+The operator console adds checked, timed manual release in console_commands.py.
+Arbitrary train moves remain unsupported.
 Its decisions are traceable to the supplied TB/T 3027, 3578 and 3537 copies and
 to the imported workbook rows; it is not safety-certified railway software.
 """
@@ -42,8 +43,8 @@ class RuntimeSession:
 
 
 class SimulationService:
-    def __init__(self) -> None:
-        self.package = station_package()
+    def __init__(self, package: dict | None = None) -> None:
+        self.package = package if package is not None else station_package()
         self.routes = {route["id"]: route for route in self.package["routes"]}
         self.buttons = {button["name"]: button for button in self.package["buttons"]}
         self.section_defs = {section["name"]: section for section in self.package["sections"]}
@@ -99,6 +100,15 @@ class SimulationService:
         for instance in session.routes.values():
             if instance["status"] in {"released", "cancelled"}:
                 continue
+            if instance.get("manual_release_due") is not None:
+                if instance["manual_release_due"] <= now and not any(
+                    session.sections[name]["occupied"] for name in instance["sections"] + instance["protection_sections"]
+                ):
+                    for state in [*session.sections.values(), *session.switches.values()]:
+                        state["owners"].discard(instance["id"])
+                    instance.update(status="released", remaining=set(), release_due={})
+                    self._event(session, "manual_unlock_complete", f"进路 {instance['route_id']} 人工解锁延时完成，已解除锁闭", instance["route_id"])
+                continue
             for section_name, due in list(instance["release_due"].items()):
                 if due > now or session.sections[section_name]["occupied"]:
                     continue
@@ -130,6 +140,7 @@ class SimulationService:
     def _snapshot(self, session: RuntimeSession) -> dict:
         remaining = max(0, int(session.selection_deadline - monotonic() + 0.99)) if session.selection_deadline else 0
         result = {
+            "profile": self.package.get("profile", "workbook"),
             "session_id": session.id, "version": session.version,
             "interval_available": session.interval_available,
             "selected_buttons": list(session.selected), "selection_remaining_seconds": remaining,
@@ -146,7 +157,8 @@ class SimulationService:
             "routes": [{"id": instance["id"], "route_id": instance["route_id"],
                         "kind": instance["kind"], "status": instance["status"],
                         "sections": instance["sections"], "remaining_sections": sorted(instance["remaining"]),
-                        "progress": instance["progress"], "signal": instance["signal"]}
+                        "progress": instance["progress"], "signal": instance["signal"],
+                        "manual_remaining_seconds": max(0, int(instance.get("manual_release_due", 0)-monotonic()+0.99))}
                        for instance in session.routes.values()],
             "events": session.events[-60:],
         }
@@ -202,6 +214,8 @@ class SimulationService:
         """Stable rejection facts; no state is mutated during validation."""
         if route["status"] != "ready":
             return "DATA_BLOCKED", f"进路 {route['id']} 数据待核对，不能办理", []
+        if session.signals[route["signal"]].get("lit", True) is False:
+            return "SIGNAL_UNLIT", "始端信号处于灭灯状态，请先点灯", [route["signal"]]
         if route["attribute"] in {12, 14} and not session.interval_available:
             return "INTERVAL_UNAVAILABLE", "区间许可未具备，出站信号不得开放", [route["signal"]]
         try:
@@ -269,7 +283,7 @@ class SimulationService:
         for sub_id in route["subroutes"]:
             self._event(session, "subroute_lock", f"组合进路基本段 {sub_id} 已纳入锁闭", route["id"])
         self._event(session, "route_lock", f"进路 {route['id']} 预先锁闭", route["id"])
-        session.signals[route["signal"]] = {"aspect": route["aspect"], "route": route["id"]}
+        session.signals[route["signal"]].update(aspect=route["aspect"], route=route["id"])
         session.routes[instance_id] = {
             "id": instance_id, "route_id": route["id"], "kind": route["kind"],
             "signal": route["signal"], "sections": list(route["sections"]),
@@ -293,6 +307,9 @@ class SimulationService:
             self._verify_version(session, version)
             if button not in self.buttons:
                 return self._reject(session, f"按钮 {button} 不在本站配置中")
+            signal = self.buttons[button].get("signal")
+            if session.signals.get(signal, {}).get("sealed"):
+                return self._reject(session, f"{signal} 按钮已封锁，不能选排进路", reason_code="SIGNAL_BUTTON_SEALED", devices=[signal])
             proposed = session.selected + [button]
             matching = [route for route in self.package["routes"]
                         if route["status"] != "excluded" and route["button_sequence"][:len(proposed)] == proposed]
@@ -331,8 +348,8 @@ class SimulationService:
             instance = session.routes.get(instance_id)
             if not instance:
                 return self._reject(session, "进路实例不存在")
-            if instance["status"] in {"released", "cancelled", "closed_locked"}:
-                return self._reject(session, "该进路已完成正常解锁")
+            if instance["status"] in {"released", "cancelled", "closed_locked", "manual_unlocking"}:
+                return self._reject(session, "该进路当前不能推进仿真车辆")
             if instance["progress"] == -2:
                 approach = instance["approach_section"]
                 if session.sections[approach]["occupied"]:
@@ -358,7 +375,7 @@ class SimulationService:
                     session.sections[approach].update(occupied=False, occupancy_kind="clear", occupancy_origin="simulation")
                     self._event(session, "approach_clear", f"车辆出清接近区段 {approach}", instance["route_id"])
                 if next_index == 0 and instance["kind"] == "train":
-                    session.signals[instance["signal"]] = {"aspect": None, "route": None}
+                    session.signals[instance["signal"]].update(aspect=None, route=None)
                     self._event(session, "signal_close", f"列车第一轮对进入信号机内方，{instance['signal']} 关闭",
                                 instance["route_id"])
                 if next_index > 0:
