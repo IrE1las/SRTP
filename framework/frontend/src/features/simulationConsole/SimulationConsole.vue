@@ -51,7 +51,7 @@
       </form></div>
     <div v-if="showDevices && station" class="device-workbench">
       <div><strong>设备练习</strong><span>先在站场点击设备；故障与占用仅教师、管理员可设置。</span></div><p>{{ inspected ? `${inspected.type} ${inspected.name}：${inspectedState}` : '尚未选择设备' }}</p>
-      <template v-if="inspected?.type === '道岔' && canControlTrain"><button @click="inject('SET_SWITCH_INDICATION', inspected.name)">设置失表示</button><button @click="inject('RESTORE_SWITCH_INDICATION', inspected.name)">恢复表示</button></template>
+      <template v-if="inspected?.type === '道岔' && canControlTrain"><button @click="inject('SET_SWITCH_INDICATION', inspected.name)">{{ source === 'reference' ? '本端失表示' : '设置失表示' }}</button><button @click="inject('RESTORE_SWITCH_INDICATION', inspected.name)">{{ source === 'reference' ? '恢复本端表示' : '恢复表示' }}</button></template>
       <template v-if="inspected?.type === '区段' && canControlTrain"><button @click="inject('SET_SECTION_OCCUPANCY', inspected.name, { kind:'vehicle' })">车列占用</button><button @click="inject('SET_SECTION_OCCUPANCY', inspected.name, { kind:'fault' })">故障占用</button><button @click="inject('CLEAR_SECTION_OCCUPANCY', inspected.name)">恢复空闲</button></template>
       <div v-if="source === 'reference'"><p>闭塞采用本地邻站模拟，设备状态与各区间分别保存。</p></div>
       <div v-for="block in source === 'reference' ? Object.values(displaySnapshot?.blocks || {}) : []" :key="block.signal">
@@ -62,7 +62,7 @@
     </div>
     <section class="activity-panel" v-if="station && showActivity"><div class="activity-heading"><strong>活动进路</strong><span>仅教师或管理员推进仿真车辆；观察占用、信号关闭及正常解锁。</span></div>
       <p v-if="!activeRoutes.length" class="empty-route">暂无活动进路。{{ source === 'reference' ? '调车示例：D3 → D7。' : '接车示例：XNLA → S5LA。' }}</p>
-      <div class="route-cards"><div v-for="route in activeRoutes" :key="route.id" class="route-card"><strong>{{ routeName(route.route_id) }}</strong><span>{{ statusText(route) }}</span><button :disabled="busy || replaying || stale || !canControlTrain || ['clearing','manual_unlocking','closed_locked'].includes(route.status)" @click="advance(route.id)">{{ canControlTrain ? '仿真行车 · 推进一步' : '由教师控制仿真行车' }}</button></div></div>
+      <div class="route-cards"><div v-for="route in activeRoutes" :key="route.id" class="route-card"><strong>{{ routeName(route.route_id) }}</strong><span>{{ statusText(route) }}</span><button :disabled="busy || replaying || stale || !canControlTrain || ['setting','clearing','manual_unlocking','closed_locked'].includes(route.status)" @click="advance(route.id)">{{ canControlTrain ? '仿真行车 · 推进一步' : '由教师控制仿真行车' }}</button></div></div>
     </section>
     <section v-if="showRoutes && station" class="route-audit"><div class="activity-heading"><strong>{{ source === 'reference' ? '原软件进路与来源' : '教学站进路与核对' }}</strong><span>可解析办理 {{ station.counts.ready_routes }} · 数据异常 {{ station.counts.blocked_routes }} · 共 {{ station.counts.candidate_routes }}</span></div>
       <p v-if="!station.routes">学生可在站场自由操作；完整进路条件和核对清单由教师查看。</p>
@@ -93,15 +93,15 @@ const canControlTrain=computed(()=>['teacher','admin'].includes(userStore.role))
 const visibleCommands=computed(()=>COMMANDS.filter(c=>!c.referenceOnly || source.value==='reference'))
 const displaySnapshot=computed(()=>replaying.value ? replayFrames.value[replayIndex.value] : snapshot.value)
 const activeRoutes=computed(()=>(displaySnapshot.value?.routes || []).filter(r=>!['released','cancelled'].includes(r.status)))
-const alarms=computed(()=>(displaySnapshot.value?.events || []).filter(e=>e.version>acknowledged.value && (e.kind==='rejected' || ['SET_SWITCH_INDICATION','signal_close'].includes(e.kind))).slice(-8).reverse())
-const faultCount=computed(()=>Object.values(displaySnapshot.value?.switches || {}).filter(s=>s.represented===false).length+Object.values(displaySnapshot.value?.sections || {}).filter(s=>s.occupancy_kind==='fault').length)
+const alarms=computed(()=>(displaySnapshot.value?.events || []).filter(e=>e.version>acknowledged.value && (e.kind==='rejected' || ['SET_SWITCH_INDICATION','signal_close','switch_timeout','route_setting_failed'].includes(e.kind))).slice(-8).reverse())
+const faultCount=computed(()=>Object.values(displaySnapshot.value?.switches || {}).filter(s=>s.represented===false && !s.moving).length+Object.values(displaySnapshot.value?.sections || {}).filter(s=>s.occupancy_kind==='fault').length)
 const clockText=computed(()=>new Date(now.value).toLocaleString('zh-CN',{hour12:false,timeZone:'Asia/Shanghai'}))
 const pendingRemaining=computed(()=>Math.max(0,Math.ceil(((pending.value?.deadline || 0)-now.value)/1000)))
 const filteredRoutes=computed(()=>(station.value?.routes || []).filter(r=>`${r.name || r.id} ${r.button_sequence.join(' ')}`.toLowerCase().includes(routeQuery.value.toLowerCase())))
 const inspectedState=computed(()=>{
   if(!inspected.value)return ''
   const {type,name}=inspected.value,s=displaySnapshot.value
-  if(type==='道岔'){const p=s?.switches?.[name];return `${p?.position?'反位':'定位'}，${p?.represented===false?'失表示':'表示正常'}${p?.locked?'，进路锁闭':''}${p?.manual_locked?'，单锁':''}${p?.sealed?'，封锁':''}`}
+  if(type==='道岔'){const p=s?.switches?.[name];return `${p?.moving ? `向${p.target_position?'反位':'定位'}转换，等待本端表示` : `${p?.position?'反位':'定位'}，${p?.represented===false ? p.movement_failed?'转换超时，失表示':'失表示' : '表示正常'}`}${p?.locked?'，进路锁闭':''}${p?.manual_locked?'，单锁':''}${p?.sealed?'，封锁':''}`}
   if(type==='区段'){const p=s?.sections?.[name];return p?.occupied ? p.occupancy_kind==='fault'?'故障占用':'车列占用' : p?.locked?'锁闭':'空闲'}
   return inspected.value.state
 })
@@ -109,7 +109,7 @@ const notify=message=>ElMessage.info(message)
 const eventTime=value=>new Date(value).toLocaleTimeString('zh-CN',{hour12:false,timeZone:'Asia/Shanghai'})
 const targetLabel=target=>({switch:'道岔编号',signal:'信号机',route:'原进路始端信号',section:'轨道区段'})[target] || '设备'
 const routeName=id=>station.value?.routes?.find(r=>r.id===id)?.name || id
-function statusText(route){if(route.cancelled_segments?.length)return `已取消 ${route.cancelled_segments.length} 个基本段，其余保持锁闭`;if(route.mode==='guide' && route.guide_remaining_seconds)return `引导开放，保持剩余 ${route.guide_remaining_seconds} 秒`;return route.status==='manual_unlocking' ? `人工解锁剩余 ${route.manual_remaining_seconds} 秒` : ({signal_open:'信号开放',approaching:'车辆接近',clearing:'出清，等待正常解锁',closed_locked:'信号关闭，保持锁闭'})[route.status] || '车辆运行'}
+function statusText(route){if(route.cancelled_segments?.length)return `已取消 ${route.cancelled_segments.length} 个基本段，其余保持锁闭`;if(route.mode==='guide' && route.guide_remaining_seconds)return `引导开放，保持剩余 ${route.guide_remaining_seconds} 秒`;return route.status==='manual_unlocking' ? `人工解锁剩余 ${route.manual_remaining_seconds} 秒` : ({setting:'道岔转换中，等待各端到位表示',signal_open:'信号开放',approaching:'车辆接近',clearing:'出清，等待正常解锁',closed_locked:'信号关闭，保持锁闭'})[route.status] || '车辆运行'}
 function onFullscreenChange(){isFullscreen.value=document.fullscreenElement===consoleRoot.value}
 async function toggleFullscreen(){try{if(isFullscreen.value)await document.exitFullscreen();else await consoleRoot.value?.requestFullscreen()}catch{notify('浏览器未允许全屏，可继续在当前窗口操作')}}
 function clearPending(){pending.value=null;pin.value=''}

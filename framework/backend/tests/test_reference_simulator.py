@@ -10,6 +10,12 @@ from app.services.simulation_console import runtime, console_commands
 from app.services.simulation_console.reference_station import reference_station_package
 from app.services.simulation_console.reference_runtime import ReferenceSimulationService
 from app.services.simulation_console.commands import dump_session, load_session
+from app.services.simulation_console import reference_runtime
+
+
+@pytest.fixture(autouse=True)
+def native_clock_follows_runtime(monkeypatch):
+    monkeypatch.setattr(reference_runtime, 'monotonic', lambda: runtime.monotonic())
 
 
 def service():
@@ -63,6 +69,8 @@ def test_every_enabled_native_route_can_arrange_drive_and_release(monkeypatch):
         response=press(svc,snapshot,route['button_sequence'])
         assert response['accepted'],(route['name'],response['message'])
         snapshot=response['snapshot']
+        clock[0] += 2.1
+        snapshot=svc.snapshot(snapshot['session_id'],17)
         instance=snapshot['routes'][0]
         for _ in range(len(instance['sections'])+1+int(instance['progress']==-2)):
             response=svc.step_train(snapshot['session_id'],17,instance['id'],snapshot['version'])
@@ -75,20 +83,29 @@ def test_every_enabled_native_route_can_arrange_drive_and_release(monkeypatch):
         assert not any(state['locked'] for state in snapshot['switches'].values())
 
 
-def test_native_route_previously_blocked_by_unrelated_workbook_can_open():
+def test_native_route_previously_blocked_by_unrelated_workbook_can_open(monkeypatch):
+    clock=[1000.]
+    monkeypatch.setattr(runtime,'monotonic',lambda:clock[0])
     svc=service()
     route=next(r for r in svc.package['routes'] if r['name']=='D9>S5')
     assert route['status']=='ready'
     result=press(svc,svc.new_session(17),route['button_sequence'])
     assert result['accepted']
-    assert result['snapshot']['signals']['D9']['aspect']=='B'
+    assert result['snapshot']['signals']['D9']['aspect'] is None
+    clock[0] += 2.1
+    assert svc.snapshot(result['snapshot']['session_id'],17)['signals']['D9']['aspect']=='B'
     assert route['switches']['13']==route['switches']['15']==0
 
 
-def test_pair_switch_lock_seal_and_occupancy_guards():
+def test_pair_switch_lock_seal_and_occupancy_guards(monkeypatch):
+    clock=[1000.]
+    monkeypatch.setattr(runtime,'monotonic',lambda:clock[0])
     svc=service();snap=svc.new_session(17)
     result=command(svc,snap,'SWITCH_TOTAL_REVERSE','1')
     assert result['accepted']
+    assert all(result['snapshot']['switches'][sid]['moving'] for sid in ['1','3'])
+    clock[0] += 2.1
+    result['snapshot']=svc.snapshot(snap['session_id'],17)
     assert result['snapshot']['switches']['1']['position']==result['snapshot']['switches']['3']['position']==1
     result=command(svc,result['snapshot'],'SWITCH_SINGLE_LOCK','1')
     result=command(svc,result['snapshot'],'SWITCH_TOTAL_NORMAL','3')

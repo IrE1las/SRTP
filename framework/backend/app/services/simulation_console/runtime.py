@@ -255,6 +255,10 @@ class SimulationService:
         for name in route["sections"] + conditional:
             if session.sections[name]["owners"] - {ignore_instance}:
                 return "SECTION_LOCKED", f"区段 {name} 已被其他进路锁闭", [name]
+        return self._switch_lock_fact(session, route, ignore_instance)
+
+    def _switch_lock_fact(self, session, route, ignore_instance=None):
+        # Teaching/experiment stations retain exclusive point ownership.
         for sid in route["switches"]:
             if session.switches[sid]["owners"] - {ignore_instance}:
                 return "SWITCH_ROUTE_LOCKED", f"道岔 {sid} 已被其他进路锁闭", [sid]

@@ -14,8 +14,15 @@
     <g v-for="point in station.switches" :key="point.id" :data-switch="point.id">
       <polyline v-for="(branch, index) in point.geometry.branches" :key="index"
         :points="poly([point.geometry.point, ...branch])" :stroke="branchColor(point, index)" class="track" />
-      <line v-bind="blade(point, position(point.id) ? 1 : 2, 3, 13)" stroke="black" stroke-width="5" />
-      <line v-bind="blade(point, position(point.id) ? 2 : 1, 1, 11)" :stroke="bladeColor(point)" stroke-width="5" />
+      <template v-if="lostIndication(point.id)">
+        <line v-for="branch in [1,2]" :key="branch" v-bind="blade(point, branch, 1, 11)"
+          :stroke="C.red" stroke-width="5" class="blade-flash" />
+      </template>
+      <template v-else>
+        <line v-bind="blade(point, position(point.id) ? 1 : 2, 3, 13)" stroke="black" stroke-width="5" />
+        <line v-bind="blade(point, position(point.id) ? 2 : 1, 1, 11)" :stroke="bladeColor(point)"
+          stroke-width="5" :class="{ 'blade-flash': pointState(point.id).moving }" />
+      </template>
       <circle v-if="snapshot?.switches?.[point.id]?.manual_locked" :cx="point.x" :cy="point.y" r="9" fill="none" stroke="red" />
       <rect v-if="snapshot?.switches?.[point.id]?.sealed" :x="point.x-11" :y="point.y-11" width="22" height="22" fill="none" stroke="red" />
       <g class="device-hit" tabindex="0" role="button" :aria-label="`${point.id} 号道岔`"
@@ -23,7 +30,7 @@
         <rect :x="Math.min(point.x,point.geometry.label[0])-14" :y="Math.min(point.y,point.geometry.label[1])-20"
           width="48" :height="Math.abs(point.y-point.geometry.label[1])+38" fill="transparent" />
         <text :x="point.geometry.label[0]" :y="point.geometry.label[1]" :fill="bladeColor(point)"
-          :class="{ 'standard-flash': snapshot?.switches?.[point.id]?.represented === false }">{{ point.name }}</text>
+          :class="{ 'standard-flash': pointState(point.id).moving || lostIndication(point.id) }">{{ point.name }}</text>
         <title>{{ point.id }} 号道岔：{{ switchText(point.id) }}</title>
       </g>
     </g>
@@ -103,7 +110,9 @@ const blockPanels = [ { name: 'XD', x: 0, y: 130, width: 126 },
 const poly = points => points.map(p => p.join(',')).join(' ')
 const safePoints = points => points.every(([x,y]) => x >= 0 && x <= 1440 && y >= 0 && y <= 740)
 const color = name => sectionColor(props.snapshot?.sections?.[name])
-const position = id => props.snapshot?.switches?.[id]?.position || 0
+const pointState = id => props.snapshot?.switches?.[id] || {}
+const position = id => pointState(id).moving ? pointState(id).target_position : pointState(id).position || 0
+const lostIndication = id => pointState(id).represented === false && !pointState(id).moving
 function blockColor(name,direction) { const b=props.snapshot?.blocks?.[name];return b?.permission && b.direction===direction ? C.green : C.silver }
 function blockPhase(name) { return ({ idle:'未闭塞',requested:'请求中',awaiting_peer:'待邻站',permitted:'许可' })[props.snapshot?.blocks?.[name]?.phase] || '' }
 function pressBlock(target,label) {
@@ -114,9 +123,9 @@ function branchColor(point,index){const state=props.snapshot?.sections?.[point.s
 function jointLine(joint){const [x,y]=joint.center,l=joint.length;return joint.shape===0 ? {x1:x-5,y1:y-5,x2:x+5,y2:y+5} : {x1:x,y1:y-l,x2:x,y2:y+l}}
 function sectionText(name) { const s = props.snapshot?.sections?.[name]; return s?.occupied ? '占用' : s?.locked ? '锁闭' : '空闲' }
 function inspectSection(name) { emit('inspect', '区段', name, sectionText(name)) }
-function switchText(id) { const s=props.snapshot?.switches?.[id]; return `${s?.position ? '反位' : '定位'}，${s?.represented === false ? '失表示' : '表示正常'}${s?.locked ? '，进路锁闭' : ''}${s?.manual_locked ? '，单锁' : ''}${s?.sealed ? '，封锁' : ''}` }
+function switchText(id) { const s=pointState(id); return `${s.moving ? `向${s.target_position ? '反位' : '定位'}转换，等待本端表示` : `${s.position ? '反位' : '定位'}，${s.represented === false ? s.movement_failed ? '转换超时，失表示' : '失表示' : '表示正常'}`}${s.locked ? '，进路锁闭' : ''}${s.manual_locked ? '，单锁' : ''}${s.sealed ? '，封锁' : ''}` }
 function selectSwitch(point) { emit('group', point.id); emit('inspect', '道岔', point.id, switchText(point.id)) }
-function bladeColor(point) { return props.snapshot?.switches?.[point.id]?.represented === false ? C.red : position(point.id) ? C.yellow : C.green }
+function bladeColor(point) { return lostIndication(point.id) ? C.red : position(point.id) ? C.yellow : C.green }
 function blade(point, branch, start, end) {
   const [x,y] = point.geometry.point, [tx,ty] = point.geometry.branches[branch][0] || [x+1,y]
   const l=Math.hypot(tx-x,ty-y)||1, ux=(tx-x)/l, uy=(ty-y)/l
@@ -150,4 +159,5 @@ text { user-select:none;pointer-events:none; }
 [role=button]:focus-visible { outline:none;filter:drop-shadow(0 0 4px white); }
 .block-panel text { font-size:16px; }.block-panel .block-phase { font-size:11px;fill:#ffff00; }.block-control:hover { filter:brightness(1.3); }
 .standard-flash { animation:standard-flash 1s steps(1,end) infinite; }@keyframes standard-flash { 50% { opacity:0; } }
+.blade-flash { animation:blade-flash 1s steps(1,end) infinite; }@keyframes blade-flash { 50% { stroke:#000; } }
 </style>

@@ -8,6 +8,12 @@ import pytest
 from app.services.simulation_console import runtime, console_commands, station
 from app.services.simulation_console.reference_station import reference_station_package
 from app.services.simulation_console.reference_runtime import ReferenceSimulationService
+from app.services.simulation_console import reference_runtime
+
+
+@pytest.fixture(autouse=True)
+def native_clock_follows_runtime(monkeypatch):
+    monkeypatch.setattr(reference_runtime, 'monotonic', lambda: runtime.monotonic())
 
 
 def service():
@@ -71,7 +77,12 @@ def test_each_original_definition_arranges_runs_and_releases(route,monkeypatch):
     session=svc._get(snap['session_id'],21)
     result=svc._arrange(session,route)
     assert result['accepted'],result['message']
-    snap=result['snapshot'];instance=snap['routes'][0]
+    snap=result['snapshot']
+    if any(snap['switches'][sid]['moving'] for sid in route['switches']):
+        assert snap['routes'][0]['status']=='setting'
+        assert all(snap['signals'][name]['aspect'] is None for name in route['segment_signals'])
+    clock[0]+=2.1
+    snap=svc.snapshot(snap['session_id'],21);instance=snap['routes'][0]
     assert all(snap['switches'][sid]['position']==pos for sid,pos in route['switches'].items())
     assert all(snap['signals'][name]['aspect'] is not None for name in route['segment_signals'])
     for _ in range(len(instance['sections'])+1+int(instance['progress']==-2)):
@@ -86,7 +97,9 @@ def test_each_original_definition_arranges_runs_and_releases(route,monkeypatch):
     assert all(snap['signals'][name]['aspect'] is None for name in route['segment_signals'])
 
 
-def test_native_clearance_fault_blocks_then_reverse_isolation_allows():
+def test_native_clearance_fault_blocks_then_reverse_isolation_allows(monkeypatch):
+    clock=[1000.]
+    monkeypatch.setattr(runtime,'monotonic',lambda:clock[0])
     svc=service();snap=svc.new_session(21,occupied_sections=['5DG'])
     result=press(svc,snap,['D1DA','D7DA'])
     assert not result['accepted'] and '5DG' in result['devices']
@@ -94,6 +107,8 @@ def test_native_clearance_fault_blocks_then_reverse_isolation_allows():
     session=svc._get(snap['session_id'],21)
     session.sections['5DG'].update(occupied=False,occupancy_kind='clear')
     result=operate(svc,result['snapshot'],'SWITCH_TOTAL_REVERSE','5')
+    clock[0]+=2.1
+    result['snapshot']=svc.snapshot(snap['session_id'],21)
     session.sections['5DG'].update(occupied=True,occupancy_kind='vehicle')
     result=press(svc,result['snapshot'],['D1DA','D7DA'])
     assert result['accepted']
@@ -192,10 +207,14 @@ def test_native_operations_leave_original_teaching_package_and_session_unchanged
 
 
 @pytest.mark.parametrize('name,signals', [('D1>S5',['D1','D9']),('L_XTA>SF',['X','XI'])])
-def test_composite_cancel_only_releases_selected_basic_segment(name,signals):
+def test_composite_cancel_only_releases_selected_basic_segment(name,signals,monkeypatch):
+    clock=[1000.]
+    monkeypatch.setattr(runtime,'monotonic',lambda:clock[0])
     svc=service();snap=svc.new_session(21)
     definition=next(r for r in svc.package['routes'] if r['name']==name)
     result=press(svc,snap,definition['button_sequence'])
+    clock[0]+=2.1
+    result['snapshot']=svc.snapshot(snap['session_id'],21)
     snap=result['snapshot'];instance=snap['routes'][0]
     first,second=[svc.routes[cid] for cid in definition['subroutes']]
     result=operate(svc,snap,'CANCEL_ROUTE',instance['id'],payload={'signal':signals[0]})

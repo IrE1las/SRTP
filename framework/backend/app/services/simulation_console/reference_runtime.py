@@ -5,11 +5,13 @@ behaviour. Local block peers model an external input, not a hardware protocol.
 """
 from copy import deepcopy
 from time import monotonic
+from uuid import uuid4
 
 from .runtime import SimulationService
+from .reference_points import ReferencePoints
 
 
-class ReferenceSimulationService(SimulationService):
+class ReferenceSimulationService(ReferencePoints, SimulationService):
     def __init__(self, package):
         self.reference_states = {}
         super().__init__(package)
@@ -20,12 +22,23 @@ class ReferenceSimulationService(SimulationService):
                          'phase': 'permitted' if session.interval_available else 'idle',
                          'direction': 'departure', 'pending_direction': None}
                        for b in self.package['blocks']},
-            'guide_locks': [], 'guide_armed': None, 'fault_releases': {},
+            'guide_locks': [], 'guide_armed': None, 'fault_releases': {}, 'point_motions': {},
         })
 
     def _snapshot(self, session):
+        for instance in session.routes.values():
+            if instance['status'] == 'manual_unlocking' or (
+                instance['status'] == 'closed_locked' and not instance.get('cancelled_subroutes')
+            ):
+                self._close_route_signals(session, instance)
         result = super()._snapshot(session)
         state = self._state(session)
+        for sid, point in session.switches.items():
+            result['switches'][sid].update(
+                moving=point.get('moving', False), target_position=point.get('target_position'),
+                movement_failed=point.get('movement_failed', False),
+                normal_indication=point['represented'] and point['position'] == 0,
+                reverse_indication=point['represented'] and point['position'] == 1)
         result.update(blocks=deepcopy(state['blocks']), guide_locks=list(state['guide_locks']),
                       guide_armed=state['guide_armed'],
                       fault_releases={name:max(0, int(due-monotonic()+0.99))
@@ -98,6 +111,10 @@ class ReferenceSimulationService(SimulationService):
                 session.switches[sid]['represented']=False
         if fact:
             return fact
+        if ignore_instance:
+            for sid, pos in route['switches'].items():
+                if session.switches[sid]['position'] != pos or session.switches[sid].get('moving'):
+                    return 'SWITCH_POSITION_MISMATCH', f'道岔 {sid} 位置不符，不能开放信号', [sid]
         # Evaluate native clearance conditions against the positions that will
         # be selected, rather than stale pre-arrangement point positions.
         for check in route.get('clearance_checks', []):
@@ -109,21 +126,45 @@ class ReferenceSimulationService(SimulationService):
 
     def _arrange(self, session, route):
         guide = self._state(session)['guide_armed']==route['signal']
-        definition = {**route, 'aspect':'HB'} if guide else route
-        result = super()._arrange(session, definition)
-        if result['accepted']:
-            instance = next(reversed(session.routes.values()))
-            instance['mode'] = 'guide' if guide else 'normal'
-            if guide:
-                instance['guide_deadline']=monotonic()+15
-            for signal in route.get('segment_signals', []):
-                aspect = 'HB' if guide else 'B' if route['kind']!='train' else route['aspect']
-                session.signals[signal].update(aspect=aspect, route=route['id'])
-            self._state(session)['guide_armed']=None
-            if guide:
-                self._event(session,'guide_open',f"{route['signal']} 引导信号开放，进路保持锁闭",route['id'])
-        result['snapshot']=self._snapshot(session)
-        return result
+        fact = self._blocking_fact(session, route)
+        session.selected = []
+        session.selection_deadline = None
+        self._state(session)['guide_armed'] = None
+        if fact:
+            return self._reject(session, fact[1], route['id'], fact[0], fact[2])
+        iid = str(uuid4())
+        protection = self._conditional_sections(session, route)
+        approach = route['approach_section']
+        external = approach in session.sections and approach not in route['sections']
+        instance = {'id': iid, 'route_id': route['id'], 'kind': route['kind'],
+                    'signal': route['signal'], 'sections': list(route['sections']),
+                    'protection_sections': protection, 'approach_section': approach if external else None,
+                    'remaining': set(route['sections']), 'switches': list(route['switches']),
+                    'progress': -2 if external else -1, 'status': 'setting',
+                    'release_due': {}, 'train_started': False, 'mode': 'guide' if guide else 'normal'}
+        session.routes[iid] = instance
+        for sid in route['switches']:
+            session.switches[sid]['owners'].add(iid)
+        for name in set(route['sections'] + protection):
+            session.sections[name]['owners'].add(iid)
+        for child in route['subroutes']:
+            self._event(session, 'subroute_lock', f'组合进路基本段 {child} 已纳入锁闭', route['id'])
+        self._event(session, 'route_lock', f"进路 {route['id']} 条件检查通过，预先锁闭", route['id'])
+        self._start_points(session, route['switches'], monotonic())
+        if not any(session.switches[sid].get('moving') for sid in route['switches']):
+            self._open_reference_signals(session, instance)
+        return {'accepted': True, 'message': session.last_message, 'snapshot': self._snapshot(session)}
+
+    def _open_reference_signals(self, session, instance):
+        route = self.routes[instance['route_id']]
+        guide = instance['mode'] == 'guide'
+        for signal in route['segment_signals']:
+            session.signals[signal].update(aspect='HB' if guide else route['aspect'], route=route['id'])
+        instance['status'] = 'signal_open'
+        if guide:
+            instance['guide_deadline'] = monotonic() + 15
+        self._event(session, 'guide_open' if guide else 'signal_open',
+                    f"进路 {route['id']} 各端表示核对完成，{'引导' if guide else ''}信号开放", route['id'])
 
     def select_button(self, session_id, owner_id, button, version=None):
         session=self._get(session_id,owner_id)
@@ -164,13 +205,16 @@ class ReferenceSimulationService(SimulationService):
             return super().clear_selection(session_id,owner_id,version)
 
     def _release_due(self, session):
+        self._advance_points(session, monotonic())
+        self._protect_point_signals(session)
         super()._release_due(session)
         state=self._state(session)
         for name,due in list(state['fault_releases'].items()):
             if monotonic()<due or session.sections[name]['occupied']:
                 continue
             # Section release never erases another section's locks or occupancy.
-            for owner in list(session.sections[name]['owners']):
+            owners = set(session.sections[name]['owners'])
+            for owner in owners:
                 route=session.routes.get(owner)
                 if route:
                     route['remaining'].discard(name)
@@ -179,9 +223,9 @@ class ReferenceSimulationService(SimulationService):
                         route['status']='released'
                         for other in [*session.sections.values(),*session.switches.values()]:
                             other['owners'].discard(owner)
-            session.sections[name]['owners'].clear()
+            session.sections[name]['owners'].difference_update(owners)
             for sid in self.section_defs[name]['switches']:
-                session.switches[sid]['owners'].clear()
+                session.switches[sid]['owners'].difference_update(owners)
             del state['fault_releases'][name]
             self._event(session,'fault_unlock_complete',f'{name} 区故解延时完成')
         for instance in session.routes.values():
@@ -204,6 +248,10 @@ class ReferenceSimulationService(SimulationService):
     def step_train(self, session_id, owner_id, instance_id, version=None):
         session=self._get(session_id,owner_id)
         with session.mutex:
+            self._release_due(session)
+            self._verify_version(session, version)
+            if session.routes.get(instance_id, {}).get('status') == 'setting':
+                return self._reject(session, '道岔转换中，尚未收到全部到位表示，不能行车', reason_code='ROUTE_SETTING')
             persistent={name:{k:v for k,v in value.items() if k in {'sealed','lit'}}
                         for name,value in session.signals.items()}
             instance=session.routes.get(instance_id)
@@ -230,6 +278,9 @@ class ReferenceSimulationService(SimulationService):
         """Called under console_commands' mutex/version/PIN checks."""
         kind,target=command['type'],command.get('target','')
         state=self._state(session)
+        points = self._operate_points(session, command, monotonic())
+        if points is not None:
+            return points
         def reject(code,message):
             return self._reject(session,message,reason_code=code,devices=[target])
         def success(message):
@@ -245,6 +296,18 @@ class ReferenceSimulationService(SimulationService):
                 return reject('PARTIALLY_CANCELLED','组合进路已有基本段取消，请完成取消后重新选排')
         if kind=='REPEAT_OPEN_SIGNAL' and session.routes.get(target,{}).get('mode')=='guide':
             return reject('GUIDE_REOPEN_REQUIRED','引导信号须通过引导办理、确认口令后重开')
+        if kind=='REPEAT_OPEN_SIGNAL':
+            instance = session.routes.get(target)
+            if instance and instance['status'] == 'setting':
+                return reject('ROUTE_SETTING', '道岔转换中，不能重开信号')
+            # Shared command validation is retained, then open every native
+            # segment only when actual indications match the retained route.
+            from .commands import execute
+            result = execute(self, session, command)
+            if result['accepted']:
+                self._open_reference_signals(session, instance)
+                result['snapshot'] = self._snapshot(session)
+            return result
         if kind=='CANCEL_ROUTE':
             instance=session.routes.get(target)
             definition=self.routes.get(instance['route_id']) if instance else None
