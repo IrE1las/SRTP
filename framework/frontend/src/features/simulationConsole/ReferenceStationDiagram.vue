@@ -64,7 +64,8 @@
     </g>
     <g v-for="button in auxiliaryButtons" :key="button.name" class="device-hit" role="button" tabindex="0" :aria-label="button.name"
       @click="emit('press', button.name)" @keydown.enter="emit('press', button.name)">
-      <rect :x="button.x-35" :y="button.y-34" width="70" height="48" fill="transparent" />
+      <rect :x="button.x-(button.name === 'STA' ? 20 : 35)" :y="button.y-(button.name === 'STA' ? 10 : 34)"
+        :width="button.name === 'STA' ? 40 : 70" :height="button.name === 'STA' ? 26 : 48" fill="transparent" />
       <rect :x="button.x-7" :y="button.y-7" width="14" height="14" :fill="C.gray" :stroke="C.silver" />
       <text :x="button.x" :y="button.y-17" text-anchor="middle">{{ button.name }}</text>
     </g>
@@ -103,7 +104,7 @@ const tracks = computed(() => props.station.reference_geometry.filter(r => r.typ
 const joints = computed(() => props.station.reference_geometry.filter(r => r.type === 501))
 const auxiliaryButtons = computed(() => props.station.buttons.filter(b => ['BA1','XDDZA','SFDZA','XTA','XFTA','STA','SFTA'].includes(b.name))
   .map(b => ({ ...b, ...({ BA1: { x: 420, y: 245 }, XDDZA: { x: 240, y: 246 }, SFDZA: { x: 1220, y: 326 },
-    XTA: { x: 80,y: 420 }, XFTA: { x: 80,y: 500 }, STA: { x: 1370,y: 485 }, SFTA: { x: 1330,y: 290 } })[b.name] })))
+    XTA: { x: 80,y: 420 }, XFTA: { x: 80,y: 500 }, STA: { x: 1340,y: 485 }, SFTA: { x: 1330,y: 290 } })[b.name] })))
 const blockPanels = [ { name: 'XD', x: 0, y: 130, width: 126 },
   { name: 'X', x: 0, y: 558, width: 322 }, { name: 'XF', x: 326, y: 558, width: 240 },
   { name: 'SF', x: 794, y: 558, width: 260 }, { name: 'S', x: 1060, y: 558, width: 298 } ]
