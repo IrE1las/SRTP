@@ -104,7 +104,7 @@ const tracks = computed(() => props.station.reference_geometry.filter(r => r.typ
 const joints = computed(() => props.station.reference_geometry.filter(r => r.type === 501))
 const auxiliaryButtons = computed(() => props.station.buttons.filter(b => ['BA1','XDDZA','SFDZA','XTA','XFTA','STA','SFTA'].includes(b.name))
   .map(b => ({ ...b, ...({ BA1: { x: 420, y: 245 }, XDDZA: { x: 240, y: 246 }, SFDZA: { x: 1220, y: 326 },
-    XTA: { x: 80,y: 420 }, XFTA: { x: 80,y: 500 }, STA: { x: 1340,y: 485 }, SFTA: { x: 1330,y: 290 } })[b.name] })))
+    XTA: { x: 80,y: 420 }, XFTA: { x: 80,y: 500 }, STA: { x: 1340,y: 500 }, SFTA: { x: 1330,y: 290 } })[b.name] })))
 const blockPanels = [ { name: 'XD', x: 0, y: 130, width: 126 },
   { name: 'X', x: 0, y: 558, width: 322 }, { name: 'XF', x: 326, y: 558, width: 240 },
   { name: 'SF', x: 794, y: 558, width: 260 }, { name: 'S', x: 1060, y: 558, width: 298 } ]
