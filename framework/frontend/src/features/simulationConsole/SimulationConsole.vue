@@ -62,7 +62,7 @@
     </div>
     <section class="activity-panel" v-if="station && showActivity"><div class="activity-heading"><strong>活动进路</strong><span>仅教师或管理员推进仿真车辆；观察占用、信号关闭及正常解锁。</span></div>
       <p v-if="!activeRoutes.length" class="empty-route">暂无活动进路。{{ source === 'reference' ? '调车示例：D3 → D7。' : '接车示例：XNLA → S5LA。' }}</p>
-      <div class="route-cards"><div v-for="route in activeRoutes" :key="route.id" class="route-card"><strong>{{ routeName(route.route_id) }}</strong><span>{{ statusText(route) }}</span><button :disabled="busy || replaying || stale || !canControlTrain || ['setting','clearing','manual_unlocking','closed_locked'].includes(route.status)" @click="advance(route.id)">{{ canControlTrain ? '仿真行车 · 推进一步' : '由教师控制仿真行车' }}</button></div></div>
+      <div class="route-cards"><div v-for="route in activeRoutes" :key="route.id" class="route-card"><strong>{{ routeName(route.route_id) }}</strong><span>{{ statusText(route) }}</span><button :disabled="busy || replaying || stale || !canControlTrain || ['setting','track_proving','cancelling','clearing','manual_unlocking','closed_locked'].includes(route.status)" @click="advance(route.id)">{{ canControlTrain ? '仿真行车 · 推进一步' : '由教师控制仿真行车' }}</button></div></div>
     </section>
     <section v-if="showRoutes && station" class="route-audit"><div class="activity-heading"><strong>{{ source === 'reference' ? '原软件进路与来源' : '教学站进路与核对' }}</strong><span>可解析办理 {{ station.counts.ready_routes }} · 数据异常 {{ station.counts.blocked_routes }} · 共 {{ station.counts.candidate_routes }}</span></div>
       <p v-if="!station.routes">学生可在站场自由操作；完整进路条件和核对清单由教师查看。</p>
@@ -86,7 +86,7 @@ const loading=ref(true), busy=ref(false), stale=ref(false), loadError=ref(''), i
 const showRoutes=ref(false), showDevices=ref(false), showActivity=ref(false), showHelp=ref(false), inspected=ref(null), intervalAvailable=ref(true), confirmNew=ref(false)
 const replaying=ref(false), replayFrames=ref([]), replayIndex=ref(0), acknowledged=ref(0), routeQuery=ref('')
 const pending=ref(null), pinCommand=ref(null), pin=ref(''), pinInput=ref(null), now=ref(Date.now())
-let poller, ticker
+let poller, ticker, lastPoll=0
 let commandQueue=Promise.resolve()
 const storageKey=computed(()=>`srtp-console-${source.value}-${userStore.user?.id || 'anonymous'}`)
 const canControlTrain=computed(()=>['teacher','admin'].includes(userStore.role))
@@ -109,7 +109,7 @@ const notify=message=>ElMessage.info(message)
 const eventTime=value=>new Date(value).toLocaleTimeString('zh-CN',{hour12:false,timeZone:'Asia/Shanghai'})
 const targetLabel=target=>({switch:'道岔编号',signal:'信号机',route:'原进路始端信号',section:'轨道区段'})[target] || '设备'
 const routeName=id=>station.value?.routes?.find(r=>r.id===id)?.name || id
-function statusText(route){if(route.cancelled_segments?.length)return `已取消 ${route.cancelled_segments.length} 个基本段，其余保持锁闭`;if(route.mode==='guide' && route.guide_remaining_seconds)return `引导开放，保持剩余 ${route.guide_remaining_seconds} 秒`;return route.status==='manual_unlocking' ? `人工解锁剩余 ${route.manual_remaining_seconds} 秒` : ({setting:'道岔转换中，等待各端到位表示',signal_open:'信号开放',approaching:'车辆接近',clearing:'出清，等待正常解锁',closed_locked:'信号关闭，保持锁闭'})[route.status] || '车辆运行'}
+function statusText(route){if(route.status==='cancelling')return '取消中，等待道岔、轨道光带及信号依次更新';if(route.cancelled_segments?.length)return `已取消 ${route.cancelled_segments.length} 个基本段，其余保持锁闭`;if(route.mode==='guide' && route.guide_remaining_seconds)return `引导开放，保持剩余 ${route.guide_remaining_seconds} 秒`;return route.status==='manual_unlocking' ? `人工解锁剩余 ${route.manual_remaining_seconds} 秒` : ({setting:'道岔转换中，等待各端到位表示',track_proving:'轨道光带已亮，等待信号开放',cancelling:'取消中，等待道岔、轨道光带及信号依次更新',signal_open:'信号开放',approaching:'车辆接近',clearing:'出清，等待正常解锁',closed_locked:'信号关闭，保持锁闭'})[route.status] || '车辆运行'}
 function onFullscreenChange(){isFullscreen.value=document.fullscreenElement===consoleRoot.value}
 async function toggleFullscreen(){try{if(isFullscreen.value)await document.exitFullscreen();else await consoleRoot.value?.requestFullscreen()}catch{notify('浏览器未允许全屏，可继续在当前窗口操作')}}
 function clearPending(){pending.value=null;pin.value=''}
@@ -137,7 +137,7 @@ function acknowledgeAlarms(){acknowledged.value=displaySnapshot.value?.version |
 async function openReplay(){if(!snapshot.value || busy.value)return;clearPending();try{replayFrames.value=await getSimulationReplay(snapshot.value.session_id);if(replayFrames.value.length){replayIndex.value=replayFrames.value.length-1;replaying.value=true}}catch{ElMessage.warning('读取回放失败')}}
 function closeReplay(){replaying.value=false;refresh()}
 function onKey(event){if(event.key==='Escape'){clearPending();cancelPin()}}
-onMounted(async()=>{document.addEventListener('fullscreenchange',onFullscreenChange);document.addEventListener('keydown',onKey);await boot();poller=window.setInterval(refresh,1000);ticker=window.setInterval(()=>{now.value=Date.now();if(pending.value && pending.value.deadline<=now.value)clearPending()},250)})
+onMounted(async()=>{document.addEventListener('fullscreenchange',onFullscreenChange);document.addEventListener('keydown',onKey);await boot();poller=window.setInterval(()=>{const t=Date.now();if(source.value==='reference' || t-lastPoll>=1000){lastPoll=t;refresh()}},250);ticker=window.setInterval(()=>{now.value=Date.now();if(pending.value && pending.value.deadline<=now.value)clearPending()},250)})
 onBeforeUnmount(()=>{document.removeEventListener('fullscreenchange',onFullscreenChange);document.removeEventListener('keydown',onKey);clearInterval(poller);clearInterval(ticker)})
 </script>
 

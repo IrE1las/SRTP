@@ -83,6 +83,8 @@ def test_each_original_definition_arranges_runs_and_releases(route,monkeypatch):
         assert all(snap['signals'][name]['aspect'] is None for name in route['segment_signals'])
     clock[0]+=2.1
     snap=svc.snapshot(snap['session_id'],21);instance=snap['routes'][0]
+    clock[0]+=.7
+    snap=svc.snapshot(snap['session_id'],21);instance=snap['routes'][0]
     assert all(snap['switches'][sid]['position']==pos for sid,pos in route['switches'].items())
     assert all(snap['signals'][name]['aspect'] is not None for name in route['segment_signals'])
     for _ in range(len(instance['sections'])+1+int(instance['progress']==-2)):
@@ -133,7 +135,9 @@ def test_guide_requires_aligned_points_respects_vehicle_and_expires(monkeypatch)
     assert not result['accepted']
     result=operate(svc,result['snapshot'],'GUIDE_ARM','X',pin='0000')
     result=press(svc,result['snapshot'],['SILA'])
-    assert result['accepted'] and result['snapshot']['signals']['X']['aspect']=='HB'
+    assert result['accepted'] and result['snapshot']['signals']['X']['aspect'] is None
+    clock[0]+=.7
+    assert svc.snapshot(snap['session_id'],21)['signals']['X']['aspect']=='HB'
     clock[0]+=10
     result=operate(svc,svc.snapshot(snap['session_id'],21),'GUIDE_MAINTAIN','X')
     assert result['accepted']
@@ -215,15 +219,20 @@ def test_composite_cancel_only_releases_selected_basic_segment(name,signals,monk
     result=press(svc,snap,definition['button_sequence'])
     clock[0]+=2.1
     result['snapshot']=svc.snapshot(snap['session_id'],21)
+    clock[0]+=.7
+    result['snapshot']=svc.snapshot(snap['session_id'],21)
     snap=result['snapshot'];instance=snap['routes'][0]
     first,second=[svc.routes[cid] for cid in definition['subroutes']]
     result=operate(svc,snap,'CANCEL_ROUTE',instance['id'],payload={'signal':signals[0]})
     assert result['accepted']
-    snap=result['snapshot']
+    clock[0]+=.7
+    snap=svc.snapshot(snap['session_id'],21)
     assert snap['signals'][signals[0]]['aspect'] is None
     assert snap['signals'][signals[1]]['aspect'] is not None
     assert all(snap['sections'][n]['locked'] for n in second['sections'])
     result=operate(svc,snap,'CANCEL_ROUTE',instance['id'],payload={'signal':signals[1]})
+    clock[0]+=.7
+    result['snapshot']=svc.snapshot(snap['session_id'],21)
     assert result['accepted'] and result['snapshot']['routes'][0]['status']=='cancelled'
     assert not any(s['locked'] for s in result['snapshot']['sections'].values())
 

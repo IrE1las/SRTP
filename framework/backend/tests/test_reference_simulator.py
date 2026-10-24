@@ -71,6 +71,8 @@ def test_every_enabled_native_route_can_arrange_drive_and_release(monkeypatch):
         snapshot=response['snapshot']
         clock[0] += 2.1
         snapshot=svc.snapshot(snapshot['session_id'],17)
+        clock[0] += .7
+        snapshot=svc.snapshot(snapshot['session_id'],17)
         instance=snapshot['routes'][0]
         for _ in range(len(instance['sections'])+1+int(instance['progress']==-2)):
             response=svc.step_train(snapshot['session_id'],17,instance['id'],snapshot['version'])
@@ -93,6 +95,8 @@ def test_native_route_previously_blocked_by_unrelated_workbook_can_open(monkeypa
     assert result['accepted']
     assert result['snapshot']['signals']['D9']['aspect'] is None
     clock[0] += 2.1
+    svc.snapshot(result['snapshot']['session_id'],17)
+    clock[0] += .7
     assert svc.snapshot(result['snapshot']['session_id'],17)['signals']['D9']['aspect']=='B'
     assert route['switches']['13']==route['switches']['15']==0
 
@@ -177,7 +181,9 @@ def test_manual_unlock_deadline_roundtrips_through_durable_session():
     assert next(iter(saved.routes.values()))['manual_release_due']==pytest.approx(next(iter(original.routes.values()))['manual_release_due'],abs=0.1)
 
 
-def test_reference_http_selection_ownership_and_fault_permissions(client,db_session):
+def test_reference_http_selection_ownership_and_fault_permissions(client,db_session,monkeypatch):
+    clock=[1000.]
+    monkeypatch.setattr(runtime,'monotonic',lambda:clock[0])
     from app.models.user import User
     from app.core.security import create_access_token
     from app.api.simulation_console import reference_service
@@ -203,6 +209,9 @@ def test_reference_http_selection_ownership_and_fault_permissions(client,db_sess
         reply=client.post(url+'/buttons',headers=student,json={'button':button,'version':snap['version']})
         assert reply.status_code==200 and reply.json()['accepted']
         snap=reply.json()['snapshot']
+    assert snap['signals']['D3']['aspect'] is None
+    clock[0]+=.7
+    snap=client.get(url,headers=student).json()
     assert snap['signals']['D3']['aspect']=='B'
     assert client.post(url+'/advance',headers=student,json={'route_instance_id':snap['routes'][0]['id'],'version':snap['version']}).status_code==403
     assert client.post(url+'/commands',headers=student,json={'type':'SIGNAL_UNSEAL','target':'D3','pin':'wrong','version':snap['version']}).json()['reason_code']=='INVALID_PIN'

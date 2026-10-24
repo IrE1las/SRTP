@@ -109,7 +109,8 @@ const blockPanels = [ { name: 'XD', x: 0, y: 130, width: 126 },
   { name: 'SF', x: 794, y: 558, width: 260 }, { name: 'S', x: 1060, y: 558, width: 298 } ]
 const poly = points => points.map(p => p.join(',')).join(' ')
 const safePoints = points => points.every(([x,y]) => x >= 0 && x <= 1440 && y >= 0 && y <= 740)
-const color = name => sectionColor(props.snapshot?.sections?.[name])
+const displayedSection = name => { const s=props.snapshot?.sections?.[name]; return s ? {...s, locked:s.display_locked ?? s.locked} : s }
+const color = name => sectionColor(displayedSection(name))
 const pointState = id => props.snapshot?.switches?.[id] || {}
 const position = id => pointState(id).moving ? pointState(id).target_position : pointState(id).position || 0
 const lostIndication = id => pointState(id).represented === false && !pointState(id).moving
@@ -119,7 +120,7 @@ function pressBlock(target,label) {
   const type=({'闭塞':'BLOCK_REQUEST','复原':'BLOCK_RESET','事故':'BLOCK_ACCIDENT_RESET','发车辅助':'BLOCK_DEPARTURE_AUX','接车辅助':'BLOCK_RECEPTION_AUX','总辅助':'BLOCK_TOTAL_AUX'})[label]
   emit('block',{ type, fixedTarget:target, label:`${target} ${label}`, sealed:!['BLOCK_REQUEST','BLOCK_RESET'].includes(type) })
 }
-function branchColor(point,index){const state=props.snapshot?.sections?.[point.section];return state?.locked && !state.occupied && index!==0 && index!==(position(point.id)?2:1) ? C.idle : sectionColor(state)}
+function branchColor(point,index){const state=displayedSection(point.section);return state?.locked && !state.occupied && index!==0 && index!==(position(point.id)?2:1) ? C.idle : sectionColor(state)}
 function jointLine(joint){const [x,y]=joint.center,l=joint.length;return joint.shape===0 ? {x1:x-5,y1:y-5,x2:x+5,y2:y+5} : {x1:x,y1:y-l,x2:x,y2:y+l}}
 function sectionText(name) { const s = props.snapshot?.sections?.[name]; return s?.occupied ? '占用' : s?.locked ? '锁闭' : '空闲' }
 function inspectSection(name) { emit('inspect', '区段', name, sectionText(name)) }

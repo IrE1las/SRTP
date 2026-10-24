@@ -9,9 +9,10 @@ from uuid import uuid4
 
 from .runtime import SimulationService
 from .reference_points import ReferencePoints
+from .reference_sequence import ReferenceSequence
 
 
-class ReferenceSimulationService(ReferencePoints, SimulationService):
+class ReferenceSimulationService(ReferencePoints, ReferenceSequence, SimulationService):
     def __init__(self, package):
         self.reference_states = {}
         super().__init__(package)
@@ -33,6 +34,11 @@ class ReferenceSimulationService(ReferencePoints, SimulationService):
                 self._close_route_signals(session, instance)
         result = super()._snapshot(session)
         state = self._state(session)
+        for name, section in result['sections'].items():
+            section['display_locked'] = any(
+                owner in session.routes and
+                name in session.routes[owner].get('display_sections', [])
+                for owner in session.sections[name]['owners'])
         for sid, point in session.switches.items():
             result['switches'][sid].update(
                 moving=point.get('moving', False), target_position=point.get('target_position'),
@@ -141,7 +147,8 @@ class ReferenceSimulationService(ReferencePoints, SimulationService):
                     'protection_sections': protection, 'approach_section': approach if external else None,
                     'remaining': set(route['sections']), 'switches': list(route['switches']),
                     'progress': -2 if external else -1, 'status': 'setting',
-                    'release_due': {}, 'train_started': False, 'mode': 'guide' if guide else 'normal'}
+                    'release_due': {}, 'train_started': False, 'mode': 'guide' if guide else 'normal',
+                    'display_sections': []}
         session.routes[iid] = instance
         for sid in route['switches']:
             session.switches[sid]['owners'].add(iid)
@@ -152,14 +159,15 @@ class ReferenceSimulationService(ReferencePoints, SimulationService):
         self._event(session, 'route_lock', f"进路 {route['id']} 条件检查通过，预先锁闭", route['id'])
         self._start_points(session, route['switches'], monotonic())
         if not any(session.switches[sid].get('moving') for sid in route['switches']):
-            self._open_reference_signals(session, instance)
+            self._begin_track_proving(session, instance, monotonic())
         return {'accepted': True, 'message': session.last_message, 'snapshot': self._snapshot(session)}
 
     def _open_reference_signals(self, session, instance):
         route = self.routes[instance['route_id']]
         guide = instance['mode'] == 'guide'
         for signal in route['segment_signals']:
-            session.signals[signal].update(aspect='HB' if guide else route['aspect'], route=route['id'])
+            session.signals[signal].update(aspect='HB' if guide else route['aspect'], route=route['id'],
+                                           instance_id=instance['id'])
         instance['status'] = 'signal_open'
         if guide:
             instance['guide_deadline'] = monotonic() + 15
@@ -206,6 +214,7 @@ class ReferenceSimulationService(ReferencePoints, SimulationService):
 
     def _release_due(self, session):
         self._advance_points(session, monotonic())
+        self._advance_reference_sequences(session, monotonic())
         self._protect_point_signals(session)
         super()._release_due(session)
         state=self._state(session)
@@ -230,15 +239,14 @@ class ReferenceSimulationService(ReferencePoints, SimulationService):
             self._event(session,'fault_unlock_complete',f'{name} 区故解延时完成')
         for instance in session.routes.values():
             if instance.get('mode')=='guide' and instance.get('guide_deadline',0)<=monotonic():
-                if session.signals[instance['signal']].get('aspect')=='HB':
-                    session.signals[instance['signal']].update(aspect=None,route=None)
+                if (session.signals[instance['signal']].get('aspect')=='HB' and
+                    session.signals[instance['signal']].get('instance_id')==instance['id']):
+                    self._close_route_signals(session, instance)
                     instance['status']='closed_locked'
                     self._event(session,'guide_expired','引导信号保持超时，信号关闭、锁闭保持',instance['route_id'])
             if instance['status'] in {'released','cancelled'}:
                 definition=self.routes[instance['route_id']]
-                for signal in definition.get('segment_signals',[]):
-                    if session.signals[signal].get('route')==instance['route_id']:
-                        session.signals[signal].update(aspect=None,route=None)
+                self._close_route_signals(session, instance)
                 if not instance.get('block_cycle_complete') and instance.get('train_started'):
                     block=state['blocks'].get(definition.get('block_signal'))
                     if block and block['type']=='semi':
@@ -250,8 +258,10 @@ class ReferenceSimulationService(ReferencePoints, SimulationService):
         with session.mutex:
             self._release_due(session)
             self._verify_version(session, version)
-            if session.routes.get(instance_id, {}).get('status') == 'setting':
+            if session.routes.get(instance_id, {}).get('status') in {'setting', 'track_proving'}:
                 return self._reject(session, '道岔转换中，尚未收到全部到位表示，不能行车', reason_code='ROUTE_SETTING')
+            if session.routes.get(instance_id, {}).get('cancel_pending'):
+                return self._reject(session, '取消顺序执行中，不能推进仿真车辆', reason_code='CANCEL_PENDING')
             persistent={name:{k:v for k,v in value.items() if k in {'sealed','lit'}}
                         for name,value in session.signals.items()}
             instance=session.routes.get(instance_id)
@@ -286,6 +296,8 @@ class ReferenceSimulationService(ReferencePoints, SimulationService):
         def success(message):
             self._event(session,kind,message)
             return {'accepted':True,'reason_code':'OK','message':message,'snapshot':self._snapshot(session)}
+        if kind in {'CANCEL_ROUTE', 'REPEAT_OPEN_SIGNAL', 'MANUAL_UNLOCK_ROUTE'} and session.routes.get(target, {}).get('cancel_pending'):
+            return reject('CANCEL_PENDING', '进路取消顺序执行中，请等待完成')
         if kind in {'CANCEL_ROUTE','REPEAT_OPEN_SIGNAL'}:
             instance=session.routes.get(target,{})
             if any(name in state['fault_releases'] for name in instance.get('sections',[])):
@@ -298,7 +310,7 @@ class ReferenceSimulationService(ReferencePoints, SimulationService):
             return reject('GUIDE_REOPEN_REQUIRED','引导信号须通过引导办理、确认口令后重开')
         if kind=='REPEAT_OPEN_SIGNAL':
             instance = session.routes.get(target)
-            if instance and instance['status'] == 'setting':
+            if instance and instance['status'] in {'setting', 'track_proving'}:
                 return reject('ROUTE_SETTING', '道岔转换中，不能重开信号')
             # Shared command validation is retained, then open every native
             # segment only when actual indications match the retained route.
@@ -309,42 +321,7 @@ class ReferenceSimulationService(ReferencePoints, SimulationService):
                 result['snapshot'] = self._snapshot(session)
             return result
         if kind=='CANCEL_ROUTE':
-            instance=session.routes.get(target)
-            definition=self.routes.get(instance['route_id']) if instance else None
-            if definition and definition['subroutes'] and instance['status'] not in {'released','cancelled'}:
-                if instance.get('manual_release_due') is not None:
-                    return reject('UNLOCK_PENDING','人工解锁倒计时中')
-                signal=command.get('payload',{}).get('signal',instance['signal'])
-                children=[self.routes[cid] for cid in definition['subroutes']]
-                child=next((c for c in children if c['signal']==signal),None)
-                if not child:
-                    return reject('UNKNOWN_DEVICE','请选择该组合进路的基本段始端')
-                cancelled=instance.setdefault('cancelled_subroutes',[])
-                if child['id'] in cancelled:
-                    return reject('SEGMENT_CANCELLED','该基本段已经取消')
-                approach=child['approach_section']
-                if instance['train_started'] or (approach and session.sections[approach]['occupied']):
-                    return reject('APPROACH_LOCKED','该基本段已接近或进路已行车')
-                if any(session.sections[n]['occupied'] for n in child['sections']):
-                    return reject('SECTION_OCCUPIED','基本段区段仍占用')
-                cancelled.append(child['id'])
-                retained=[c for c in children if c['id'] not in cancelled]
-                keep_sections={n for c in retained for n in c['sections']}
-                keep_switches={sid for c in retained for sid in c['switches']}
-                for name in child['sections']:
-                    if name not in keep_sections:
-                        instance['remaining'].discard(name)
-                        session.sections[name]['owners'].discard(target)
-                for sid in instance['switches']:
-                    if sid not in keep_switches:
-                        session.switches[sid]['owners'].discard(target)
-                session.signals[signal].update(aspect=None,route=None)
-                instance['status']='closed_locked' if retained else 'cancelled'
-                if not retained:
-                    for obj in [*session.sections.values(),*session.switches.values()]:
-                        obj['owners'].discard(target)
-                    instance['remaining'].clear()
-                return success(f'{signal} 基本段取消完成；'+('其余基本段保持锁闭' if retained else '组合进路全部取消'))
+            return self._request_reference_cancel(session, command, monotonic())
         if kind=='SECTION_FAULT_UNLOCK':
             if target not in session.sections:
                 return reject('UNKNOWN_DEVICE','请选择区段')
@@ -355,11 +332,12 @@ class ReferenceSimulationService(ReferencePoints, SimulationService):
                 return reject('SECTION_NOT_LOCKED','该区段没有进路锁闭')
             if target in state['fault_releases']:
                 return reject('UNLOCK_PENDING','该区段已在区故解倒计时中')
+            if any(session.routes.get(owner, {}).get('cancel_pending') for owner in track['owners']):
+                return reject('CANCEL_PENDING', '相关进路取消顺序执行中')
             for owner in track['owners']:
                 instance=session.routes.get(owner)
                 if instance:
-                    for signal in self.routes[instance['route_id']]['segment_signals']:
-                        session.signals[signal].update(aspect=None,route=None)
+                    self._close_route_signals(session, instance)
                     instance['status']='closed_locked'
             state['fault_releases'][target]=monotonic()+30
             return success(f'{target} 相关信号关闭，区故解倒计时 30 秒，锁闭保持')
@@ -379,7 +357,7 @@ class ReferenceSimulationService(ReferencePoints, SimulationService):
                     if fact:
                         return self._reject(session,fact[1],reason_code=fact[0],devices=fact[2])
                     existing.update(mode='guide',guide_deadline=monotonic()+15,status='signal_open')
-                    session.signals[target].update(aspect='HB',route=existing['route_id'])
+                    session.signals[target].update(aspect='HB',route=existing['route_id'],instance_id=existing['id'])
                     return success(f'{target} 引导信号保持 15 秒；继续办理保持可延续开放')
                 if session.signals[target].get('sealed'):
                     return reject('SIGNAL_BUTTON_SEALED','始端按钮已封锁')

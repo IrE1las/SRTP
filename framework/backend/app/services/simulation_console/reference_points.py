@@ -65,25 +65,30 @@ class ReferencePoints:
                 self._close_route_signals(session, instance)
                 self._event(session, 'route_setting_failed', f'进路选排未完成：{fact[1]}；锁闭保持', route['id'])
             else:
-                self._open_reference_signals(session, instance)
+                self._begin_track_proving(session, instance, now)
 
     def _close_route_signals(self, session, instance):
         for name in self.routes[instance['route_id']]['segment_signals']:
-            if session.signals[name].get('route') == instance['route_id']:
-                session.signals[name].update(aspect=None, route=None)
+            if session.signals[name].get('instance_id') == instance['id']:
+                session.signals[name].update(aspect=None, route=None, instance_id=None)
 
     def _protect_point_signals(self, session):
         for instance in session.routes.values():
-            if instance['status'] in {'released', 'cancelled', 'setting', 'manual_unlocking'}:
+            if instance['status'] in {'released', 'cancelled', 'setting', 'track_proving', 'manual_unlocking'}:
                 continue
             route = self.routes[instance['route_id']]
+            demands = route['switches']
+            if instance.get('cancelled_subroutes'):
+                demands = {sid: pos for cid in route['subroutes'] if cid not in instance['cancelled_subroutes']
+                           for sid, pos in self.routes[cid]['switches'].items()}
             # Total guide locking deliberately tolerates missing indication;
             # its existing explicit guards remain in reference_runtime.
             if instance.get('mode') == 'guide' and instance['signal'] in self._state(session)['guide_locks']:
                 continue
             if any(not session.switches[sid]['represented'] or
-                   session.switches[sid]['position'] != pos for sid, pos in route['switches'].items()):
-                if any(session.signals[n].get('aspect') is not None for n in route['segment_signals']):
+                   session.switches[sid]['position'] != pos for sid, pos in demands.items()):
+                if any(session.signals[n].get('aspect') is not None and
+                       session.signals[n].get('instance_id') == instance['id'] for n in route['segment_signals']):
                     self._close_route_signals(session, instance)
                     instance['status'] = 'closed_locked'
                     self._event(session, 'signal_close', '道岔表示不符，相关信号关闭；进路锁闭保持', route['id'])
