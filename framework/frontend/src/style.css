@@ -1,4 +1,3 @@
-
 :root {
   --swjtu-navy: #093278;
   --swjtu-blue: #0075b7;
@@ -209,3 +208,11 @@ button:focus-visible, a:focus-visible, summary:focus-visible { outline: 3px soli
   .layout-main .editor-form .el-space { flex-wrap: wrap; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+
+
+/* Reserve the viewport gutter on both short and long pages to prevent width jumps. */
+html { scrollbar-gutter: stable; }
+@supports not (scrollbar-gutter: stable) { html { overflow-y: scroll; } }
+.app-layout { width: 100%; max-width: 100%; }
+.app-body > .workspace { flex: 1 1 0%; min-width: 0; }
+#app .layout-main > :is(.lab-page, .review-page, .answer-page) { width: 100%; min-width: 0; }

@@ -1,40 +1,59 @@
-# SRTP 铁路联锁实训
+# SRTP 铁路联锁学习与考试平台
 
-Vue 3 前端与 FastAPI 后端组成的铁路联锁教学网站，包含站场交互作答、经典例题错误解释、实验专题、教师出题与批阅等功能。
+当前交付阶段为 **S1：旧功能清理、三角色导航、六专题理论学习**。实施依据见《项目重构正式约束与分步验收计划.md》；下一步须经用户验收并明确许可。
 
-## 项目资料
+学生只有首页、学习界面、考试界面三个顶级入口。理论学习保留原图、六专题18道复合题、客观核对、参考解答及教师评阅；教师使用首页、题目管理、考试管理；管理员只有首页、用户管理和AI设置。操作学习和考试目前显示null与后续步骤说明。
 
-- `framework/frontend`：网页与站场图形交互。
-- `framework/backend`：登录、题目、判分与AI解析接口。
-- `ai_design/station`：专业规则、站场拓扑、核对后的联锁表和题目依据。
-- `pictures`：站场原图等项目图片。
-- `车站与区间控制实验`中的四份报告：实验专题会校验这些来源文件的哈希，不能单独修改原件后继续沿用旧题目。
+旧三模块实验中心、经典例题、旧练习及统计、独立调车题库、专题7/8、旧自主命题和自由仿真页面/API已移除。标准站引擎、原软件资料和绘图组件保留；S1返修已将标准站操作台接入理论专题1—4，5—6继续用原图联锁表平台。新的操作题录制与作答仍留S3、S4。
 
-专业解释以本项目已有规则文件为最高约束。详细操作见根目录的各项功能说明。
+## S1返修说明（2026-10-27）
 
-## 首次运行
+六入口、专题答题和我的作答分成独立页面；教师题目管理直接进入学生名单，再逐份批改，不提供题目预览。管理员移除题目和考试管理路由。复验前停止并重启项目使新增后端接口生效，不需迁移或重建现有库。重点步骤见验收文档/S1_返修复验流程.txt。
 
-需要Python 3.12+及Node.js/npm（Windows）。
+## S1第二轮复验补充
 
-双击根目录`启动项目.bat`（或运行`启动项目.ps1`）即可，启动器会自动完成本机首次准备，之后每次启动也会自动检查：
+返回按钮简写为“返回”；“查看提交内容与反馈”进入独立详情页，不在列表下展开。现有列表统一每页6条，学生作答历史采用服务端分页，返回时保留专题和页码。滚动条稳定占位，长短页面不因滚动条出现而重新挤压布局。教师增删与考试列表仍留后续，未提前实现。
 
-1. 创建`.runtime/venv`虚拟环境，并按`framework/backend/requirements.lock.txt`安装后端依赖（锁文件更新时自动重装）；
-2. 缺少`framework/backend/.env`时从`.env.example`复制，并生成本机随机`SECRET_KEY`；
-3. 缺少`node_modules`时执行`npm ci`；
-4. 本地数据库为空时自动建表并初始化：共享管理员`admin`（密码`00000000`）、演示站场、调车联锁表35条进路与实验专题24道题目。
+## 启动
 
-各机器的数据库在本机生成，账号与作答数据相互独立、不随Git分发；每台机器首次启动都会自动创建同一个共享管理员账号`admin` / `00000000`。学生与教师账号可在登录页自行注册。需要真实AI调用时，编辑`framework/backend/.env`填写自己的`DEEPSEEK_API_KEY`。
+工作目录：G:\gg\SRTP。需要Python 3.12+、Node.js/npm。
 
-默认前端为`http://127.0.0.1:5173/`，后端为`http://127.0.0.1:8000/`。教学数据初始化脚本`framework/backend/scripts/seed_local_data.py`可单独重跑（幂等，已有数据时自动跳过）。
+~~~powershell
+Set-Location G:\gg\SRTP
+.\启动项目.ps1 -NoBrowser
+~~~
 
-手动准备（仅当自动步骤失败需要排查时）：
+用户自行打开 [平台首页](http://127.0.0.1:5173/)。也可双击启动项目.bat。
 
-```powershell
-python -m venv .runtime/venv
-.runtime/venv/Scripts/python.exe -m pip install -r framework/backend/requirements.lock.txt
-npm --prefix framework/frontend ci
-Copy-Item framework/backend/.env.example framework/backend/.env
-```
+新库自动建立本机管理员 admin / 00000000，导入35条核对后的调车表资料和六专题18题；不建立旧模块表。数据库、配置和运行产物只保存在本机。S1仍保留既有注册流程；关闭注册、管理员建号、停用、联系方式和改密统一在S2交付。
 
-`.env.example`不包含可用密钥，勿将实际配置提交到Git。管理员初始化及资料导入详见`接管与使用说明.md`、`调车联锁表数据库导入说明.md`与`管理员出题与批阅使用说明.md`。
+当前机器依赖已按原锁文件安装；默认源连通性不佳时可使用镜像，详见验收文档。启动器不会自动迁移旧库。
 
+## 旧库升级
+
+停止服务，在副本上先检查。迁移会保留用户原ID、六专题题目及作答/评阅记录、原图调车表；删除旧功能专属表及六专题之外的题目、作答和关联记录。--apply自动先保存数据库备份和迁移清单到忽略目录 .runtime/backups/s1/。
+
+~~~powershell
+.\停止项目.ps1
+.\.runtime\venv\Scripts\python.exe framework/backend/scripts/migrate_s1.py --database framework/backend/railway.db
+# 核对预览，备份并在副本验证后，才对目标库显式执行：
+.\.runtime\venv\Scripts\python.exe framework/backend/scripts/migrate_s1.py --database framework/backend/railway.db --apply
+~~~
+
+当前代理没有迁移或新建实际业务数据库。操作验收与失败恢复详见验收文档/S1_操作验证流程.txt。
+
+## 代码检查
+
+~~~powershell
+.\.runtime\venv\Scripts\python.exe -m pytest framework/backend/tests --basetemp=.runtime/s1/final-tmp -q --tb=short
+node --test framework/frontend/tests/*.test.mjs
+npm --prefix framework/frontend run build
+~~~
+
+测试在导入主程序前隔离数据库和密钥，HTTP测试禁用实际启动钩子；启动测试显式绑定隔离库。不使用浏览器自动验收，也不调用真实AI。
+
+## 专业依据和保留资料
+
+ai_design/station下的专业规则、原图拓扑、已核对列车/调车联锁表及四份原始实验报告仍为理论依据。标准站使用原软件SDM/STADATA资料，不使用理论教学表替代。S1测试中的源文件契约保存修改前校验值，核对18题和35条参考解答未变。
+
+每步结束交付操作流程、代码验证记录和实际清单，然后等待用户确认；当前未进入S2，未提交或推送。

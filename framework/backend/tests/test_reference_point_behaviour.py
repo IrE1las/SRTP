@@ -239,18 +239,6 @@ def test_cancelling_during_conversion_never_opens_later(rig):
     assert not any(p['locked'] for p in snap['switches'].values())
 
 
-def test_experiment_service_keeps_instant_alignment_and_exclusive_ownership(rig):
-    svc = runtime.SimulationService()
-    snap = svc.new_session(31)
-    session = svc._get(snap['session_id'], 31)
-    result = console_commands.operate(svc, session.id, 31,
-                                     {'type':'SWITCH_TOTAL_REVERSE', 'target':'5'}, session.version)
-    assert result['accepted'] and result['snapshot']['switches']['5']['position'] == 1
-    assert 'moving' not in result['snapshot']['switches']['5']
-    definition = next(r for r in svc.package['routes'] if '5' in r['switches'])
-    session.switches['5']['owners'].add('existing-experiment-lock')
-    assert svc._switch_lock_fact(session, definition)[0] == 'SWITCH_ROUTE_LOCKED'
-
 
 def settle_route(rig):
     advance(rig, 2.1)

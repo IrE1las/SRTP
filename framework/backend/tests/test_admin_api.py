@@ -2,7 +2,7 @@
 
 from fastapi.testclient import TestClient
 
-from tests.test_exercise_api import auth_headers
+from tests.helpers import auth_headers
 
 
 def test_admin_can_manage_users_and_non_admin_is_rejected(client: TestClient) -> None:

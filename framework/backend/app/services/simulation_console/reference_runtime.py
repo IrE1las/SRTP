@@ -1,7 +1,7 @@
 """Runtime used only by the recovered original-application station.
 
-The teaching/experiment SimulationService and its workbook keep their existing
-behaviour. Local block peers model an external input, not a hardware protocol.
+Shared SimulationService primitives require an explicit station package.
+Local block peers model an external input, not a hardware protocol.
 """
 from copy import deepcopy
 from time import monotonic

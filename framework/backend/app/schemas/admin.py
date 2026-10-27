@@ -29,6 +29,5 @@ class AdminOverviewResponse(BaseModel):
     """System overview for admins."""
 
     user_count: int
-    exercise_count: int
-    session_count: int
-    operation_log_count: int
+    theory_question_count: int
+    theory_attempt_count: int
