@@ -27,7 +27,11 @@ async function harness(path,{params={},query={},mocks={},expose=[]}={}) {
     replace:async value=>{calls.push(['replace',value]);route.path=value.path;route.query=value.query||{}},
     push:value=>{calls.push(['push',value])},
   }
+<<<<<<< Updated upstream
   const deps={computed,nextTick,ref,watch,onMounted:fn=>{mounted=fn},useRoute:()=>route,useRouter:()=>router,
+=======
+  const deps={computed,nextTick,reactive,ref,watch,onMounted:fn=>{mounted=fn},useRoute:()=>route,useRouter:()=>router,
+>>>>>>> Stashed changes
     useUserStore:()=>({role:'student',user:{id:7}}),
     THEORY_ROOT,theoryTopicPath,theoryPlatform,theoryPlatformName,theoryHistoryPath,
     TheoryStationCanvas:{},TheorySimulationConsole:{},Notation:{},ListPager:{},paginate,pageNumber,LIST_PAGE_SIZE,topology:{signals:[],switches:[],sections:[]},

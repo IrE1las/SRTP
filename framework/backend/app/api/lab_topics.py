@@ -105,7 +105,8 @@ def submit(key: str, body: Submission, db: Session=Depends(get_db), user: User=D
         result = evaluate(question.content,body.answers)
     except ValueError as exc:
         raise HTTPException(422,str(exc)) from exc
-    attempt = LabAttempt(question_id=question.id,student_id=user.id,question_snapshot=question.content,answers=body.answers,result=result)
+    attempt = LabAttempt(question_id=question.id,student_id=user.id,question_snapshot=question.content,
+                         identity_snapshot={**student_identity(user),'source':'submission'},answers=body.answers,result=result)
     db.add(attempt)
     db.commit()
     db.refresh(attempt)
@@ -149,7 +150,11 @@ def review_students(topic:int|None=Query(None,ge=1,le=6),db:Session=Depends(get_
     if topic is not None:
         query=query.filter(LabQuestion.topic==topic)
     totals={row[0]:row[1:] for row in query.group_by(LabAttempt.student_id)}
+<<<<<<< Updated upstream
     people=db.query(User).filter(User.role=='student').order_by(User.class_name,User.student_id,User.id).all()
+=======
+    people=db.query(User).filter(or_(User.role=='student',User.id.in_(list(totals)))).order_by(User.class_name,User.student_id,User.id).all()
+>>>>>>> Stashed changes
     return [{**student_identity(person),'attempt_count':totals.get(person.id,(0,0,None))[0],
              'pending_count':totals.get(person.id,(0,0,None))[1] or 0,
              'latest_submission':totals.get(person.id,(0,0,None))[2]} for person in people]
@@ -157,7 +162,13 @@ def review_students(topic:int|None=Query(None,ge=1,le=6),db:Session=Depends(get_
 @router.get('/review-students/{student_id}/attempts')
 def student_attempts(student_id:int,topic:int|None=Query(None,ge=1,le=6),
                      db:Session=Depends(get_db),user:User=Depends(teacher)):
+<<<<<<< Updated upstream
     student=db.query(User).filter_by(id=student_id,role='student').one_or_none()
+=======
+    student=db.get(User,student_id)
+    if student is not None and student.role!='student' and not db.query(LabAttempt.id).filter_by(student_id=student_id).first():
+        student=None
+>>>>>>> Stashed changes
     if student is None:
         raise HTTPException(404,'学生不存在')
     query=db.query(LabAttempt.id,LabQuestion.topic,LabAttempt.question_snapshot['title'].as_string(),
@@ -173,6 +184,10 @@ def student_attempts(student_id:int,topic:int|None=Query(None,ge=1,le=6),
 def review_detail(attempt_id:int,db:Session=Depends(get_db),user:User=Depends(teacher)):
     attempt=review_attempt(db,attempt_id)
     student=db.get(User,attempt.student_id)
+<<<<<<< Updated upstream
     return {**attempt_view(attempt),'student':student_identity(student),'question':attempt.question_snapshot,
+=======
+    return {**attempt_view(attempt),'student':attempt.identity_snapshot or student_identity(student),'question':attempt.question_snapshot,
+>>>>>>> Stashed changes
             'rubric':[{'id':f['id'],'label':f['label'],'points':f['points'],'criteria':f.get('criteria',[])}
                       for f in attempt.question_snapshot['fields'] if f['kind']=='essay']}

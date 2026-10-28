@@ -94,7 +94,7 @@ function Start-ProjectService($Port, $Executable, $Arguments, $Directory, $Name)
         }
         return $listener.OwningProcess
     }
-    $process = Start-Process -FilePath $Executable -ArgumentList $Arguments -WorkingDirectory $Directory -WindowStyle Hidden -RedirectStandardOutput (Join-Path $runtimeDir "$Name.log") -RedirectStandardError (Join-Path $runtimeDir "$Name.error.log")
+    $process = Start-Process -FilePath $Executable -ArgumentList $Arguments -WorkingDirectory $Directory -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $runtimeDir "$Name.log") -RedirectStandardError (Join-Path $runtimeDir "$Name.error.log")
     return $process.Id
 }
 $backendPid = Start-ProjectService 8000 $pythonExe '-m uvicorn main:app --host 127.0.0.1 --port 8000' $backendDir 'backend'

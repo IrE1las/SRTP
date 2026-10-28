@@ -25,6 +25,7 @@ class LabAttempt(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     question_id: Mapped[int] = mapped_column(ForeignKey('lab_questions.id'), nullable=False, index=True)
     student_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False, index=True)
+    identity_snapshot: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
     # Keep the exact rubric/version used when submitted, even after a future import.
     question_snapshot: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
     answers: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)

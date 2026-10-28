@@ -83,8 +83,15 @@ def test_admin_summary_has_no_deleted_statistics_and_linked_user_cannot_be_delet
     result = client.get('/api/admin/overview',headers=admin)
     assert set(result.json()) == {'user_count','theory_question_count','theory_attempt_count'}
     user = db_session.query(User).filter_by(username='linked_student').one()
+<<<<<<< Updated upstream
     assert client.delete(f'/api/admin/users/{user.id}', headers=admin).status_code == 409
     assert db_session.get(User,user.id) is not None
+=======
+    assert client.delete(f'/api/admin/users/{user.id}', headers=admin).status_code == 200
+    assert db_session.get(User,user.id) is not None
+    assert not db_session.get(User,user.id).is_active
+    assert db_session.query(LabAttempt).filter_by(student_id=user.id).count() == 1
+>>>>>>> Stashed changes
 
 def test_ai_settings_retains_unrelated_local_configuration(tmp_path, monkeypatch):
     from app.api import settings as api

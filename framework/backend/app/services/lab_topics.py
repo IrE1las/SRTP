@@ -211,6 +211,7 @@ def evaluate(content, answers):
 
 def attempt_view(attempt):
     return {'id':attempt.id,'question_id':attempt.question_id,'student_id':attempt.student_id,
+            'identity_snapshot':attempt.identity_snapshot,
             'question_title':attempt.question_snapshot['title'], 'topic':attempt.question_snapshot['topic'],
             'answers':attempt.answers,'result':attempt.result,'review':attempt.review,
             'created_at':attempt.created_at,'reviewed_at':attempt.reviewed_at}
