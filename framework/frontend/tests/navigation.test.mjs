@@ -16,7 +16,11 @@ test('teacher and administrator have separate role menus', () => {
     assert.equal(navigationForRole(role)[0].path,roleHomeMap[role])
     const paths = navigationGroups(role)[0].items.map(i=>i.path)
     assert.equal(paths.length, new Set(paths).size)
-    assert.ok(paths.every(p=>p.startsWith('/'+role)))
+    assert.ok(paths.every(p=>p.startsWith('/'+role) || role==='teacher' && p==='/operations/manage'))
   }
   assert.deepEqual(navigationForRole('unknown'), [])
+})
+
+test('teachers have distinct theory and operation navigation under question management', () => {
+  assert.deepEqual(navigationForRole('teacher')[1].children, [{title:'理论学习',path:'/teacher/questions'},{title:'操作学习',path:'/operations/manage'}])
 })

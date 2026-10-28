@@ -4,11 +4,7 @@
     <router-link v-else to="/teacher/questions">← 返回学生名单</router-link>
     <p v-if="notice" role="alert" class="notice">{{ notice }}</p>
     <template v-if="attempt">
-<<<<<<< Updated upstream
-      <header class="review-heading"><div><h1>{{ attempt.review?'查看批阅':'批改作答' }}</h1><p>{{ attempt.student.student_name || attempt.student.username || 'null' }} · 学号 {{ attempt.student.student_number || 'null' }} · {{ attempt.question_title }}</p></div></header>
-=======
       <header class="review-heading"><div><h1>{{ attempt.review?'查看批阅':'批改作答' }}</h1><p>{{ attempt.student.student_name || attempt.student.username || 'null' }} · 学号 {{ attempt.student.student_number || 'null' }} · 班级 {{ attempt.student.class_name || 'null' }} · {{ attempt.question_title }}</p><p v-if="attempt.student.source === 'migration_current_identity'">身份为旧库迁移时记录，提交时身份未确认。</p></div></header>
->>>>>>> Stashed changes
       <div class="summary">作答编号 {{ attempt.id }} · 客观项 {{ attempt.result.automatic_score }}/{{ attempt.result.automatic_max }}<span v-if="attempt.review"> · 总分 {{ attempt.result.total_score }}/{{ attempt.result.total_max }}</span><span v-else> · 论述待人工评分</span></div>
       <article v-for="field in attempt.result.feedback" :key="field.id" class="answer-field">
         <h3><Notation :text="field.label"/></h3><strong>学生作答</strong><p class="answer-text"><Notation :text="answerText(attempt.answers[field.id])"/></p>

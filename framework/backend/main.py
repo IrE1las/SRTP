@@ -3,15 +3,13 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import admin, auth, settings, lab_topics, theory_console
+from app.api import admin, auth, settings, lab_topics, theory_console, operations
 from app.core.database import Base, SessionLocal, engine
 from app.core.security import get_password_hash
 from app.models.user import User
 from app.services.s1_migration import require_current_schema
-<<<<<<< Updated upstream
-=======
 from app.services.s2_migration import require_account_schema
->>>>>>> Stashed changes
+from app.services.s3_migration import require_operation_schema
 from app.services.bootstrap import seed_theory
 import app.models  # register only the retained tables
 
@@ -19,8 +17,6 @@ app = FastAPI(title='铁路计算机联锁仿真实训系统 API', version='0.2.
 app.add_middleware(CORSMiddleware, allow_origins=['http://localhost:5173', 'http://127.0.0.1:5173'],
                    allow_credentials=True, allow_methods=['*'], allow_headers=['*'])
 DEFAULT_ADMIN_PASSWORD = '00000000'
-<<<<<<< Updated upstream
-=======
 
 @app.exception_handler(RequestValidationError)
 async def safe_validation_error(request, exc):
@@ -28,7 +24,6 @@ async def safe_validation_error(request, exc):
     errors = [{"loc": list(error["loc"]), "msg": error["msg"], "type": error["type"]}
               for error in exc.errors()]
     return JSONResponse(status_code=422, content={"detail": errors})
->>>>>>> Stashed changes
 
 def _ensure_default_admin():
     with SessionLocal() as db:
@@ -41,10 +36,8 @@ def _ensure_default_admin():
 def on_startup():
     # Existing databases require explicit, backed-up migration before any writes.
     require_current_schema(engine)
-<<<<<<< Updated upstream
-=======
     require_account_schema(engine)
->>>>>>> Stashed changes
+    require_operation_schema(engine)
     Base.metadata.create_all(bind=engine)
     _ensure_default_admin()
     with SessionLocal() as db:
@@ -52,11 +45,9 @@ def on_startup():
 
 @app.get('/api/health', tags=['health'])
 def health_check():
-<<<<<<< Updated upstream
-    return {'status':'ok', 'service':'railway-interlocking-api', 'stage':'S1'}
-=======
-    return {'status':'ok', 'service':'railway-interlocking-api', 'stage':'S2'}
->>>>>>> Stashed changes
+    return {'status':'ok', 'service':'railway-interlocking-api', 'stage':'S3'}
+
+app.include_router(operations.router, prefix='/api/operations', tags=['operations'])
 
 app.include_router(auth.router, prefix='/api/auth', tags=['auth'])
 app.include_router(admin.router, prefix='/api/admin', tags=['admin'])

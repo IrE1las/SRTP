@@ -22,7 +22,7 @@ import { getReviewStudentAttempts } from '@/api/labTopics'
 const route=useRoute(),router=useRouter(),student=ref(null),attempts=ref([]),loading=ref(false),notice=ref('')
 const page=ref(pageNumber(route.query.page))
 const pageView=computed(()=>paginate(attempts.value,page.value))
-const backPath=computed(()=>({path:'/teacher/questions',query:{...(/^[1-6]$/.test(String(route.query.topic))?{topic:String(route.query.topic)}:{}),page:String(pageNumber(route.query.studentsPage))}}))
+const backPath=computed(()=>({path:'/teacher/questions',query:{...(/^[1-6]$/.test(String(route.query.topic))?{topic:String(route.query.topic)}:{}),...(route.query.class?{class:String(route.query.class)}:{}),...(route.query.search?{search:String(route.query.search)}:{}),page:String(pageNumber(route.query.studentsPage))}}))
 function changePage(value){page.value=value;router.push({path:route.path,query:{...route.query,page:String(value)}})}
 watch(()=>route.query.page,value=>{page.value=pageNumber(value)})
 let request=0

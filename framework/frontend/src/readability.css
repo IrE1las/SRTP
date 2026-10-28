@@ -60,7 +60,10 @@ body .el-table th.el-table__cell { background: #f1f6fa; color: #3b576c; }
 body .el-table__row .el-checkbox { display: flex; justify-content: center; }
 body .el-dialog__headerbtn, body .el-drawer__close-btn { min-width: 44px; min-height: 44px; }
 body .el-dialog__header { padding-right: 48px; }
-body .el-message, body .el-message-box { max-width: calc(100vw - 24px); }
+body .el-message { max-width: calc(100vw - 24px); }
+/* MessageBox uses width:100%; retain an explicit desktop cap. */
+body .el-message-box { width: 480px; max-width: calc(100vw - 32px); }
+body .el-message-box__message { overflow-wrap: anywhere; }
 body .el-message-box__btns { gap: 10px; }
 #app .layout-main .path-card { border-color: #cbdce8; }
 #app .layout-main .path-card:hover, #app .layout-main .path-card:focus-visible { border-color: #3786b6; box-shadow: 0 5px 18px #0b578319; }

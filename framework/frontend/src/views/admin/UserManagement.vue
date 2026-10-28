@@ -1,16 +1,3 @@
-<<<<<<< Updated upstream
-<template><section v-loading="loading"><h1>用户管理</h1><p>现有账号列表。建号、身份编辑、停用和密码重置待S2实现。</p><p v-if="error" role="alert">{{ error }}</p><el-table :data="pageView.items" border><el-table-column prop="username" label="用户名"/><el-table-column v-for="field in fields" :key="field.key" :label="field.label"><template #default="{row}">{{ row[field.key] || 'null' }}</template></el-table-column></el-table><ListPager :page="pageView.page" :total="pageView.total" @change="page=$event"/></section></template>
-<script setup>
-import { computed, onMounted, ref } from 'vue'
-import ListPager from '@/components/ListPager.vue'
-import { paginate } from '@/domain/pagination'
-import { listAdminUsers } from '@/api/admin'
-const users = ref([]), loading = ref(false), error = ref('')
-const page=ref(1),pageView=computed(()=>paginate(users.value,page.value))
-const fields = [{key:'real_name',label:'姓名'},{key:'role',label:'角色'},{key:'student_id',label:'学号'},{key:'class_name',label:'班级'}]
-onMounted(async () => { loading.value = true; try { users.value = await listAdminUsers() } catch { error.value = '用户列表加载失败。' } finally { loading.value = false } })
-</script>
-=======
 <template>
   <section v-loading="loading" class="user-management">
     <div class="user-toolbar"><h1>用户管理</h1><el-button type="primary" @click="openCreate">新建账号</el-button></div>
@@ -150,4 +137,3 @@ onMounted(loadUsers)
 <style scoped>
 .user-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}.user-toolbar h1{margin:0}.form-actions{display:flex;justify-content:flex-end;gap:8px}.user-management [role=alert]{color:#a52727;overflow-wrap:anywhere}.user-management [role=status]{overflow-wrap:anywhere}
 </style>
->>>>>>> Stashed changes

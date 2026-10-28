@@ -27,11 +27,7 @@ async function harness(path,{params={},query={},mocks={},expose=[]}={}) {
     replace:async value=>{calls.push(['replace',value]);route.path=value.path;route.query=value.query||{}},
     push:value=>{calls.push(['push',value])},
   }
-<<<<<<< Updated upstream
-  const deps={computed,nextTick,ref,watch,onMounted:fn=>{mounted=fn},useRoute:()=>route,useRouter:()=>router,
-=======
   const deps={computed,nextTick,reactive,ref,watch,onMounted:fn=>{mounted=fn},useRoute:()=>route,useRouter:()=>router,
->>>>>>> Stashed changes
     useUserStore:()=>({role:'student',user:{id:7}}),
     THEORY_ROOT,theoryTopicPath,theoryPlatform,theoryPlatformName,theoryHistoryPath,
     TheoryStationCanvas:{},TheorySimulationConsole:{},Notation:{},ListPager:{},paginate,pageNumber,LIST_PAGE_SIZE,topology:{signals:[],switches:[],sections:[]},
@@ -268,13 +264,13 @@ test('a longer question list is paged by six and changing page selects a questio
 })
 test('teacher lists show six rows and keep roster and attempt page positions separate',async()=>{
   const roster=await harness('views/teacher/TheoryStudentList.vue',{
-    query:{page:'2'},mocks:{getReviewStudents:async()=>Array.from({length:13},(_,i)=>({id:i+1,username:'student'+(i+1),attempt_count:1}))},
+    query:{page:'2'},mocks:{getReviewStudents:async()=>Array.from({length:13},(_,i)=>({id:i+1,username:'student'+(i+1),student_number:'2026'+String(i+1).padStart(3,'0'),attempt_count:1}))},
     expose:['pageView','openStudent','search'],
   })
   assert.deepEqual(roster.state.pageView.value.items.map(row=>row.id),[7,8,9,10,11,12])
   roster.state.openStudent(8)
   assert.deepEqual(roster.calls.at(-1),['push',{path:'/teacher/questions/students/8',query:{studentsPage:'2'}}])
-  roster.state.search.value='student13'
+  roster.state.search.value='2026013'
   await nextTick()
   assert.equal(roster.state.pageView.value.page,1)
   assert.equal(roster.state.pageView.value.total,1)
@@ -300,4 +296,18 @@ test('the former return-to-six-topics label is simply Return',async()=>{
     assert.ok(!template.content.includes('返回六专题'))
     assert.ok(template.content.includes('>返回</router-link>'))
   }
+})
+
+test('teacher roster independently filters class and student number, sorts naturally and carries filters into the return link',async()=>{
+  const rows=[{id:2,student_name:'同名',student_number:'10',class_name:'二班',attempt_count:1},{id:3,student_name:'同名',student_number:'2',class_name:'二班',attempt_count:1},{id:1,student_name:'10',student_number:'11',class_name:'一班',attempt_count:1}]
+  const roster=await harness('views/teacher/TheoryStudentList.vue',{mocks:{getReviewStudents:async()=>rows},expose:['pageView','classes','className','search','openStudent','applyFilters']})
+  assert.deepEqual(roster.state.classes.value.sort(),['一班','二班'].sort())
+  roster.state.className.value='二班'
+  assert.deepEqual(roster.state.pageView.value.items.map(row=>row.student_number),['2','10'])
+  roster.state.search.value='10'
+  assert.deepEqual(roster.state.pageView.value.items.map(row=>row.id),[2])
+  roster.state.openStudent(2)
+  assert.deepEqual(roster.calls.at(-1),['push',{path:'/teacher/questions/students/2',query:{class:'二班',search:'10',studentsPage:'1'}}])
+  const attempts=await harness('views/teacher/TheoryStudentAttempts.vue',{params:{studentId:'2'},query:{class:'二班',search:'10',studentsPage:'2'},expose:['backPath']})
+  assert.deepEqual(attempts.state.backPath.value,{path:'/teacher/questions',query:{class:'二班',search:'10',page:'2'}})
 })

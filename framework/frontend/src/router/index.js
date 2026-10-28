@@ -17,7 +17,11 @@ const children = [
   { path: 'student/learn/theory/attempts', component: () => import('@/views/student/TheoryHistory.vue'), meta: { roles: ['student'] } },
   { path: 'student/learn/theory/attempts/:attemptId([0-9]+)', component: () => import('@/views/student/TheoryAttemptDetail.vue'), meta: { roles: ['student'] } },
   { path: 'student/learn/theory/:topicId([1-6])', component: () => import('@/views/student/TheoryTopic.vue'), meta: { roles: ['student'] } },
-  { path: 'student/learn/operations', component: pending, props: { title: '操作学习', stage: 'S3、S4' }, meta: { roles: ['student'] } },
+  { path: 'student/learn/operations', component: () => import('@/views/student/OperationCatalogue.vue'), meta: { roles: ['student'] } },
+  { path: 'operations/manage', component: () => import('@/views/teacher/OperationQuestions.vue'), meta: { roles: ['teacher','admin'] } },
+  { path: 'operations/manage/new', component: () => import('@/views/teacher/OperationEditor.vue'), meta: { roles: ['teacher','admin'] } },
+  { path: 'operations/manage/:questionId([0-9]+)/edit', component: () => import('@/views/teacher/OperationEditor.vue'), meta: { roles: ['teacher','admin'] } },
+  { path: 'operations/manage/:questionId([0-9]+)/review', component: () => import('@/views/teacher/OperationReview.vue'), meta: { roles: ['teacher','admin'] } },
   { path: 'student/exams', component: pending, props: { title: '考试界面', stage: 'S5、S6' }, meta: { roles: ['student'] } },
   { path: 'teacher', redirect: '/teacher/dashboard', meta: { roles: ['teacher'] } },
   { path: 'teacher/dashboard', component: profile, meta: { roles: ['teacher'] } },
@@ -31,6 +35,7 @@ const children = [
 ]
 const router = createRouter({ history: createWebHistory(), scrollBehavior(to,from,savedPosition) { return savedPosition || {left:0,top:0} }, routes: [
   { path: '/login', component: () => import('@/views/auth/Login.vue') },
+  { path: '/operations/manage/:questionId([0-9]+)/record', component: () => import('@/views/teacher/OperationWorkspace.vue'), meta: { requiresAuth: true, roles: ['teacher','admin'] } },
   { path: '/', component: AppLayout, meta: { requiresAuth: true }, children },
   { path: '/:pathMatch(.*)*', component: () => import('@/views/shared/NotFound.vue'), meta: { requiresAuth: true } },
 ] })

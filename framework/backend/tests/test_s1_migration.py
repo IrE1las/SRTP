@@ -17,12 +17,9 @@ def legacy_db(tmp_path):
     path = tmp_path / 'legacy.db'
     with sqlite3.connect(path) as conn:
         conn.executescript((Path(__file__).parent / 'fixtures/s1_legacy_schema.sql').read_text('utf8'))
-<<<<<<< Updated upstream
-=======
     # S1 cleanup remains independently tested; provision S2 ORM fields before fixture seeding.
     from app.services.s2_migration import migrate_database as migrate_accounts
     migrate_accounts(path, apply=True, backup_dir=tmp_path / 'account-fixture-backups')
->>>>>>> Stashed changes
     engine = create_engine(f'sqlite:///{path.as_posix()}')
     with Session(engine) as db:
         seed_theory(db)

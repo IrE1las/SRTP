@@ -1,5 +1,6 @@
 @echo off
 cd /d "%~dp0"
+echo [launch] Starting SRTP. Checking services and the database ...
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0launch.ps1"
 if errorlevel 1 (
     echo.
