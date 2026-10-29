@@ -2,6 +2,7 @@
   <section class="op-page" :aria-busy="loading">
 
     <header class="op-heading"><div><h1>操作学习</h1><p class="op-muted">操作题库 · 设置题目，录制标准答案，再发布给指定班级。</p></div><router-link :to="newLocation" class="op-primary-link">＋ 新建操作题</router-link></header>
+    <nav class="learning-tabs" aria-label="操作学习管理"><strong aria-current="page">操作题库</strong><router-link to="/operations/reviews">操作批改</router-link></nav>
     <div class="op-panel">
       <div class="op-toolbar">
         <form class="op-search" role="search" @submit.prevent="applyFilters"><el-input v-model="search" name="operation-search" aria-label="按题目标题或班级搜索" maxlength="200" placeholder="搜索标题或班级…" clearable autocomplete="off" @clear="applyFilters" /><el-button native-type="submit" :loading="loading">搜索</el-button></form>
@@ -31,6 +32,7 @@ import { pageNumber } from '@/domain/pagination'
 import { operationBase, operationLocation, operationReturn, operationStatus, operationError } from '@/domain/operationPresentation'
 import { listOperations, disableOperation, deleteOperation } from '@/api/operations'
 import '@/features/operationQuestions/operation.css'
+import '@/features/operationQuestions/learning.css'
 const user = useUserStore(), route = useRoute(), router = useRouter()
 const rows = ref([]), page = ref(1), total = ref(0), loading = ref(false), working = ref(false), notice = ref(''), search = ref(''), filter = ref('all')
 const filtered = computed(() => !!route.query.search || (route.query.status && route.query.status !== 'all'))

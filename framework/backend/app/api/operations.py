@@ -55,7 +55,8 @@ def question(qid: int, db: Session = Depends(get_db), user: User = Depends(manag
     result['sessions'] = [{'id': s.id, 'kind': s.kind, 'status': s.status, 'version_id': s.version_id,
                            'owner_id': s.owner_id} for s in db.scalars(select(OperationSession).join(
         OperationVersion, OperationSession.version_id == OperationVersion.id).where(
-            OperationVersion.question_id == qid).order_by(OperationSession.created_at.desc()))]
+            OperationVersion.question_id == qid, OperationSession.kind.in_(['recording', 'preview']))
+            .order_by(OperationSession.created_at.desc()))]
     return result
 
 

@@ -62,6 +62,9 @@ def question(db, user, qid):
 
 def delete_question(db, user, qid):
     q = question(db, user, qid)
+    from app.models.operation_learning import OperationAttempt
+    if db.scalar(select(OperationAttempt.session_id).where(OperationAttempt.question_id == qid).limit(1)):
+        fail('该题目已有学生作答引用，不能永久删除；请停用题目以保留历史依据')
     version_ids = select(OperationVersion.id).where(OperationVersion.question_id == qid)
     session_ids = select(OperationSession.id).where(OperationSession.version_id.in_(version_ids))
     if db.scalar(select(OperationSession.id).where(OperationSession.version_id.in_(version_ids), OperationSession.status == 'active').limit(1)):
@@ -100,7 +103,8 @@ def detail(q, v, include_standard=True):
               'published_version': q.published_version, 'version_id': v.id,
               'number': v.number, 'status': 'disabled' if q.disabled else v.status,
               'revision': v.revision, 'title': v.title, 'prompt': v.prompt,
-              'classes': v.classes, 'initial': v.initial, 'station_version': v.station_version}
+              'classes': v.classes, 'initial': v.initial, 'station_version': v.station_version,
+              'published_at': v.published_at.isoformat() if v.published_at else None}
     if include_standard:
         result.update(standard_log=v.standard_log, standard_session_id=v.standard_session_id)
     return result
@@ -125,7 +129,7 @@ def edit(db, user, qid, body):
     if v.revision != body.revision:
         fail('题目已变化，请重新加载后编辑')
     if db.scalar(select(OperationSession.id).where(OperationSession.version_id == v.id,
-            OperationSession.status == 'active').limit(1)):
+            OperationSession.status == 'active', OperationSession.kind != 'learning').limit(1)):
         fail('请先结束该版本的录制或预览，再修改题设')
     data = validate_draft(body)
     if v.status == 'published':
@@ -205,6 +209,8 @@ def list_questions(db, user, page, search='', status='all'):
         if term and not any(term in str(value or '').casefold() for value in [v.title, *v.classes]):
             continue
         rows.append(row)
+    if user.role == 'student':
+        rows.sort(key=lambda row: (row['published_at'] or '', row['id']), reverse=True)
     return {'items': rows[(page - 1) * 6: page * 6], 'total': len(rows), 'page': page, 'page_size': 6}
 
 
@@ -214,7 +220,7 @@ def view_session(db, user, sid):
         fail('会话不存在', 404)
     version = db.get(OperationVersion, record.version_id)
     question(db, user, version.question_id)
-    if record.owner_id == user.id:
+    if record.owner_id == user.id and record.kind != 'learning':
         return {**refresh(db, user, sid), 'read_only': False}
     if record.station_version != station_version():
         fail('站场版本已变化，请下载原日志查看')
@@ -227,7 +233,13 @@ def get_session(db, user, sid):
     if not record:
         fail('会话不存在或无权访问', 404)
     v = db.get(OperationVersion, record.version_id)
-    question(db, user, v.question_id)
+    if record.kind == 'learning':
+        from app.models.operation_learning import OperationAttempt
+        attempt = db.get(OperationAttempt, sid)
+        if user.role != 'student' or not attempt or attempt.student_id != user.id:
+            fail('学习会话不存在或无权操作', 404)
+    else:
+        question(db, user, v.question_id)
     # Course data are shared; live commands remain bound to the originating operator.
     if record.owner_id != user.id:
         fail('该操作台属于另一位录制人', 404)
@@ -304,7 +316,7 @@ def click(db, user, sid, body):
         result['event'] = previous.content
         return result
     if record.status != 'active':
-        fail('录制或预览已结束，不得追加操作')
+        fail('操作记录已封存，不得追加操作')
     if body.sequence != record.revision + 1:
         fail('操作序号不连续，请同步会话后重试')
     if body.action == 'function' and body.button_id not in {*COMMAND_TARGETS, 'CLEAR_SELECTION'}:

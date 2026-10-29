@@ -341,11 +341,12 @@ test('review confirms destination classes, publishes, reloads and reports the re
   assert.match(state.notice.value,/已发布/)
 })
 
-test('student catalogue exposes only the released list and keeps online answering unavailable', async () => {
+test('student catalogue exposes only the released list and enters S4 through the guarded begin API', async () => {
   const source=await readFile(new URL('../src/views/student/OperationCatalogue.vue',import.meta.url),'utf8')
   assert.ok(!source.includes('OperationConsole'));assert.ok(!source.includes('standard_log'))
-  assert.ok(source.includes('<el-button disabled>暂未开放作答'))
-  assert.ok(!source.includes('S4'))
+  assert.ok(source.includes('await beginLearning(question.id)'))
+  assert.ok(source.includes('/student/learn/operations/attempts/'))
+  assert.ok(!source.includes('暂未开放作答'))
 })
 
 test('all S3 subpages have accurate breadcrumbs without changing the role menus', async () => {

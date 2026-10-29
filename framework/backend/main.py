@@ -10,6 +10,8 @@ from app.models.user import User
 from app.services.s1_migration import require_current_schema
 from app.services.s2_migration import require_account_schema
 from app.services.s3_migration import require_operation_schema
+from app.services.s4_migration import require_learning_schema
+from app.api import operation_learning
 from app.services.bootstrap import seed_theory
 import app.models  # register only the retained tables
 
@@ -38,6 +40,7 @@ def on_startup():
     require_current_schema(engine)
     require_account_schema(engine)
     require_operation_schema(engine)
+    require_learning_schema(engine)
     Base.metadata.create_all(bind=engine)
     _ensure_default_admin()
     with SessionLocal() as db:
@@ -45,9 +48,10 @@ def on_startup():
 
 @app.get('/api/health', tags=['health'])
 def health_check():
-    return {'status':'ok', 'service':'railway-interlocking-api', 'stage':'S3'}
+    return {'status':'ok', 'service':'railway-interlocking-api', 'stage':'S4'}
 
 app.include_router(operations.router, prefix='/api/operations', tags=['operations'])
+app.include_router(operation_learning.router, prefix='/api/operation-learning', tags=['operation-learning'])
 
 app.include_router(auth.router, prefix='/api/auth', tags=['auth'])
 app.include_router(admin.router, prefix='/api/admin', tags=['admin'])

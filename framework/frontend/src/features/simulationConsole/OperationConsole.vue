@@ -23,7 +23,7 @@ import ReferenceStationDiagram from './ReferenceStationDiagram.vue'
 import { COMMANDS } from './standardDisplay'
 import { getOperationStation, getOperationSession, postOperationEvent } from '@/api/operations'
 import { eventEnvelope, persistableEvent } from '@/domain/operationEvents'
-const props = defineProps({ sessionId: { type: String, required: true }, readOnly: { type: Boolean, default: false } })
+const props = defineProps({ sessionId: { type: String, required: true }, readOnly: { type: Boolean, default: false }, api: { type: Object, default: null } })
 const emit = defineEmits(['update'])
 const station = ref(null), result = ref(null), loading = ref(true), busy = ref(false), error = ref(''), root = ref(null)
 const showPin = ref(false), pin = ref(''), pinInput = ref(null), viewScale = ref('fit'), viewNotice = ref('')
@@ -46,7 +46,7 @@ function enqueue(action, values = {}) {
     outstanding = persistableEvent(event)
     sessionStorage.setItem(key, JSON.stringify(outstanding))
     try {
-      accept(await postOperationEvent(props.sessionId, event))
+      accept(await (props.api?.event || postOperationEvent)(props.sessionId, event))
       outstanding = null; sessionStorage.removeItem(key)
     } catch (e) {
       error.value = e.response?.data?.detail || '操作尚未确认，已暂停；请同步并重试。'
@@ -81,20 +81,20 @@ async function exitFullscreen() { await document.exitFullscreen?.() }
 defineExpose({ hasUnconfirmed, sync: accept, flush: async () => { await queue; if (outstanding || error.value) throw new Error('请先同步未确认的操作'); return result.value } })
 async function refresh() {
   if (busy.value || disposed || outstanding) return
-  try { accept(await getOperationSession(props.sessionId)); error.value = '' }
+  try { accept(await (props.api?.console || getOperationSession)(props.sessionId)); error.value = '' }
   catch { error.value = '连接中断，业务操作已暂停。' }
 }
 async function recover() {
   busy.value = true
   try {
-    if (!station.value) station.value = await getOperationStation()
-    accept(await getOperationSession(props.sessionId))
+    if (!station.value) station.value = await (props.api?.station || getOperationStation)()
+    accept(await (props.api?.console || getOperationSession)(props.sessionId))
     if (outstanding) {
       // PIN is intentionally absent after reload. Ask again instead of persisting it.
       if (result.value.pending && sealed.has(result.value.pending.type) && !confirmedPin && outstanding.sequence > result.value.revision) {
         error.value = '请输入教学口令后再次点击“同步并重试”。'; showPin.value = true; return
       }
-      accept(await postOperationEvent(props.sessionId, { ...outstanding, pin: confirmedPin || null }))
+      accept(await (props.api?.event || postOperationEvent)(props.sessionId, { ...outstanding, pin: confirmedPin || null }))
       outstanding = null; sessionStorage.removeItem(key)
     }
     error.value = ''
@@ -104,8 +104,8 @@ async function recover() {
 async function fullscreen() { try { await root.value?.requestFullscreen() } catch { viewNotice.value = '未能进入全屏，可以继续在当前窗口操作。' } }
 onMounted(async () => {
   try {
-    station.value = await getOperationStation()
-    const initial = await getOperationSession(props.sessionId)
+    station.value = await (props.api?.station || getOperationStation)()
+    const initial = await (props.api?.console || getOperationSession)(props.sessionId)
     if (disposed) return
     accept(initial)
     const stored = sessionStorage.getItem(key)

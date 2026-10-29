@@ -28,6 +28,10 @@ export function navigationGroups(role) {
   return [{ title: '功能导航', items: navigationForRole(role).flatMap(item => item.children?.length ? item.children : [item]) }]
 }
 export function pageLabel(path, role) {
+  if (path === '/operations/reviews') return '操作批改'
+  if (path.startsWith('/operations/reviews/')) return '操作作答批改'
+  if (path === '/student/learn/operations/history') return '我的操作记录'
+  if (path.startsWith('/student/learn/operations/attempts/')) return '操作答题'
   if (path === '/operations/manage') return '操作题管理'
   if (path === '/operations/manage/new' || /^\/operations\/manage\/\d+\/edit$/.test(path)) return '题目设置'
   if (/^\/operations\/manage\/\d+\/review$/.test(path)) return '检查与发布'
