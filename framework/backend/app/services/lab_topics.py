@@ -17,6 +17,8 @@ from app.services.answer_references import load_references, explanation_text
 
 ROOT = Path(__file__).resolve().parents[4]
 BLUEPRINT = ROOT / 'ai_design/station/report_topic_blueprint.json'
+RETAINED_KEYS = tuple(f'lab-{topic:02d}-{sequence:02d}' for topic in range(1,7) for sequence in range(1,4))
+TOPIC_TITLES = ('进路选择与设备操作', '进路取消与人工解锁', '模拟行车与正常解锁', '故障现象与安全处理', '列车进路联锁表', '调车进路联锁表')
 KIND_LABELS = {'choice':'判断选择','multi':'多项辨析','order':'时序排序','cell':'联锁表填写','essay':'记录与分析'}
 
 
@@ -49,8 +51,10 @@ def resolve_blueprint(db: Session):
     inventory = ({s['name'] for s in topology['signals']} | {s['id'] for s in topology['switches']}
                  | {s['name'] for s in topology['sections']})
     topics = {t['id']:t for t in blueprint['topics']}
-    if set(topics) != set(range(1,9)) or len(blueprint['questions']) != 24:
-        raise ValueError('专题应完整覆盖八个实验的24道复合题')
+    if set(topics) != set(range(1,7)) or len(blueprint['questions']) != 18:
+        raise ValueError('理论学习应完整覆盖六个专题的18道复合题')
+    if tuple(topics[i]['title'] for i in range(1,7)) != TOPIC_TITLES or {q['key'] for q in blueprint['questions']} != set(RETAINED_KEYS):
+        raise ValueError('六专题名称、顺序或题目编号不完整')
     keys = set()
     resolved = []
     references = load_references(ROOT)
@@ -113,7 +117,7 @@ def import_topics(db: Session):
             existing.fingerprint = fingerprint
             updated += 1
     db.flush()
-    return {'topics':8,'total':len(items),'inserted':inserted,'updated':updated}
+    return {'topics':6,'total':len(items),'inserted':inserted,'updated':updated}
 
 
 def public_question(question, detail=True):
@@ -125,7 +129,7 @@ def public_question(question, detail=True):
     if detail:
         result.update({k:item[k] for k in ['prompt','conditions','source_section','devices','station_key']})
         result['fingerprint'] = question.fingerprint
-        result['diagram_mode'] = item.get('diagram_mode','semi_auto' if item['topic']==7 else 'auto' if item['topic']==8 else 'station')
+        result['diagram_mode'] = 'station'
         result['fields'] = [{k:f[k] for k in ['id','label','kind','points','options'] if k in f} for f in item['fields']]
     return result
 
@@ -207,6 +211,7 @@ def evaluate(content, answers):
 
 def attempt_view(attempt):
     return {'id':attempt.id,'question_id':attempt.question_id,'student_id':attempt.student_id,
+            'identity_snapshot':attempt.identity_snapshot,
             'question_title':attempt.question_snapshot['title'], 'topic':attempt.question_snapshot['topic'],
             'answers':attempt.answers,'result':attempt.result,'review':attempt.review,
             'created_at':attempt.created_at,'reviewed_at':attempt.reviewed_at}

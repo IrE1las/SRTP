@@ -1,10 +1,24 @@
-param([switch]$NoBrowser)
+﻿param([switch]$NoBrowser)
+$ErrorActionPreference = 'Stop'
+try { [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding($false) } catch {}
+$env:PYTHONIOENCODING = 'utf-8'
+# A launcher can inherit PowerShell 7's module path. Prefer this engine's
+# own system modules so Windows PowerShell 5.1 can resolve its standard commands.
+$nativeModuleRoot = Join-Path $PSHOME 'Modules'
+if (Test-Path -LiteralPath $nativeModuleRoot) {
+    $env:PSModulePath = $nativeModuleRoot + [System.IO.Path]::PathSeparator + $env:PSModulePath
+}
+
+Write-Host 'SRTP startup is running. Please keep this window open.'
+Write-Host '[1/5] Checking the project environment ...'
+try {
 $ErrorActionPreference = 'Stop'
 $projectRoot = $PSScriptRoot
 $runtimeDir = Join-Path $projectRoot '.runtime'
 $backendDir = Join-Path $projectRoot 'framework\backend'
 $frontendDir = Join-Path $projectRoot 'framework\frontend'
 $pythonExe = Join-Path $runtimeDir 'venv\Scripts\python.exe'
+if (Test-Path -LiteralPath (Join-Path $runtimeDir 'startup-repair\upgrade-in-progress.lock')) { throw 'Database upgrade is in progress. Wait for it to finish before starting again.' }
 
 function Test-PythonBase([string[]]$base) {
     try {
@@ -50,7 +64,7 @@ if (-not (Test-Path -LiteralPath $envFile)) {
     Write-Host '[launch] First run: creating local .env from template ...'
     Copy-Item -LiteralPath (Join-Path $backendDir '.env.example') -Destination $envFile
 }
-$envText = Get-Content -LiteralPath $envFile -Raw
+$envText = Get-Content -LiteralPath $envFile -Raw -Encoding UTF8
 if ($envText -notmatch '(?m)^SECRET_KEY=\S+$' -or $envText -match 'SECRET_KEY=replace-with-a-new-random-secret-before-running') {
     $random = -join ((1..64) | ForEach-Object { '{0:x}' -f (Get-Random -Maximum 16) })
     if ($envText -match '(?m)^SECRET_KEY=') {
@@ -78,7 +92,37 @@ $env:TMP = $env:TEMP
 $env:PYTHONDONTWRITEBYTECODE = '1'
 $env:DATABASE_URL = 'sqlite:///' + (Join-Path $backendDir 'railway.db').Replace('\','/')
 
+Write-Host '[2/5] Checking the current database before starting services ...'
+& $pythonExe (Join-Path $backendDir 'scripts\check_startup.py') --database (Join-Path $backendDir 'railway.db')
+if ($LASTEXITCODE -ne 0) { throw 'Database preflight failed. See the specific reason above; no migration was applied by the launcher.' }
+
+function Wait-ProjectService($Name, $ServiceId, $Url) {
+    $watch = [System.Diagnostics.Stopwatch]::StartNew()
+    $lastProgress = -5
+    while ($watch.Elapsed.TotalSeconds -lt 30) {
+        if (-not (Get-Process -Id $ServiceId -ErrorAction SilentlyContinue)) {
+            $errorLog = Join-Path $runtimeDir "$Name.error.log"
+            if (Test-Path -LiteralPath $errorLog) {
+                Write-Host "[$Name] Process exited. Latest error log:" -ForegroundColor Red
+                Get-Content -LiteralPath $errorLog -Encoding UTF8 -Tail 16 | ForEach-Object { Write-Host $_ }
+            }
+            throw "$Name exited before it was ready. Check .runtime\$Name.error.log."
+        }
+        try {
+            $response = Invoke-WebRequest -Uri $Url -UseBasicParsing -TimeoutSec 2
+            if ($response.StatusCode -eq 200) { Write-Host "[$Name] Ready: $Url"; return }
+        } catch {}
+        if ($watch.Elapsed.TotalSeconds - $lastProgress -ge 3) {
+            Write-Host ("[$Name] Waiting for response ... {0}s" -f [int]$watch.Elapsed.TotalSeconds)
+            $lastProgress = $watch.Elapsed.TotalSeconds
+        }
+        Start-Sleep -Milliseconds 500
+    }
+    throw "$Name did not become ready in 30 seconds. Check .runtime\$Name.error.log."
+}
+
 function Start-ProjectService($Port, $Executable, $Arguments, $Directory, $Name) {
+    Write-Host ("[launch] Starting/checking {0} on port {1} ..." -f $Name, $Port)
     $listener = Get-NetTCPConnection -State Listen -LocalPort $Port -ErrorAction SilentlyContinue | Select-Object -First 1
     if ($listener) {
         $processInfo = Get-CimInstance Win32_Process -Filter "ProcessId = $($listener.OwningProcess)"
@@ -94,27 +138,24 @@ function Start-ProjectService($Port, $Executable, $Arguments, $Directory, $Name)
         }
         return $listener.OwningProcess
     }
-    $process = Start-Process -FilePath $Executable -ArgumentList $Arguments -WorkingDirectory $Directory -WindowStyle Hidden -RedirectStandardOutput (Join-Path $runtimeDir "$Name.log") -RedirectStandardError (Join-Path $runtimeDir "$Name.error.log")
+    $process = Start-Process -FilePath $Executable -ArgumentList $Arguments -WorkingDirectory $Directory -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $runtimeDir "$Name.log") -RedirectStandardError (Join-Path $runtimeDir "$Name.error.log")
     return $process.Id
 }
+Write-Host '[3/5] Starting backend ...'
 $backendPid = Start-ProjectService 8000 $pythonExe '-m uvicorn main:app --host 127.0.0.1 --port 8000' $backendDir 'backend'
+Wait-ProjectService 'backend' $backendPid 'http://127.0.0.1:8000/api/health'
+Write-Host '[4/5] Starting frontend ...'
 $frontendPid = Start-ProjectService 5173 $nodeExe ('"' + $vitePath + '" --host 127.0.0.1 --port 5173 --strictPort') $frontendDir 'frontend'
 @{backend=$backendPid;frontend=$frontendPid} | ConvertTo-Json | Set-Content (Join-Path $runtimeDir 'services.json')
-foreach ($url in @('http://127.0.0.1:8000/api/health','http://127.0.0.1:5173/')) {
-    $ready = $false
-    for ($attempt=0; $attempt -lt 30; $attempt++) {
-        try { $response=Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 2; if($response.StatusCode -eq 200){$ready=$true;break} } catch {}
-        Start-Sleep -Milliseconds 500
-    }
-    if(-not $ready){throw "Service did not become ready: $url. Inspect .runtime logs."}
-}
+Wait-ProjectService 'frontend' $frontendPid 'http://127.0.0.1:5173/'
 
 # First run on a fresh database: import the reviewed shunting table and lab topics.
-Write-Host '[launch] Checking local teaching data (skipped when already present) ...'
+Write-Host '[5/5] Checking local teaching data (skipped when already present) ...'
 & $pythonExe (Join-Path $backendDir 'scripts\seed_local_data.py')
 if ($LASTEXITCODE -ne 0) { throw 'Local data bootstrap failed. Inspect .runtime logs.' }
 
 if (-not $NoBrowser) {
+    Write-Host '[launch] Opening the project page in your browser ...'
     $edgeCandidates = @(
         'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe',
         'C:\Program Files\Microsoft\Edge\Application\msedge.exe'
@@ -135,3 +176,10 @@ Write-Host '  Admin:     http://127.0.0.1:5173/admin'
 Write-Host '  API docs:  http://127.0.0.1:8000/docs'
 Write-Host '  Account:   admin / 00000000'
 Write-Host ''
+
+} catch {
+    Write-Host ''
+    Write-Host ('Startup failed: ' + $_.Exception.Message) -ForegroundColor Red
+    Write-Host ('Logs: ' + (Join-Path $PSScriptRoot '.runtime'))
+    exit 1
+}

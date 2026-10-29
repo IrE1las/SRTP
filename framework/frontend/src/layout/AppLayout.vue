@@ -12,7 +12,6 @@
       <div class="workspace">
         <HeaderBar @toggle-menu="mobileMenu = true" />
         <main id="main-content" class="layout-main" tabindex="-1">
-          <CampusBanner v-if="showBanner" />
           <router-view />
         </main>
         <footer class="workspace-footer"><span>SRTP <i>·</i> 铁路计算机联锁仿真实训系统</span><a href="https://www.swjtu.edu.cn/xxgk/xswh.htm" target="_blank" rel="noopener noreferrer">视觉参考：西南交通大学</a></footer>
@@ -22,12 +21,10 @@
   </div>
 </template>
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import HeaderBar from './HeaderBar.vue'
 import SidebarMenu from './SidebarMenu.vue'
-import CampusBanner from '@/components/CampusBanner.vue'
 const route = useRoute(), mobileMenu = ref(false)
-const showBanner = computed(() => ['/admin', '/student/dashboard', '/student/lobby', '/teacher/dashboard'].includes(route.path))
 watch(() => route.path, () => { mobileMenu.value = false })
 </script>

@@ -35,7 +35,7 @@ def get_current_user(
         raise credentials_exception from None
 
     user = get_user_by_id(db, user_id)
-    if user is None:
+    if user is None or not user.is_active or payload.get("ver") != user.token_version:
         raise credentials_exception
     return user
 

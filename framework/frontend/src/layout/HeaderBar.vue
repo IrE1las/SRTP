@@ -10,8 +10,8 @@
       </el-dropdown>
     </div>
     <el-dialog v-model="searchOpen" title="快速前往" width="520px" class="page-search-dialog" @opened="searchInput?.focus()">
-      <el-input ref="searchInput" v-model="query" placeholder="搜索练习、诊断或管理页面" clearable :prefix-icon="Search" size="large" />
-      <div class="search-results"><router-link v-for="item in searchResults" :key="item.path" :to="item.path" @click="searchOpen = false"><el-icon><component :is="item.icon" /></el-icon><span>{{ item.title }}</span><small>{{ item.group }}</small><el-icon><Right /></el-icon></router-link><el-empty v-if="!searchResults.length" description="没有找到相关页面，试试其他关键词" :image-size="70" /></div>
+      <el-input ref="searchInput" v-model="query" placeholder="搜索学习、考试或管理页面" clearable :prefix-icon="Search" size="large" />
+      <div class="search-results"><router-link v-for="item in searchResults" :key="item.path" :to="item.path" @click="searchOpen = false"><span>{{ item.title }}</span><small>{{ item.group }}</small><el-icon><Right /></el-icon></router-link><el-empty v-if="!searchResults.length" description="没有找到相关页面，试试其他关键词" :image-size="70" /></div>
     </el-dialog>
   </div>
 </template>

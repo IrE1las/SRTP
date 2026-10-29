@@ -11,6 +11,7 @@ sys.path.insert(0, str(BACKEND))
 from app.core.database import SessionLocal, engine
 from app.models import LabAttempt, LabQuestion
 from app.services.lab_topics import ROOT, import_topics, resolve_blueprint
+from app.services.s1_migration import require_current_schema
 
 
 def main():
@@ -20,10 +21,11 @@ def main():
     db_path = Path(engine.url.database).resolve()
     if engine.url.get_backend_name() != 'sqlite' or not db_path.is_relative_to(ROOT) or not db_path.is_file():
         raise ValueError('仅允许导入 SRTP 项目内已存在的 SQLite 数据库')
+    require_current_schema(engine)
     with SessionLocal() as db:
         dataset, questions = resolve_blueprint(db)
         report = {'mode':'validate','database':str(db_path),'dataset_id':dataset.id,
-                  'topics':8,'questions':len(questions),
+                  'topics':6,'questions':len(questions),
                   'automatic_fields':sum(f['kind']!='essay' for q in questions for f in q['fields']),
                   'manual_fields':sum(f['kind']=='essay' for q in questions for f in q['fields'])}
     if args.apply:

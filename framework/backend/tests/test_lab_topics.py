@@ -4,10 +4,11 @@ import json
 import pytest
 
 from app.models.lab_topic import LabAttempt, LabQuestion
-from app.models.shunting_route import ShuntingQuestion, ShuntingRoute
+from app.models.shunting_route import ShuntingRoute
+from sqlalchemy import inspect
 from app.services import lab_topics
-from tests.test_exercise_api import auth_headers
-from tests.test_shunting_questions import _import_payload
+from tests.helpers import auth_headers
+from tests.helpers import _import_payload
 
 
 @pytest.fixture()
@@ -23,16 +24,15 @@ def completed(question):
 
 
 def test_report_coverage_and_source_binding(topics, db_session):
-    assert len(topics)==24
-    assert {q.topic for q in topics}==set(range(1,9))
-    assert all(sum(q.topic==topic for q in topics)==3 for topic in range(1,9))
+    assert len(topics)==18
+    assert {q.topic for q in topics}==set(range(1,7))
+    assert all(sum(q.topic==topic for q in topics)==3 for topic in range(1,7))
     assert db_session.query(ShuntingRoute).count()==35
-    assert db_session.query(ShuntingQuestion).count()==0
+    assert 'shunting_questions' not in inspect(db_session.bind).get_table_names()
     shunting=db_session.query(ShuntingRoute).filter_by(route_number=34).one()
     q=next(q for q in topics if q.key=='lab-06-02')
     field=next(f for f in q.content['fields'] if f['id']=='switches')
     assert field['expected']==shunting.fields['道岔']=='(17/19)、{23/25}、27'
-    assert all(q.content['conditions'] for q in topics if q.topic>=7)
 
 
 def test_all_authored_questions_evaluate_without_invented_manual_score(topics):
@@ -115,8 +115,8 @@ def test_order_and_multi_are_checked_exactly(topics):
 
 
 def test_import_is_idempotent_and_does_not_generate_old_questions(topics,db_session):
-    assert lab_topics.import_topics(db_session)=={'topics':8,'total':24,'inserted':0,'updated':0}
-    assert db_session.query(ShuntingQuestion).count()==0
+    assert lab_topics.import_topics(db_session)=={'topics':6,'total':18,'inserted':0,'updated':0}
+    assert 'shunting_questions' not in inspect(db_session.bind).get_table_names()
 
 
 def test_source_mutation_rejected(topics,db_session,tmp_path,monkeypatch):
@@ -135,10 +135,10 @@ def test_student_submit_teacher_review_and_history_isolation(client,topics,db_se
     q=topics[0]
     path=f'/api/lab-topics/questions/{q.key}'
     assert client.get('/api/lab-topics/questions').status_code==401
-    assert len(client.get('/api/lab-topics/questions',headers=student).json())==24
+    assert len(client.get('/api/lab-topics/questions',headers=student).json())==18
     assert 'expected' not in client.get(path,headers=student).text
     assert client.get(path+'/rubric',headers=student).status_code==403
-    assert client.get('/api/lab-topics/reviews',headers=student).status_code==403
+    assert client.get('/api/lab-topics/reviews',params={'topic':1},headers=student).status_code==403
     assert client.get(path+'/rubric',headers=teacher).status_code==200
     body={'fingerprint':'0'*64,'answers':completed(q)}
     assert client.post(path+'/submit',headers=student,json=body).status_code==409
@@ -147,8 +147,8 @@ def test_student_submit_teacher_review_and_history_isolation(client,topics,db_se
     assert response.status_code==201,response.text
     attempt=response.json()
     assert attempt['result']['total_score'] is None
-    assert client.get('/api/lab-topics/attempts',headers=other).json()==[]
-    assert len(client.get('/api/lab-topics/attempts',headers=student).json())==1
+    assert client.get('/api/lab-topics/attempts',params={'topic':1},headers=other).json()==[]
+    assert len(client.get('/api/lab-topics/attempts',params={'topic':1},headers=student).json())==1
     markpath=f"/api/lab-topics/attempts/{attempt['id']}/review"
     mark={'scores':{'reason':8},'comment':'解释准确，补充封闭对选路的限制。'}
     assert client.post(markpath,headers=student,json=mark).status_code==403
@@ -159,7 +159,7 @@ def test_student_submit_teacher_review_and_history_isolation(client,topics,db_se
     assert marked.status_code==200,marked.text
     assert marked.json()['result']['total_score']==48
     assert client.post(markpath,headers=teacher,json=mark).status_code==409
-    saved=client.get('/api/lab-topics/attempts',headers=student).json()[0]
+    saved=client.get('/api/lab-topics/attempts',params={'topic':1},headers=student).json()[0]
     assert saved['review']==mark
     assert saved['result']['status']=='graded'
     assert lab_topics.import_topics(db_session)['updated']==0

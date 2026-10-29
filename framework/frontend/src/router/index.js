@@ -1,197 +1,53 @@
 import { createRouter, createWebHistory } from 'vue-router'
-
 import AppLayout from '@/layout/AppLayout.vue'
 import { useUserStore } from '@/store/user'
+import { roleHomeMap } from '@/ui/navigation'
+export { roleHomeMap }
 
-export const roleHomeMap = {
-  student: '/student/dashboard',
-  teacher: '/teacher/dashboard',
-  admin: '/admin',
-}
-
-const routes = [
-  {
-    path: '/login',
-    name: 'Login',
-    component: () => import('@/views/auth/Login.vue'),
-  },
-  {
-    path: '/',
-    component: AppLayout,
-    meta: { requiresAuth: true },
-    children: [
-      { path: 'student/modules', component: () => import('@/features/modules/ModuleHub.vue'), meta: { roles: ['student','teacher','admin'] } },
-      { path: 'student/modules/one/experiment-1', component: () => import('@/features/modules/ExperimentOne.vue'), meta: { roles: ['student','teacher','admin'] } },
-      { path: 'student/modules/one/experiment-1/:questionId', component: () => import('@/features/modules/ExperimentOne.vue'), meta: { roles: ['student','teacher','admin'] } },
-      { path: 'student/modules/:moduleId(one|two|three)', component: () => import('@/features/modules/ModuleHub.vue'), meta: { roles: ['student','teacher','admin'] } },
-
-      {
-        path: '',
-        redirect: () => {
-          const userStore = useUserStore()
-          return roleHomeMap[userStore.role] || '/login'
-        },
-      },
-      {
-        path: 'student',
-        redirect: '/student/dashboard',
-        meta: { requiresAuth: true, roles: ['student'] },
-      },
-      {
-        path: 'student/dashboard',
-        name: 'StudentDashboard',
-        component: () => import('@/views/student/Dashboard.vue'),
-        meta: { requiresAuth: true, roles: ['student'] },
-      },
-      {
-        path: 'student/lobby',
-        name: 'ExerciseLobby',
-        component: () => import('@/views/student/ExerciseLobby.vue'),
-        meta: { requiresAuth: true, roles: ['student'] },
-      },
-      {
-        path: 'student/shunting-questions',
-        name: 'ShuntingQuestionBank',
-        component: () => import('@/views/student/ShuntingQuestionBank.vue'),
-        meta: { requiresAuth: true, roles: ['student'] },
-      },
-      {
-        path: 'student/lab-topics',
-        name: 'LabTopics',
-        component: () => import('@/views/student/LabTopics.vue'),
-        meta: { requiresAuth: true, roles: ['student', 'teacher'] },
-      },
-      {
-        path: 'student/simulation-console',
-        name: 'SimulationConsole',
-        component: () => import('@/features/simulationConsole/SimulationConsole.vue'),
-        meta: { requiresAuth: true, roles: ['student', 'teacher', 'admin'] },
-      },
-      {
-        path: 'teacher/lab-topics',
-        name: 'TeacherLabTopics',
-        component: () => import('@/views/student/LabTopics.vue'),
-        meta: { requiresAuth: true, roles: ['teacher'] },
-      },
-      {
-        path: 'student/exercises/:id',
-        name: 'ExerciseWorkbench',
-        component: () => import('@/views/student/ExerciseWorkbench.vue'),
-        meta: { requiresAuth: true, roles: ['student'] },
-      },
-      {
-        path: 'student/history',
-        name: 'ExerciseHistory',
-        component: () => import('@/views/student/ExerciseHistory.vue'),
-        meta: { requiresAuth: true, roles: ['student'] },
-      },
-      {
-        path: 'student/history/:sessionId',
-        name: 'ExerciseReplay',
-        component: () => import('@/views/student/ExerciseReplay.vue'),
-        meta: { requiresAuth: true, roles: ['student'] },
-      },
-      {
-        path: 'student/interlocking-exam',
-        name: 'InterlockingExam',
-        component: () => import('@/views/student/InterlockingExam.vue'),
-        meta: { requiresAuth: true, roles: ['student'] },
-      },
-      {
-        path: 'student/interlocking-exam-protective',
-        name: 'InterlockingExamProtective',
-        component: () => import('@/views/student/InterlockingExamProtective.vue'),
-        meta: { requiresAuth: true, roles: ['student'] },
-      },
-      {
-        path: 'student/interlocking-exam-driven',
-        name: 'InterlockingExamDriven',
-        component: () => import('@/views/student/InterlockingExamDriven.vue'),
-        meta: { requiresAuth: true, roles: ['student'] },
-      },
-      {
-        path: 'student/interlocking-exam-conditional',
-        name: 'InterlockingExamConditional',
-        component: () => import('@/views/student/InterlockingExamConditional.vue'),
-        meta: { requiresAuth: true, roles: ['student'] },
-      },
-      {
-        path: 'teacher',
-        redirect: '/teacher/dashboard',
-        meta: { requiresAuth: true, roles: ['teacher'] },
-      },
-      {
-        path: 'teacher/dashboard',
-        name: 'TeacherDashboard',
-        component: () => import('@/views/teacher/Dashboard.vue'),
-        meta: { requiresAuth: true, roles: ['teacher'] },
-      },
-      {
-        path: 'teacher/exercises',
-        name: 'TeacherExerciseList',
-        component: () => import('@/views/teacher/ExerciseList.vue'),
-        meta: { requiresAuth: true, roles: ['teacher'] },
-      },
-      {
-        path: 'teacher/exercises/new',
-        name: 'TeacherExerciseCreate',
-        component: () => import('@/views/teacher/ExerciseEditor.vue'),
-        meta: { requiresAuth: true, roles: ['teacher'] },
-      },
-      {
-        path: 'teacher/exercises/:id/edit',
-        name: 'TeacherExerciseEdit',
-        component: () => import('@/views/teacher/ExerciseEditor.vue'),
-        meta: { requiresAuth: true, roles: ['teacher'] },
-      },
-      { path: 'admin/questions', name: 'AdminQuestionBank', component: () => import('@/views/admin/QuestionBank.vue'), meta: { requiresAuth: true, roles: ['admin'] } },
-      { path: 'admin/questions/new', name: 'AdminQuestionCreate', component: () => import('@/views/admin/QuestionEditor.vue'), meta: { requiresAuth: true, roles: ['admin'] } },
-      { path: 'admin/questions/:id', name: 'AdminQuestionEdit', component: () => import('@/views/admin/QuestionEditor.vue'), meta: { requiresAuth: true, roles: ['admin'] } },
-      { path: 'admin/grading', name: 'AdminGrading', component: () => import('@/views/teacher/GradingWorkbench.vue'), meta: { requiresAuth: true, roles: ['admin'] } },
-      { path: 'teacher/grading', name: 'TeacherGrading', component: () => import('@/views/teacher/GradingWorkbench.vue'), meta: { requiresAuth: true, roles: ['teacher'] } },
-      {
-        path: 'admin',
-        name: 'AdminDashboard',
-        component: () => import('@/views/admin/Dashboard.vue'),
-        meta: { requiresAuth: true, roles: ['admin'] },
-      },
-      {
-        path: 'admin/ai-settings',
-        name: 'AdminAiSettings',
-        component: () => import('@/views/admin/AiSettings.vue'),
-        meta: { requiresAuth: true, roles: ['admin'] },
-      },
-    ],
-  },
-  {
-    path: '/:pathMatch(.*)*',
-    redirect: '/',
-  },
+const profile = () => import('@/views/shared/ProfileHome.vue')
+const theory = () => import('@/views/student/LabTopics.vue')
+const pending = () => import('@/views/shared/PendingFeature.vue')
+const questions = () => import('@/views/teacher/TheoryStudentList.vue')
+const children = [
+  { path: '', redirect: () => roleHomeMap[useUserStore().role] || '/login' },
+  { path: 'student', redirect: '/student/dashboard', meta: { roles: ['student'] } },
+  { path: 'student/dashboard', component: profile, meta: { roles: ['student'] } },
+  { path: 'student/learn', redirect: '/student/learn/theory', meta: { roles: ['student'] } },
+  { path: 'student/learn/theory', component: theory, meta: { roles: ['student'] } },
+  { path: 'student/learn/theory/attempts', component: () => import('@/views/student/TheoryHistory.vue'), meta: { roles: ['student'] } },
+  { path: 'student/learn/theory/attempts/:attemptId([0-9]+)', component: () => import('@/views/student/TheoryAttemptDetail.vue'), meta: { roles: ['student'] } },
+  { path: 'student/learn/theory/:topicId([1-6])', component: () => import('@/views/student/TheoryTopic.vue'), meta: { roles: ['student'] } },
+  { path: 'student/learn/operations', component: () => import('@/views/student/OperationCatalogue.vue'), meta: { roles: ['student'] } },
+  { path: 'student/learn/operations/history', component: () => import('@/views/student/OperationHistory.vue'), meta: { roles: ['student'] } },
+  { path: 'student/learn/operations/attempts/:attemptId', component: () => import('@/views/student/OperationAttempt.vue'), meta: { roles: ['student'] } },
+  { path: 'operations/reviews', component: () => import('@/views/teacher/OperationReviews.vue'), meta: { roles: ['teacher','admin'] } },
+  { path: 'operations/reviews/:attemptId', component: () => import('@/views/teacher/OperationAttemptReview.vue'), meta: { roles: ['teacher','admin'] } },
+  { path: 'operations/manage', component: () => import('@/views/teacher/OperationQuestions.vue'), meta: { roles: ['teacher','admin'] } },
+  { path: 'operations/manage/new', component: () => import('@/views/teacher/OperationEditor.vue'), meta: { roles: ['teacher','admin'] } },
+  { path: 'operations/manage/:questionId([0-9]+)/edit', component: () => import('@/views/teacher/OperationEditor.vue'), meta: { roles: ['teacher','admin'] } },
+  { path: 'operations/manage/:questionId([0-9]+)/review', component: () => import('@/views/teacher/OperationReview.vue'), meta: { roles: ['teacher','admin'] } },
+  { path: 'student/exams', component: pending, props: { title: '考试界面', stage: 'S5、S6' }, meta: { roles: ['student'] } },
+  { path: 'teacher', redirect: '/teacher/dashboard', meta: { roles: ['teacher'] } },
+  { path: 'teacher/dashboard', component: profile, meta: { roles: ['teacher'] } },
+  { path: 'teacher/questions', component: questions, meta: { roles: ['teacher'] } },
+  { path: 'teacher/questions/students/:studentId', component: () => import('@/views/teacher/TheoryStudentAttempts.vue'), meta: { roles: ['teacher'] } },
+  { path: 'teacher/questions/attempts/:attemptId', component: () => import('@/views/teacher/TheoryReview.vue'), meta: { roles: ['teacher'] } },
+  { path: 'teacher/exams', component: pending, props: { title: '考试管理', stage: 'S5、S6' }, meta: { roles: ['teacher'] } },
+  { path: 'admin', component: profile, meta: { roles: ['admin'] } },
+  { path: 'admin/users', component: () => import('@/views/admin/UserManagement.vue'), meta: { roles: ['admin'] } },
+  { path: 'admin/ai-settings', component: () => import('@/views/admin/AiSettings.vue'), meta: { roles: ['admin'] } },
 ]
-
-const router = createRouter({
-  history: createWebHistory(),
-  routes,
-})
-
-router.beforeEach((to) => {
-  const userStore = useUserStore()
-  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
-  const allowedRoles = to.matched.flatMap((record) => record.meta.roles || [])
-
-  if (!requiresAuth && to.path === '/login' && userStore.isLoggedIn) {
-    return roleHomeMap[userStore.role] || '/'
-  }
-
-  if (requiresAuth && !userStore.isLoggedIn) {
-    return { path: '/login', query: { redirect: to.fullPath } }
-  }
-
-  if (allowedRoles.length > 0 && userStore.role !== 'admin' && !allowedRoles.includes(userStore.role)) {
-    return roleHomeMap[userStore.role] || '/login'
-  }
-
+const router = createRouter({ history: createWebHistory(), scrollBehavior(to,from,savedPosition) { return savedPosition || {left:0,top:0} }, routes: [
+  { path: '/login', component: () => import('@/views/auth/Login.vue') },
+  { path: '/operations/manage/:questionId([0-9]+)/record', component: () => import('@/views/teacher/OperationWorkspace.vue'), meta: { requiresAuth: true, roles: ['teacher','admin'] } },
+  { path: '/', component: AppLayout, meta: { requiresAuth: true }, children },
+  { path: '/:pathMatch(.*)*', component: () => import('@/views/shared/NotFound.vue'), meta: { requiresAuth: true } },
+] })
+router.beforeEach(to => {
+  const user = useUserStore()
+  if (to.matched.some(r => r.meta.requiresAuth) && !user.isLoggedIn) return { path: '/login', query: { redirect: to.fullPath } }
+  if (to.path === '/login' && user.isLoggedIn) return roleHomeMap[user.role] || '/'
+  if (to.meta.roles && !to.meta.roles.includes(user.role)) return roleHomeMap[user.role] || '/login'
   return true
 })
-
 export default router

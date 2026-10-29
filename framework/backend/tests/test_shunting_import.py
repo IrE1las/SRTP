@@ -4,10 +4,9 @@ from pathlib import Path
 
 import pytest
 
-from app.models.interlocking_table import InterlockingTable
 from app.models.shunting_route import ShuntingDataset, ShuntingRoute
 from app.services.shunting_data import import_reviewed_routes, validate_payload
-from tests.test_exercise_api import auth_headers
+from tests.helpers import auth_headers
 
 PAYLOAD = Path(__file__).resolve().parents[3]/'ai_design/station/shunting_interlocking_reviewed.json'
 
@@ -17,8 +16,7 @@ def payload():
     return json.loads(PAYLOAD.read_text(encoding='utf-8'))
 
 
-def test_lossless_roundtrip_and_repeat_import_preserves_demo_routes(db_session, seeded_station, payload):
-    before = [(r.id,r.route_name,r.switches_required,r.sections_required) for r in db_session.query(InterlockingTable).all()]
+def test_lossless_roundtrip_and_repeat_import_preserves_original_cells(db_session, payload):
     result = import_reviewed_routes(db_session, payload)
     db_session.commit()
     assert result['inserted'] == 35
@@ -33,7 +31,6 @@ def test_lossless_roundtrip_and_repeat_import_preserves_demo_routes(db_session, 
     db_session.commit()
     assert second == {'dataset_id':result['dataset_id'],'inserted':0,'updated':0,'total':35}
     assert [r.id for r in db_session.query(ShuntingRoute).order_by(ShuntingRoute.route_number)] == ids
-    assert [(r.id,r.route_name,r.switches_required,r.sections_required) for r in db_session.query(InterlockingTable).all()] == before
     dataset = db_session.query(ShuntingDataset).one()
     assert [t['id'] for t in dataset.station_topology['tracks']] == ['5','III','I','II','4']
     assert dataset.source['reviewed'] is True
@@ -69,29 +66,3 @@ def test_import_transaction_can_be_rolled_back(db_session, payload):
     db_session.rollback()
     assert db_session.query(ShuntingDataset).count() == 0
     assert db_session.query(ShuntingRoute).count() == 0
-
-
-def test_teacher_api_reads_database_and_preserves_subscripts(client, db_session, payload):
-    import_reviewed_routes(db_session, payload)
-    db_session.commit()
-    teacher = auth_headers(client, 'shunting_teacher', 'teacher')
-    student = auth_headers(client, 'shunting_student', 'student')
-    base = '/api/exam/shunting'
-    assert client.get(base+'/routes').status_code == 401
-    assert client.get(base+'/routes', headers=student).status_code == 403
-    listing = client.get(base+'/routes', headers=teacher)
-    assert listing.status_code == 200
-    assert [r['route_number'] for r in listing.json()] == list(range(20,55))
-    info = client.get(base+'/dataset', headers=teacher).json()
-    assert info['route_count'] == 35 and info['station_key'] == 'original-photo-station'
-    for source in payload['routes']:
-        response = client.get(base+f'/routes/{source["route_number"]}', headers=teacher)
-        assert response.status_code == 200
-        assert response.json()['fields'] == source['fields']
-        assert response.json()['rich_text'] == source['rich_text']
-    assert client.get(base+'/routes/19', headers=teacher).status_code == 404
-
-
-def test_api_reports_missing_dataset(client):
-    teacher = auth_headers(client, 'shunting_empty_teacher', 'teacher')
-    assert client.get('/api/exam/shunting/dataset', headers=teacher).status_code == 404

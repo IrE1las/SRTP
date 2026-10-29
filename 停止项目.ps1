@@ -4,7 +4,11 @@ $record = Join-Path $projectRoot '.runtime\services.json'
 if (-not (Test-Path -LiteralPath $record)) { Write-Output 'No saved services.'; exit }
 $services = Get-Content -LiteralPath $record -Raw | ConvertFrom-Json
 foreach ($name in @('backend','frontend')) {
-    $serviceId = $services.$name
+    [int]$serviceId = 0
+    if (-not [int]::TryParse([string]$services.$name, [ref]$serviceId) -or $serviceId -le 0) {
+        Write-Output "No valid saved process for $name."
+        continue
+    }
     $info = Get-CimInstance Win32_Process -Filter "ProcessId = $serviceId"
     if (-not $info) { continue }
     $owned = if ($name -eq 'backend') {
