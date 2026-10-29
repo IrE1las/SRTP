@@ -1,3 +1,3 @@
 <template>
-  <router-view />
+  <router-view :key="$route.meta.examStandalone ? $route.path : undefined" />
 </template>

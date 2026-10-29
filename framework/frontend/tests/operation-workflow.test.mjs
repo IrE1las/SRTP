@@ -7,7 +7,7 @@ import { COMMANDS } from '../src/features/simulationConsole/standardDisplay.js'
 import { eventEnvelope, persistableEvent, initialForm, draftPayload } from '../src/domain/operationEvents.js'
 import { paginate } from '../src/domain/pagination.js'
 
-async function consoleHarness({ stored, failOnce = false, initialPending = null } = {}) {
+async function consoleHarness({ stored, failOnce = false, initialPending = null, props = {sessionId:'sid'} } = {}) {
   const source = await readFile(new URL('../src/features/simulationConsole/OperationConsole.vue', import.meta.url), 'utf8')
   const descriptor = parse(source).descriptor
   const calls = [], updates = [], storage = new Map(stored ? [['srtp-operation-pending-sid', JSON.stringify(stored)]] : [])
@@ -15,7 +15,7 @@ async function consoleHarness({ stored, failOnce = false, initialPending = null 
   const server = { session_id:'sid', revision:0, status:'active', pending:initialPending, events:[], snapshot:{ session_kind:'recording', selected_buttons:[], switches:{} } }
   const dependencies = {
     computed, ref, COMMANDS, eventEnvelope, persistableEvent,
-    defineProps: () => ({ sessionId:'sid' }), defineEmits: () => (_, data) => updates.push(data), defineExpose: value => { exposed = value },
+    defineProps: () => props, defineEmits: () => (_, data) => updates.push(data), defineExpose: value => { exposed = value },
     onMounted: fn => { mount = fn }, onBeforeUnmount: fn => { unmount = fn },
     setInterval: () => 1, clearInterval: () => {},
     sessionStorage: { setItem:(key,value) => storage.set(key,value), getItem:key => storage.get(key), removeItem:key => storage.delete(key) },
@@ -51,6 +51,21 @@ test('real console setup persists the function click before a device target and 
   assert.deepEqual(calls.map(c => c.sequence), [1,2,3,4])
   assert.notEqual(calls[2].event_id, calls[3].event_id)
   assert.equal(server.events.length, 4)
+})
+
+test('submission disables new input while already queued real clicks still flush; exam pause stops pending execution', async () => {
+  const props = {sessionId:'sid',readOnly:false,pausePending:false}
+  const active = await consoleHarness({props})
+  const first=active.state.press('D3DA'), second=active.state.press('D3DA')
+  props.readOnly=true
+  await Promise.all([first,second]);await active.exposed.flush()
+  assert.equal(active.calls.length,2)
+  const pausedProps={sessionId:'sid',readOnly:false,pausePending:false}
+  const paused=await consoleHarness({props:pausedProps})
+  const queued=paused.state.press('D3DA')
+  pausedProps.pausePending=true;pausedProps.readOnly=true
+  await queued
+  assert.equal(paused.calls.length,0)
 })
 
 test('an uncertain request pauses operations and retry reuses its original event ID and sequence', async () => {

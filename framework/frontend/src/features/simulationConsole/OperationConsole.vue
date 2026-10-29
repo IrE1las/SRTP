@@ -1,7 +1,7 @@
 <template>
   <section class="record-console" v-loading="loading" :aria-busy="loading || busy">
     <div v-if="error" class="console-error" role="alert"><span>{{ error }}</span><el-button :loading="busy" @click="recover">同步并重试</el-button></div>
-    <div class="console-actions"><p>先选功能，再选目标；办理进路可直接点击始、终端按钮。</p><div><label for="station-scale">站场显示</label><select id="station-scale" v-model="viewScale" name="station-scale"><option value="fit">适应窗口</option><option value="100">原始大小</option><option value="125">放大 125%</option></select><el-button :disabled="busy" @click="refresh">同步状态</el-button><el-button @click="fullscreen">全屏站场</el-button></div></div>
+    <div class="console-actions"><p>先选功能，再选目标；办理进路可直接点击始、终端按钮。</p><div><label for="station-scale">站场显示</label><select id="station-scale" v-model="viewScale" name="station-scale"><option value="fit">适应窗口</option><option value="100">原始大小</option><option value="125">放大 125%</option></select><el-button :disabled="busy" @click="refresh">同步状态</el-button><el-button v-if="!examMode" @click="fullscreen">全屏站场</el-button></div></div>
     <p v-if="viewNotice" class="view-notice" role="status">{{ viewNotice }}</p>
     <div class="station-console" ref="root">
       <button class="fullscreen-exit" type="button" @click="exitFullscreen">退出全屏（Esc）</button>
@@ -23,7 +23,7 @@ import ReferenceStationDiagram from './ReferenceStationDiagram.vue'
 import { COMMANDS } from './standardDisplay'
 import { getOperationStation, getOperationSession, postOperationEvent } from '@/api/operations'
 import { eventEnvelope, persistableEvent } from '@/domain/operationEvents'
-const props = defineProps({ sessionId: { type: String, required: true }, readOnly: { type: Boolean, default: false }, api: { type: Object, default: null } })
+const props = defineProps({ sessionId: { type: String, required: true }, readOnly: { type: Boolean, default: false }, api: { type: Object, default: null }, examMode: { type: Boolean, default: false }, pausePending: { type: Boolean, default: false } })
 const emit = defineEmits(['update'])
 const station = ref(null), result = ref(null), loading = ref(true), busy = ref(false), error = ref(''), root = ref(null)
 const showPin = ref(false), pin = ref(''), pinInput = ref(null), viewScale = ref('fit'), viewNotice = ref('')
@@ -40,7 +40,7 @@ function accept(data) {
 function enqueue(action, values = {}) {
   if (blocked.value) return Promise.resolve()
   queue = queue.then(async () => {
-    if (disposed || error.value || result.value?.status !== 'active') return
+    if (disposed || props.pausePending || error.value || result.value?.status !== 'active') return
     busy.value = true
     const event = eventEnvelope(action, result.value.revision + 1, values)
     outstanding = persistableEvent(event)
@@ -78,7 +78,9 @@ const hasUnconfirmed = computed(() => busy.value || !!outstanding)
 function focusPin() { pinInput.value?.focus() }
 function closePin(done) { cancelPin().finally(done) }
 async function exitFullscreen() { await document.exitFullscreen?.() }
-defineExpose({ hasUnconfirmed, sync: accept, flush: async () => { await queue; if (outstanding || error.value) throw new Error('请先同步未确认的操作'); return result.value } })
+defineExpose({ hasUnconfirmed, sync: accept,
+  recover: async () => { await queue; await recover(); if (outstanding || error.value) throw new Error(error.value || '操作尚未确认'); return result.value },
+  flush: async () => { await queue; if (outstanding || error.value) throw new Error('请先同步未确认的操作'); return result.value } })
 async function refresh() {
   if (busy.value || disposed || outstanding) return
   try { accept(await (props.api?.console || getOperationSession)(props.sessionId)); error.value = '' }

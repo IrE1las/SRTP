@@ -1,5 +1,6 @@
 <template>
   <p v-if="user.role === 'admin'" class="operation-management-link"><router-link to="/operations/manage">操作题管理</router-link></p>
+  <p v-if="user.role === 'admin'" class="operation-management-link"><router-link to="/exams/manage">考试管理</router-link></p>
   <section class="profile-home" v-loading="loading">
     <h1>首页</h1>
     <p v-if="notice" role="status">{{ notice }}</p>

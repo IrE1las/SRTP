@@ -7,7 +7,7 @@ export function navigationForRole(role) {
       { title: '理论学习', path: '/student/learn/theory' },
       { title: '操作学习', path: '/student/learn/operations' },
     ] },
-    { title: '考试界面', path: '/student/exams', children: [], empty: 'null · 历史考试待S5实现' },
+    { title: '考试界面', path: '/student/exams', overview: true, children: [{ title: '历史考试', path: '/student/exams/history' }] },
   ]
   if (role === 'teacher') return [
     { title: '首页', path: '/teacher/dashboard' },
@@ -28,6 +28,12 @@ export function navigationGroups(role) {
   return [{ title: '功能导航', items: navigationForRole(role).flatMap(item => item.children?.length ? item.children : [item]) }]
 }
 export function pageLabel(path, role) {
+  if (path === '/student/exams') return '考试界面'
+  if (path === '/student/exams/history') return '历史考试'
+  if (path.startsWith('/exams/manage/attempts/')) return '考试操作记录'
+  if (path === '/exams/manage/new') return '新建考试'
+  if (/^\/exams\/manage\/\d+$/.test(path)) return '考试详情'
+  if (path === '/exams/manage') return '考试管理'
   if (path === '/operations/reviews') return '操作批改'
   if (path.startsWith('/operations/reviews/')) return '操作作答批改'
   if (path === '/student/learn/operations/history') return '我的操作记录'

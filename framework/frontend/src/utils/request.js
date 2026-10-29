@@ -32,7 +32,7 @@ request.interceptors.response.use(
       return Promise.reject(error)
     }
 
-    ElMessage.error(message)
+    if (!error.config?.quiet) ElMessage.error(message)
     return Promise.reject(error)
   },
 )

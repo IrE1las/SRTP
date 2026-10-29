@@ -63,9 +63,12 @@ def question(db, user, qid):
 def delete_question(db, user, qid):
     q = question(db, user, qid)
     from app.models.operation_learning import OperationAttempt
+    from app.models.exam import Exam
+    version_ids = select(OperationVersion.id).where(OperationVersion.question_id == qid)
+    if db.scalar(select(Exam.id).where(Exam.version_id.in_(version_ids)).limit(1)):
+        fail('该题目已有考试引用，不能永久删除；请停用题目以保留历史依据')
     if db.scalar(select(OperationAttempt.session_id).where(OperationAttempt.question_id == qid).limit(1)):
         fail('该题目已有学生作答引用，不能永久删除；请停用题目以保留历史依据')
-    version_ids = select(OperationVersion.id).where(OperationVersion.question_id == qid)
     session_ids = select(OperationSession.id).where(OperationSession.version_id.in_(version_ids))
     if db.scalar(select(OperationSession.id).where(OperationSession.version_id.in_(version_ids), OperationSession.status == 'active').limit(1)):
         fail('请先结束该题目的所有录制和预览，再删除')
@@ -129,7 +132,7 @@ def edit(db, user, qid, body):
     if v.revision != body.revision:
         fail('题目已变化，请重新加载后编辑')
     if db.scalar(select(OperationSession.id).where(OperationSession.version_id == v.id,
-            OperationSession.status == 'active', OperationSession.kind != 'learning').limit(1)):
+            OperationSession.status == 'active', OperationSession.kind.in_(['recording', 'preview'])).limit(1)):
         fail('请先结束该版本的录制或预览，再修改题设')
     data = validate_draft(body)
     if v.status == 'published':
@@ -218,6 +221,8 @@ def view_session(db, user, sid):
     record = db.get(OperationSession, sid)
     if not record:
         fail('会话不存在', 404)
+    if record.kind == 'exam':
+        fail('请通过有权限的考试详情查看考试记录', 404)
     version = db.get(OperationVersion, record.version_id)
     question(db, user, version.question_id)
     if record.owner_id == user.id and record.kind != 'learning':
@@ -228,12 +233,15 @@ def view_session(db, user, sid):
     return {**response(db, record, engine, session), 'read_only': True}
 
 
-def get_session(db, user, sid):
+def get_session(db, user, sid, *, exam=False):
     record = db.get(OperationSession, sid)
     if not record:
         fail('会话不存在或无权访问', 404)
     v = db.get(OperationVersion, record.version_id)
-    if record.kind == 'learning':
+    if record.kind == 'exam':
+        if not exam or user.role != 'student':
+            fail('考试会话只能通过考试接口访问', 404)
+    elif record.kind == 'learning':
         from app.models.operation_learning import OperationAttempt
         attempt = db.get(OperationAttempt, sid)
         if user.role != 'student' or not attempt or attempt.student_id != user.id:
@@ -273,7 +281,8 @@ def start_session(db, user, qid, kind):
         fail('站场版本已变化，请保存新题目版本')
     # A teacher may record again; previous active console is sealed, never overwritten.
     for previous in db.scalars(select(OperationSession).where(OperationSession.version_id == v.id,
-            OperationSession.owner_id == user.id, OperationSession.status == 'active')):
+            OperationSession.owner_id == user.id, OperationSession.status == 'active',
+            OperationSession.kind.in_(['recording', 'preview']))):
         previous.status = 'abandoned'
     engine = ReferenceSimulationService(reference_station_package())
     initial = deepcopy(v.initial)
@@ -286,8 +295,8 @@ def start_session(db, user, qid, kind):
     return response(db, record, engine, engine.sessions[sid])
 
 
-def refresh(db, user, sid):
-    record = get_session(db, user, sid)
+def refresh(db, user, sid, *, exam=False, commit=True):
+    record = get_session(db, user, sid, exam=exam)
     engine, session = unpack(reference_station_package(), record.engine_state)
     if record.status == 'active':
         engine.snapshot(sid, user.id)
@@ -299,12 +308,12 @@ def refresh(db, user, sid):
         if claimed.rowcount != 1:
             db.rollback()
             fail('会话已变化，请重新同步')
-        db.commit()
+        db.commit() if commit else db.flush()
     return response(db, record, engine, session)
 
 
-def click(db, user, sid, body):
-    record = get_session(db, user, sid)
+def click(db, user, sid, body, *, exam=False, commit=True):
+    record = get_session(db, user, sid, exam=exam)
     clean = body.model_dump(mode='json', exclude={'pin', 'event_id', 'sequence'})
     fingerprint = digest(clean)
     previous = db.scalar(select(OperationEvent).where(OperationEvent.session_id == sid,
@@ -312,7 +321,7 @@ def click(db, user, sid, body):
     if previous:
         if previous.request_fingerprint != fingerprint or previous.sequence != body.sequence:
             fail('同一事件ID不得改换动作或序号')
-        result = refresh(db, user, sid)
+        result = refresh(db, user, sid, exam=exam, commit=commit)
         result['event'] = previous.content
         return result
     if record.status != 'active':
@@ -405,7 +414,7 @@ def click(db, user, sid, body):
     db.add(OperationEvent(session_id=sid, event_id=str(body.event_id), sequence=body.sequence,
                           request_fingerprint=fingerprint, content=content))
     try:
-        db.commit()
+        db.commit() if commit else db.flush()
     except IntegrityError:
         db.rollback()
         fail('操作发生并发冲突，请以相同事件ID重试')
@@ -447,6 +456,8 @@ def download(db, user, sid):
     record = db.get(OperationSession, sid)
     if not record:
         fail('日志不存在或无权访问', 404)
+    if record.kind == 'exam':
+        fail('请通过有权限的考试下载接口访问', 404)
     v = db.get(OperationVersion, record.version_id)
     q = question(db, user, v.question_id)
     return {'schema_version': 1, 'station_version': record.station_version,

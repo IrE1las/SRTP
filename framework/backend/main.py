@@ -12,6 +12,11 @@ from app.services.s2_migration import require_account_schema
 from app.services.s3_migration import require_operation_schema
 from app.services.s4_migration import require_learning_schema
 from app.api import operation_learning
+from app.api import exams
+from app.services.s5_migration import require_exam_schema
+from app.services import exams as exam_service
+import asyncio
+import logging
 from app.services.bootstrap import seed_theory
 import app.models  # register only the retained tables
 
@@ -41,17 +46,52 @@ def on_startup():
     require_account_schema(engine)
     require_operation_schema(engine)
     require_learning_schema(engine)
+    require_exam_schema(engine)
     Base.metadata.create_all(bind=engine)
     _ensure_default_admin()
     with SessionLocal() as db:
         seed_theory(db)
+    # Catch up at original deadlines after any process downtime.
+    with SessionLocal() as db:
+        exam_service.settle_all(db)
+
+
+def _settle_exams():
+    with SessionLocal() as db, exam_service.ops.LOCK:
+        exam_service.settle_all(db)
+
+
+async def _exam_clock():
+    while True:
+        await asyncio.sleep(1)
+        try:
+            await asyncio.to_thread(_settle_exams)
+        except Exception:
+            logging.getLogger(__name__).exception('考试到期结算失败；下次轮询重试')
+
+
+@app.on_event('startup')
+async def start_exam_clock():
+    app.state.exam_clock = asyncio.create_task(_exam_clock())
+
+
+@app.on_event('shutdown')
+async def stop_exam_clock():
+    task = getattr(app.state, 'exam_clock', None)
+    if task:
+        task.cancel()
+        try:
+            await task
+        except asyncio.CancelledError:
+            pass
 
 @app.get('/api/health', tags=['health'])
 def health_check():
-    return {'status':'ok', 'service':'railway-interlocking-api', 'stage':'S4'}
+    return {'status':'ok', 'service':'railway-interlocking-api', 'stage':'S5'}
 
 app.include_router(operations.router, prefix='/api/operations', tags=['operations'])
 app.include_router(operation_learning.router, prefix='/api/operation-learning', tags=['operation-learning'])
+app.include_router(exams.router, prefix='/api/exams', tags=['exams'])
 
 app.include_router(auth.router, prefix='/api/auth', tags=['auth'])
 app.include_router(admin.router, prefix='/api/admin', tags=['admin'])
