@@ -1,6 +1,6 @@
 # 标准站共享运行与资料追溯（S1）
 
-当前只保留原软件标准站引擎和共用运行能力。旧教学工作簿加载器、教学站专属数据、自由会话HTTP接口及独立页面已删除；2026-10-27返修将标准站内嵌到理论专题1—4；新的操作题录制与正式答题流程仍留S3/S4。
+当前只保留原软件标准站引擎和共用运行能力。旧教学工作簿加载器、教学站专属数据、自由会话HTTP接口及独立页面已删除；标准站内嵌于理论专题1—4、教师答案录制/预览、学生操作学习和考试。理论观察不采集为学习或考试答卷；各正式作答使用独立会话及持久化日志。
 
 | 来源或实现 | 当前用途 |
 |---|---|
@@ -8,7 +8,7 @@
 | reference_station.py | 独立编译199条原应用进路，不读取理论教学表 |
 | reference_runtime.py、reference_points.py、reference_sequence.py | 标准站条件、道岔反馈、进路状态及显示时序 |
 | runtime.py | 注入站场包的共用会话、锁闭和计时原语；无默认教学站，无全局自由会话 |
-| commands.py、console_commands.py | 共用命令及会话序列化；后续由新业务接入权限边界 |
+| commands.py、console_commands.py | 共用命令及会话序列化；由理论观察、录制、操作学习及考试各自校验权限 |
 | ReferenceStationDiagram.vue、standardDisplay.js | 保留的标准站绘图与显示；当前无独立路由 |
 | tools/reference_simulator/、public/simulator-reference/ | 原软件解析/追溯工具及图片资源 |
 

@@ -19,7 +19,7 @@ export const examStation = () => request.get(root + '/station')
 export const examEvent = (id, event) => request.post(`${root}/attempts/${id}/events`, event)
 export const saveExamGrade = (id, body) => request.put(`${root}/attempts/${id}/grade`, body)
 export const confirmExamGrade = (id, revision) => request.post(`${root}/attempts/${id}/grade/confirm`, { revision })
-export const publishExamGrade = (id, revision) => request.post(`${root}/attempts/${id}/grade/publish`, { revision })
+export const publishExamGrade = (id, body) => request.post(`${root}/attempts/${id}/grade/publish`, body)
 // Best-effort delivery when a live page closes. Retain the local queue until a
 // normal acknowledged sync; a lost keepalive response must not erase evidence.
 export function reportExamExit(id, events) {

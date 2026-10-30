@@ -114,3 +114,21 @@ def publish(db, user, sid, revision):
     grade.updated_at = exams.now()
     audit(db, grade, user, 'publish')
     return manager_view(db, sid, evidence=True)
+
+
+def publish_current(db, user, sid, body):
+    """Save, confirm and publish the reviewed inputs in one atomic transaction."""
+    reviewable(db, user, sid)
+    if body.score is None:
+        ops.fail('请填写最终成绩后再发布', 422)
+    comment = (body.comment or '').strip() or None
+    source_revision = body.revision + 2  # Save and confirmation each advance one revision.
+    previous = db.scalar(select(ExamGradePublication).where(
+        ExamGradePublication.session_id == sid, ExamGradePublication.source_revision == source_revision))
+    if previous:
+        if previous.score_cents != int(body.score * 100) or previous.comment != comment:
+            ops.fail('成绩已被修改，请保留本地输入并刷新核对')
+        return manager_view(db, sid, evidence=True)
+    save(db, user, sid, body)
+    confirm(db, user, sid, body.revision + 1)
+    return publish(db, user, sid, source_revision)

@@ -260,3 +260,4 @@ ai_design/ai/vector_db/
 # Project recovery artifacts and machine-local AI credentials
 /trash/
 /ai/key.env
+/ai/vector_db/

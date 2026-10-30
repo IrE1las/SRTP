@@ -95,7 +95,7 @@
       </template>
       <ul class="usage-list">
         <li class="mb-2"><strong>API Key</strong>：在 DeepSeek 官网 (platform.deepseek.com) 注册后获取</li>
-        <li class="mb-2"><strong>模型名称</strong>：填写当前可用的模型标识，例如 <code>deepseek-v4-flash</code>。操作学习的AI讲解将在S4接入；考试自动评价暂不设计。</li>
+        <li class="mb-2"><strong>模型名称</strong>：填写服务商提供的模型标识。操作学习提交后可生成 AI 讲解；考试成绩由教师手工录入并发布。</li>
         <li class="mb-2"><strong>API 地址</strong>：默认为 <code>https://api.deepseek.com</code>，使用第三方代理时可修改</li>
         <li>保存后即时生效，无需重启服务</li>
       </ul>

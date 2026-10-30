@@ -1,16 +1,16 @@
 <template>
   <div class="workspace-header">
-    <div class="breadcrumb"><button class="mobile-menu-button icon-button" aria-label="打开导航菜单" @click="$emit('toggle-menu')"><el-icon><Expand /></el-icon></button><el-icon class="breadcrumb-home"><HomeFilled /></el-icon><span class="breadcrumb-root">实训平台</span><span class="breadcrumb-divider">/</span><strong>{{ currentTitle }}</strong></div>
+    <div class="breadcrumb"><button type="button" class="mobile-menu-button icon-button" aria-label="打开导航菜单" :aria-expanded="menuOpen" @click="$emit('toggle-menu')"><el-icon aria-hidden="true"><Expand /></el-icon></button><el-icon class="breadcrumb-home" aria-hidden="true"><HomeFilled /></el-icon><span class="breadcrumb-root">实训平台</span><span class="breadcrumb-divider" aria-hidden="true">/</span><strong>{{ currentTitle }}</strong></div>
     <div class="header-tools">
-      <button class="page-search" @click="searchOpen = true"><el-icon><Search /></el-icon><span>查找页面</span></button>
+      <button type="button" class="page-search" aria-label="查找页面" aria-haspopup="dialog" :aria-expanded="searchOpen" @click="searchOpen = true"><el-icon aria-hidden="true"><Search /></el-icon><span>查找页面</span></button>
       <span class="header-tool-divider"></span>
       <el-dropdown trigger="click" @command="handleCommand">
-        <button class="user-menu"><span class="user-avatar">{{ displayName.slice(0, 1).toUpperCase() }}</span><span class="user-details"><strong>{{ displayName }}</strong><small>{{ roleLabel }}</small></span><el-icon><ArrowDown /></el-icon></button>
+        <button type="button" class="user-menu" :aria-label="`${displayName}，${roleLabel}，账户菜单`"><span class="user-avatar" aria-hidden="true">{{ displayName.slice(0, 1).toUpperCase() }}</span><span class="user-details"><strong>{{ displayName }}</strong><small>{{ roleLabel }}</small></span><el-icon aria-hidden="true"><ArrowDown /></el-icon></button>
         <template #dropdown><el-dropdown-menu><el-dropdown-item command="logout">退出登录</el-dropdown-item></el-dropdown-menu></template>
       </el-dropdown>
     </div>
     <el-dialog v-model="searchOpen" title="快速前往" width="520px" class="page-search-dialog" @opened="searchInput?.focus()">
-      <el-input ref="searchInput" v-model="query" placeholder="搜索学习、考试或管理页面" clearable :prefix-icon="Search" size="large" />
+      <el-input ref="searchInput" v-model="query" name="page-search" aria-label="搜索页面" autocomplete="off" placeholder="搜索学习、考试或管理页面…" clearable :prefix-icon="Search" size="large" />
       <div class="search-results"><router-link v-for="item in searchResults" :key="item.path" :to="item.path" @click="searchOpen = false"><span>{{ item.title }}</span><small>{{ item.group }}</small><el-icon><Right /></el-icon></router-link><el-empty v-if="!searchResults.length" description="没有找到相关页面，试试其他关键词" :image-size="70" /></div>
     </el-dialog>
   </div>
@@ -21,6 +21,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ArrowDown, Expand, HomeFilled, Right, Search } from '@element-plus/icons-vue'
 import { useUserStore } from '@/store/user'
 import { navigationGroups, pageLabel, roleLabels } from '@/ui/navigation'
+defineProps({ menuOpen: { type: Boolean, default: false } })
 defineEmits(['toggle-menu'])
 const router = useRouter(), route = useRoute(), userStore = useUserStore()
 const searchOpen = ref(false), query = ref(''), searchInput = ref()

@@ -94,7 +94,7 @@
 .exam-grade-release>span,.exam-grade-release time{font-size:13px;color:var(--exam-muted);display:block;line-height:1.8}
 .exam-grade-release strong,.exam-published-grade strong{display:block;font-size:36px;line-height:1.6;color:var(--exam-ink);font-variant-numeric:tabular-nums}
 .exam-grade-release small,.exam-published-grade small{font-size:15px;font-weight:400;color:var(--exam-muted)}
-.exam-grade-buttons{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}.exam-grade-buttons .el-button+.el-button{margin-left:0}.exam-grade-buttons .el-button--primary{width:100%}
+.exam-grade-buttons{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:10px;margin-top:18px}.exam-grade-buttons .el-button+.el-button{margin-left:0}.exam-grade-buttons .el-button--primary{width:100%}
 .exam-page details>summary{cursor:pointer;font-weight:600;line-height:1.8;overflow-wrap:anywhere}.exam-page details[open]>summary{margin-bottom:20px}
 .exam-published-grade{display:grid;grid-template-columns:140px minmax(0,1fr);gap:24px;align-items:center;padding:20px 0;border-bottom:1px solid var(--exam-line)}
 .exam-published-grade>div{min-width:0}.exam-published-grade>div>span{font-size:14px;color:var(--exam-muted)}

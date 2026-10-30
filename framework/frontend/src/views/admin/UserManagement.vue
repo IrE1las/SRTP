@@ -1,8 +1,9 @@
 <template>
   <section v-loading="loading" class="user-management">
     <div class="user-toolbar"><h1>用户管理</h1><el-button type="primary" @click="openCreate">新建账号</el-button></div>
+    <div class="user-filters"><label for="user-role-filter">角色</label><el-select id="user-role-filter" :model-value="selectedRole" aria-label="按账号角色筛选" @change="changeRole"><el-option label="全部角色" value="all" /><el-option label="教师" value="teacher" /><el-option label="学生" value="student" /><el-option label="管理员" value="admin" /></el-select><span role="status">共 {{ filteredUsers.length }} 个账号</span></div>
     <p v-if="notice" role="status">{{ notice }}</p>
-    <el-table :data="pageView.items" border>
+    <el-table :data="pageView.items" border empty-text="当前角色下暂无账号">
       <el-table-column prop="username" label="用户名" min-width="120" />
       <el-table-column v-for="field in fields" :key="field.key" :label="field.label" min-width="100"><template #default="{ row }">{{ row[field.key] || 'null' }}</template></el-table-column>
       <el-table-column label="角色" width="90"><template #default="{ row }">{{ roleLabels[row.role] }}</template></el-table-column>
@@ -39,7 +40,8 @@
   </section>
 </template>
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
 import ListPager from '@/components/ListPager.vue'
 import { paginate } from '@/domain/pagination'
@@ -48,9 +50,13 @@ import { listAdminUsers, createAdminUser, updateAdminUser, resetAdminPassword, u
 import { useUserStore } from '@/store/user'
 import { roleLabels } from '@/ui/navigation'
 
-const user = useUserStore()
+const user = useUserStore(), route = useRoute(), router = useRouter()
 const users = ref([]), loading = ref(false), notice = ref(''), saving = ref(false)
-const page = ref(1), pageView = computed(() => paginate(users.value, page.value))
+const selectedRole = computed(() => ['teacher', 'student', 'admin'].includes(route.query.role) ? route.query.role : 'all')
+const filteredUsers = computed(() => selectedRole.value === 'all' ? users.value : users.value.filter(row => row.role === selectedRole.value))
+const page = ref(1), pageView = computed(() => paginate(filteredUsers.value, page.value))
+function changeRole(role) { page.value = 1; return router.replace({ path: route.path, query: { ...route.query, role: role === 'all' ? undefined : role } }) }
+watch(selectedRole, () => { page.value = 1 })
 const fields = [{ key: 'real_name', label: '姓名' }, { key: 'student_id', label: '学号' }, { key: 'class_name', label: '班级' }]
 const editorOpen = ref(false), editingId = ref(null), originalRole = ref(''), formError = ref('')
 const form = reactive({ username: '', password: '', role: 'student', real_name: '', student_id: '', class_name: '' })
@@ -81,7 +87,7 @@ async function loadUsers() {
 }
 function replaceUser(profile) {
   const index = users.value.findIndex(row => row.id === profile.id)
-  if (index < 0) { users.value.push(profile); page.value = Math.ceil(users.value.length / 6) }
+  if (index < 0) { users.value.push(profile); if (selectedRole.value === 'all' || selectedRole.value === profile.role) page.value = Math.max(1, Math.ceil(filteredUsers.value.length / 6)) }
   else users.value.splice(index, 1, profile)
   if (profile.id === user.user?.id) user.setAuth(user.token, profile)
 }
@@ -136,4 +142,5 @@ onMounted(loadUsers)
 </script>
 <style scoped>
 .user-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}.user-toolbar h1{margin:0}.form-actions{display:flex;justify-content:flex-end;gap:8px}.user-management [role=alert]{color:#a52727;overflow-wrap:anywhere}.user-management [role=status]{overflow-wrap:anywhere}
+.user-filters{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px}.user-filters .el-select{width:180px;max-width:100%}.user-filters>span{color:#586f82;font-size:14px}
 </style>

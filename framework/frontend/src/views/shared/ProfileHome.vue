@@ -10,23 +10,23 @@
       </template>
     </dl>
     <el-form label-position="top" @submit.prevent="saveContact">
-      <el-form-item label="电子邮箱"><el-input v-model="contact.email" maxlength="254" autocomplete="off" :disabled="!ready || savingContact || contactLocked" /></el-form-item>
-      <el-form-item label="手机号"><el-input v-model="contact.phone" maxlength="32" autocomplete="off" :disabled="!ready || savingContact || contactLocked" /></el-form-item>
+      <el-form-item label="电子邮箱"><el-input v-model="contact.email" name="email" type="email" inputmode="email" :spellcheck="false" autocapitalize="none" maxlength="254" autocomplete="off" :disabled="!ready || savingContact || contactLocked" /></el-form-item>
+      <el-form-item label="手机号"><el-input v-model="contact.phone" name="phone" type="tel" inputmode="tel" maxlength="32" autocomplete="off" :disabled="!ready || savingContact || contactLocked" /></el-form-item>
       <p v-if="contactLocked" role="alert">联系方式修改已锁定，请联系管理员解锁</p>
       <el-button native-type="submit" type="primary" :disabled="!ready || savingPassword || savingContact || contactLocked">保存联系方式</el-button>
     </el-form>
     <el-dialog v-model="contactDialogOpen" title="确认保存联系方式" width="min(440px, 94vw)" :close-on-click-modal="false" :before-close="closeContactDialog" @closed="clearContactDialog">
       <el-form label-position="top" @submit.prevent="confirmContact">
         <p v-if="contactError" role="alert">{{ contactError }}</p>
-        <el-form-item label="当前密码"><el-input v-model="contactPassword" type="password" show-password autocomplete="current-password" maxlength="1024" :disabled="savingContact || contactLocked" /></el-form-item>
+        <el-form-item label="当前密码"><el-input v-model="contactPassword" name="contact-current-password" type="password" show-password autocomplete="current-password" maxlength="1024" :disabled="savingContact || contactLocked" /></el-form-item>
         <div class="contact-actions"><el-button :disabled="savingContact" @click="closeContactDialog()">取消</el-button><el-button native-type="submit" type="primary" :loading="savingContact" :disabled="contactLocked">确认</el-button></div>
       </el-form>
     </el-dialog>
     <div class="password-row"><h2>修改密码</h2><el-button :disabled="!ready || savingPassword" @click="togglePassword">{{ passwordOpen ? '收起' : '修改密码' }}</el-button></div>
     <el-form v-if="passwordOpen" label-position="top" @submit.prevent="savePassword">
-      <el-form-item label="当前密码"><el-input v-model="password.current_password" type="password" show-password autocomplete="current-password" maxlength="1024" /></el-form-item>
-      <el-form-item label="新密码"><el-input v-model="password.new_password" type="password" show-password autocomplete="new-password" maxlength="1024" /></el-form-item>
-      <el-form-item label="重复新密码"><el-input v-model="password.confirm_password" type="password" show-password autocomplete="new-password" maxlength="1024" /></el-form-item>
+      <el-form-item label="当前密码"><el-input v-model="password.current_password" name="current-password" type="password" show-password autocomplete="current-password" maxlength="1024" /></el-form-item>
+      <el-form-item label="新密码"><el-input v-model="password.new_password" name="new-password" type="password" show-password autocomplete="new-password" maxlength="1024" /></el-form-item>
+      <el-form-item label="重复新密码"><el-input v-model="password.confirm_password" name="confirm-password" type="password" show-password autocomplete="new-password" maxlength="1024" /></el-form-item>
       <el-button native-type="submit" type="primary" :loading="savingPassword" :disabled="savingContact">修改并重新登录</el-button>
     </el-form>
   </section>

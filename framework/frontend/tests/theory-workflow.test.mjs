@@ -290,6 +290,26 @@ test('administrator user list also limits each page to six existing accounts',as
   result.state.page.value=3
   assert.deepEqual(result.state.pageView.value.items.map(row=>row.id),[13])
 })
+
+test('user role filter applies before six-item pagination, restores from the URL and resets the page',async()=>{
+  const rows=Array.from({length:18},(_,i)=>({id:i+1,role:i<13?'student':i<17?'teacher':'admin'}))
+  const result=await harness('views/admin/UserManagement.vue',{
+    query:{role:'student'},mocks:{listAdminUsers:async()=>rows},expose:['pageView','page','selectedRole','changeRole','replaceUser'],
+  })
+  assert.equal(result.state.pageView.value.total,13)
+  result.state.page.value=3
+  assert.deepEqual(result.state.pageView.value.items.map(row=>row.id),[13])
+  await result.state.changeRole('teacher')
+  assert.equal(result.state.page.value,1)
+  assert.equal(result.state.pageView.value.total,4)
+  assert.ok(result.state.pageView.value.items.every(row=>row.role==='teacher'))
+  result.state.replaceUser({id:14,role:'student'})
+  assert.equal(result.state.pageView.value.total,3)
+  await result.state.changeRole('admin')
+  assert.deepEqual(result.state.pageView.value.items.map(row=>row.id),[18])
+  await result.state.changeRole('all')
+  assert.equal(result.state.pageView.value.total,18)
+})
 test('the former return-to-six-topics label is simply Return',async()=>{
   for(const path of ['views/student/TheoryTopic.vue','views/student/TheoryHistory.vue']) {
     const {template}=await component(path)

@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
-import { computed, nextTick, reactive, ref } from 'vue'
+import { computed, nextTick, reactive, ref, watch } from 'vue'
 import { parse } from '@vue/compiler-sfc'
 import { accountError } from '../src/domain/accountForms.js'
 import { paginate } from '../src/domain/pagination.js'
@@ -19,7 +19,7 @@ async function harness(path, { mocks = {}, expose = [], role = 'student' } = {})
     login: async body => { calls.push(['login', body]); return profile },
   })
   let mounted
-  const deps = { computed, nextTick, reactive, ref, onMounted: fn => { mounted = fn },
+  const deps = { computed, nextTick, reactive, ref, watch, onMounted: fn => { mounted = fn },
     useUserStore: () => user, useRouter: () => ({ replace: async value => calls.push(['replace', value]), push: value => calls.push(['push', value]) }),
     useRoute: () => ({ query: {} }), roleHomeMap: { student: '/student/dashboard' },
     roleLabels: { student: '学生', teacher: '教师', admin: '管理员' }, accountError, paginate,

@@ -7,7 +7,7 @@ from threading import RLock
 from time import time
 from uuid import uuid4
 from fastapi import HTTPException
-from sqlalchemy import delete, func, select, update
+from sqlalchemy import delete, func, select, text, update
 from sqlalchemy.exc import IntegrityError
 from app.models.operation import OperationQuestion, OperationVersion, OperationSession, OperationEvent
 from app.services.operation_runtime import pack, unpack
@@ -60,23 +60,67 @@ def question(db, user, qid):
     return q
 
 
-def delete_question(db, user, qid):
-    q = question(db, user, qid)
+def deletion_scope(db, user, qid):
     from app.models.operation_learning import OperationAttempt
-    from app.models.exam import Exam
-    version_ids = select(OperationVersion.id).where(OperationVersion.question_id == qid)
-    if db.scalar(select(Exam.id).where(Exam.version_id.in_(version_ids)).limit(1)):
-        fail('该题目已有考试引用，不能永久删除；请停用题目以保留历史依据')
-    if db.scalar(select(OperationAttempt.session_id).where(OperationAttempt.question_id == qid).limit(1)):
-        fail('该题目已有学生作答引用，不能永久删除；请停用题目以保留历史依据')
-    session_ids = select(OperationSession.id).where(OperationSession.version_id.in_(version_ids))
-    if db.scalar(select(OperationSession.id).where(OperationSession.version_id.in_(version_ids), OperationSession.status == 'active').limit(1)):
-        fail('请先结束该题目的所有录制和预览，再删除')
-    db.execute(delete(OperationEvent).where(OperationEvent.session_id.in_(session_ids)), execution_options={'synchronize_session': False})
-    db.execute(delete(OperationSession).where(OperationSession.version_id.in_(version_ids)), execution_options={'synchronize_session': False})
-    db.execute(delete(OperationVersion).where(OperationVersion.question_id == qid), execution_options={'synchronize_session': False})
-    db.delete(q)
+    from app.models.exam import Exam, ExamAttempt
+    q = question(db, user, qid)
+    versions = list(db.scalars(select(OperationVersion.id).where(OperationVersion.question_id == qid)))
+    sessions = set(db.scalars(select(OperationSession.id).where(OperationSession.version_id.in_(versions))))
+    learning = set(db.scalars(select(OperationAttempt.session_id).where(OperationAttempt.question_id == qid)))
+    sessions.update(learning)
+    exam_ids = set(db.scalars(select(Exam.id).where(Exam.version_id.in_(versions))))
+    exam_ids.update(db.scalars(select(ExamAttempt.exam_id).where(ExamAttempt.session_id.in_(sessions))))
+    exams = set(db.scalars(select(ExamAttempt.session_id).where(ExamAttempt.exam_id.in_(exam_ids))))
+    sessions.update(exams)
+    return q, versions, sessions, learning, exam_ids, exams
+
+
+def deletion_preview(db, user, qid):
+    from app.models.exam_grade import ExamGradePublication
+    q, versions, sessions, learning, exams, attempts = deletion_scope(db, user, qid)
+    return {'id': q.id, 'disabled': q.disabled, 'versions': len(versions), 'sessions': len(sessions),
+            'learning_attempts': len(learning), 'exams': len(exams), 'exam_attempts': len(attempts),
+            'grade_publications': db.scalar(select(func.count()).select_from(ExamGradePublication).where(
+                ExamGradePublication.session_id.in_(attempts))),
+            'active_sessions': db.scalar(select(func.count()).select_from(OperationSession).where(
+                OperationSession.id.in_(sessions), OperationSession.status == 'active'))}
+
+
+def delete_question(db, user, qid, force=False):
+    from app.models.operation_learning import OperationAttempt, OperationReview
+    from app.models.exam import Exam, ExamAttempt, ExamParticipant, ExamControlEvent
+    from app.models.exam_grade import ExamGrade, ExamGradePublication, ExamGradeAudit
+    # Serialize the complete child-first deletion; failure must restore the whole graph.
     db.commit()
+    db.execute(text('BEGIN IMMEDIATE'))
+    try:
+        q, versions, sessions, learning, exams, attempts = deletion_scope(db, user, qid)
+        if force and not q.disabled:
+            fail('请先停用题目，再强制删除')
+        if not force:
+            if exams:
+                fail('该题目已有考试引用，请先停用题目，再核对关联记录并强制删除')
+            if learning:
+                fail('该题目已有学生作答引用，请先停用题目，再核对关联记录并强制删除')
+            if db.scalar(select(OperationSession.id).where(OperationSession.id.in_(sessions),
+                                                          OperationSession.status == 'active').limit(1)):
+                fail('请先结束该题目的所有录制和预览，再删除')
+        if force:
+            for model in (ExamGradeAudit, ExamGradePublication, ExamGrade, ExamControlEvent):
+                db.execute(delete(model).where(model.session_id.in_(attempts)), execution_options={'synchronize_session': False})
+            db.execute(delete(ExamParticipant).where(ExamParticipant.exam_id.in_(exams)), execution_options={'synchronize_session': False})
+            db.execute(delete(ExamAttempt).where(ExamAttempt.exam_id.in_(exams)), execution_options={'synchronize_session': False})
+            db.execute(delete(Exam).where(Exam.id.in_(exams)), execution_options={'synchronize_session': False})
+            db.execute(delete(OperationReview).where(OperationReview.session_id.in_(learning)), execution_options={'synchronize_session': False})
+            db.execute(delete(OperationAttempt).where(OperationAttempt.session_id.in_(learning)), execution_options={'synchronize_session': False})
+        db.execute(delete(OperationEvent).where(OperationEvent.session_id.in_(sessions)), execution_options={'synchronize_session': False})
+        db.execute(delete(OperationSession).where(OperationSession.id.in_(sessions)), execution_options={'synchronize_session': False})
+        db.execute(delete(OperationVersion).where(OperationVersion.id.in_(versions)), execution_options={'synchronize_session': False})
+        db.delete(q)
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
     return {'deleted': True, 'id': qid}
 
 

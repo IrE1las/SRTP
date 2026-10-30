@@ -129,8 +129,11 @@ def confirm_grade(sid: str, body: GradeRevision, db: Session = Depends(get_db), 
 
 
 @router.post('/attempts/{sid}/grade/publish')
-def publish_grade(sid: str, body: GradeRevision, db: Session = Depends(get_db), user: User = Depends(manager)):
-    return transaction(db, grades.publish, user, sid, body.revision)
+def publish_grade(sid: str, body: GradeDraft, db: Session = Depends(get_db), user: User = Depends(manager)):
+    # Revision-only requests retain the earlier API contract; the current page submits its inputs.
+    if body.model_fields_set == {'revision'}:
+        return transaction(db, grades.publish, user, sid, body.revision)
+    return transaction(db, grades.publish_current, user, sid, body)
 
 
 @router.get('/attempts/{sid}/log.json')

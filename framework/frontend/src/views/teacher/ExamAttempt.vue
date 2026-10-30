@@ -36,8 +36,8 @@
           <el-form label-position="top" :disabled="working" @submit.prevent="save">
             <el-form-item label="最终成绩（0—100）" for="exam-grade-score" :error="scoreError"><el-input id="exam-grade-score" v-model="form.score" inputmode="decimal" maxlength="7" autocomplete="off" aria-describedby="exam-grade-hint" /><p id="exam-grade-hint" class="op-help">最多两位小数。</p></el-form-item>
             <el-form-item label="评语（可选）" for="exam-grade-comment"><el-input id="exam-grade-comment" v-model="form.comment" type="textarea" :rows="4" maxlength="4000" show-word-limit /></el-form-item>
-            <p class="op-help" role="status">{{ dirty ? '有未保存的修改，请先保存草稿。' : grade.status === 'confirmed' ? '已确认，点击发布后学生才能看到本版。' : grade.status === 'published' ? '修改后需重新保存、确认和发布。' : '保存草稿后确认，确认后再发布。' }}</p>
-            <div class="exam-grade-buttons"><el-button native-type="submit" :disabled="!!scoreError || !dirty" :loading="working">保存草稿</el-button><el-button :disabled="dirty || grade.status !== 'draft' || !hasScore" @click="confirm">确认成绩</el-button><el-button type="primary" :disabled="dirty || grade.status !== 'confirmed'" @click="publish">发布成绩</el-button></div>
+            <p class="op-help" role="status">{{ dirty ? '当前输入尚未保存，可保存草稿或直接发布。' : grade.status === 'published' ? '本版已发布；修改成绩或评语后可重新发布。' : '核对成绩后点击发布，学生即可查看；也可先保存草稿。' }}</p>
+            <div class="exam-grade-buttons"><el-button native-type="submit" :disabled="!!scoreError || !dirty" :loading="working">保存草稿</el-button><el-button type="primary" :disabled="!hasScore || (!dirty && grade.status === 'published')" :loading="working" @click="publish">发布成绩</el-button></div>
           </el-form>
         </template>
       </aside>
@@ -52,7 +52,7 @@ import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
 import OperationLog from '@/features/operationQuestions/OperationLog.vue'
 import ListPager from '@/components/ListPager.vue'
-import { getExamAttempt, downloadExam, saveExamGrade, confirmExamGrade, publishExamGrade } from '@/api/exams'
+import { getExamAttempt, downloadExam, saveExamGrade, publishExamGrade } from '@/api/exams'
 import { beijingTime, examError, examStates } from '@/domain/exams'
 import { gradeStates, gradeActions, gradeError, gradePayload } from '@/domain/examGrades'
 
@@ -100,17 +100,14 @@ async function save() {
   if (scoreError.value || !dirty.value) return
   await mutate(() => saveExamGrade(route.params.attemptId, gradePayload(form, grade.value.revision)), '草稿已保存，尚未发布。')
 }
-async function confirm() {
-  if (dirty.value || grade.value.status !== 'draft' || !hasScore.value) return
-  await mutate(() => confirmExamGrade(route.params.attemptId, grade.value.revision), '成绩已确认，尚未发布。')
-}
 async function publish() {
-  if (working.value || dirty.value || grade.value.status !== 'confirmed') return
+  if (working.value || loading.value || !hasScore.value || (!dirty.value && grade.value.status === 'published')) return
+  const payload = gradePayload(form, grade.value.revision)
   working.value = true
-  try { await ElMessageBox.confirm(`发布 ${grade.value.score} 分及本版评语后，学生即可查看。`, '发布成绩', { confirmButtonText: '发布成绩', cancelButtonText: '继续核对' }) }
+  try { await ElMessageBox.confirm(`确认发布 ${payload.score} 分？\n评语：${payload.comment || '无'}\n发布后学生即可查看本版成绩与评语。`, '发布成绩', { confirmButtonText: '发布成绩', cancelButtonText: '继续核对' }) }
   catch { working.value = false; return }
   working.value = false
-  await mutate(() => publishExamGrade(route.params.attemptId, grade.value.revision), '成绩已发布，学生现在可以查看。')
+  await mutate(() => publishExamGrade(route.params.attemptId, payload), '成绩已发布，学生现在可以查看。')
 }
 async function download() { try { await downloadExam(route.params.attemptId) } catch (error) { notice.value = examError(error) } }
 onBeforeRouteLeave(canDiscard)

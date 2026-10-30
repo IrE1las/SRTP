@@ -61,9 +61,15 @@ def question(qid: int, db: Session = Depends(get_db), user: User = Depends(manag
 
 
 @router.delete('/questions/{qid}')
-def delete_question(qid: int, db: Session = Depends(get_db), user: User = Depends(manager)):
+def delete_question(qid: int, force: bool = False, db: Session = Depends(get_db), user: User = Depends(manager)):
     with service.LOCK:
-        return service.delete_question(db, user, qid)
+        return service.delete_question(db, user, qid, force)
+
+
+@router.get('/questions/{qid}/deletion')
+def deletion_preview(qid: int, db: Session = Depends(get_db), user: User = Depends(manager)):
+    with service.LOCK:
+        return service.deletion_preview(db, user, qid)
 
 
 @router.put('/questions/{qid}')

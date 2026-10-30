@@ -14,7 +14,7 @@ async function harness(options = {}) {
     computed, reactive, ref, watch: () => {}, onBeforeUnmount: () => {},
     useRoute: () => route, onBeforeRouteLeave: fn => { guards.leave = fn }, onBeforeRouteUpdate: fn => { guards.update = fn },
     window: { addEventListener: () => {}, removeEventListener: () => {} },
-    ElMessageBox: { confirm: async () => { if (options.cancel) throw new Error('cancel') } },
+    ElMessageBox: { confirm: async message => { calls.push({action:'dialog', message}); if (options.cancel) throw new Error('cancel') } },
     getExamAttempt: async sid => {
       calls.push({ action: 'get', sid })
       if (sid !== 'sid') throw new Error('not found')
@@ -27,78 +27,81 @@ async function harness(options = {}) {
       return structuredClone(current)
     },
     confirmExamGrade: async (sid, revision) => { calls.push({ action: 'confirm', sid, revision }); current = { ...current, revision: revision + 1, status: 'confirmed' }; return structuredClone(current) },
-    publishExamGrade: async (sid, revision) => {
-      calls.push({ action: 'publish', sid, revision })
+    publishExamGrade: async (sid, body) => {
+      calls.push({ action: 'publish', sid, body: structuredClone(body) })
+      if (options.conflict) throw { response: { data: { detail: '成绩已被修改，请保留本地输入并刷新核对' } } }
       if (options.failPublish) throw new Error('lost response')
-      current = { ...current, revision: revision + 1, status: 'published', published: { score: current.score, comment: current.comment, version: (current.published?.version || 0) + 1 } }
+      current = { ...current, revision: body.revision + 3, score: Number(body.score), comment: body.comment, status: 'published', published: { score: Number(body.score), comment: body.comment, version: (current.published?.version || 0) + 1 } }
       return structuredClone(current)
     },
     downloadExam: async () => {}, gradeStates, gradeActions, gradeError, gradePayload, beijingTime, examError, examStates,
   }
   const script = descriptor.scriptSetup.content.replace(/^import .*$/gm, '')
-  const state = new Function(...Object.keys(deps), script + '\nreturn {data,grade,form,dirty,working,notice,success,load,refresh,save,confirm,publish,beforeUnload,scoreError,hasScore};')(...Object.values(deps))
+  const state = new Function(...Object.keys(deps), script + '\nreturn {data,grade,form,dirty,working,notice,success,load,refresh,save,publish,beforeUnload,scoreError,hasScore};')(...Object.values(deps))
   await state.load()
   return { state, calls, guards, route }
 }
 
-test('manual grade page saves, confirms and publishes in three independent actions, including zero', async () => {
+test('manual grade page saves a private draft or directly publishes current inputs, including zero', async () => {
   const { state, calls } = await harness()
-  await state.confirm(); await state.publish()
+  await state.publish()
   assert.equal(calls.filter(c => c.action !== 'get').length, 0)
   state.form.score = '0'; state.form.comment = '独立评语'
-  await state.publish()
-  assert.equal(state.dirty.value, true)
   await state.save()
   assert.equal(state.grade.value.status, 'draft')
   assert.equal(state.grade.value.published, null)
   assert.deepEqual(calls.at(-1).body, { revision: 0, score: '0', comment: '独立评语' })
   await state.publish()
-  assert.equal(calls.at(-1).action, 'save')
-  await state.confirm()
-  assert.equal(state.grade.value.status, 'confirmed')
-  assert.equal(state.grade.value.published, null)
-  assert.equal(calls.at(-1).revision, 1)
-  await state.publish()
-  assert.equal(calls.at(-1).revision, 2)
+  assert.deepEqual(calls.at(-1).body, { revision: 1, score: '0', comment: '独立评语' })
   assert.equal(state.grade.value.published.score, 0)
   assert.equal(state.grade.value.published.version, 1)
 })
 
-test('unsaved corrections block confirmation and publication; old published version stays visible', async () => {
+test('unsaved corrections can publish immediately; saving a draft still preserves the old public version', async () => {
   const { state, calls } = await harness({ grade: { revision: 3, status: 'published', score: 70, published: { score: 70, version: 1 } } })
   state.form.score = '91.50'
-  await state.confirm(); await state.publish()
   assert.equal(calls.length, 1)
   await state.save()
   assert.equal(state.grade.value.score, 91.5)
   assert.equal(state.grade.value.published.score, 70)
   assert.equal(state.grade.value.published.version, 1)
-  await state.confirm(); await state.publish()
-  assert.equal(state.grade.value.published.score, 91.5)
+  state.form.score = '92.25'; state.form.comment = '确认当前输入'
+  await state.publish()
+  assert.deepEqual(calls.at(-1).body, {revision: 4, score: '92.25', comment: '确认当前输入'})
+  assert.match(calls.at(-2).message, /92.25.*\n评语：确认当前输入/)
+  assert.equal(state.grade.value.published.score, 92.25)
   assert.equal(state.grade.value.published.version, 2)
 })
 
 test('revision conflict preserves entered score and comment and cannot silently confirm a stale draft', async () => {
   const { state, calls } = await harness({ conflict: true })
   state.form.score = '88.88'; state.form.comment = '保留输入'
-  await state.save(); await state.confirm(); await state.publish()
+  await state.save(); await state.publish()
   assert.equal(state.form.score, '88.88')
   assert.equal(state.form.comment, '保留输入')
   assert.equal(state.dirty.value, true)
   assert.match(state.notice.value, /成绩已被修改/)
-  assert.deepEqual(calls.map(c => c.action), ['get', 'save'])
+  assert.deepEqual(calls.filter(c=>c.action!=='dialog').map(c => c.action), ['get', 'save', 'publish'])
 })
 
-test('missing or invalid scores cannot confirm; empty score can remain a comment-only draft', async () => {
+test('missing or invalid scores cannot publish; empty score can remain a comment-only draft', async () => {
   const { state, calls } = await harness()
   state.form.comment = '待复核'
-  await state.save(); await state.confirm()
+  await state.save(); await state.publish()
   assert.equal(calls.at(-1).body.score, null)
   assert.equal(state.hasScore.value, false)
   state.form.score = '100.001'
-  await state.save(); await state.confirm(); await state.publish()
+  await state.save(); await state.publish()
   assert.deepEqual(calls.map(c => c.action), ['get', 'save'])
   assert.match(state.scoreError.value, /两位小数/)
+})
+
+test('invalid current input never publishes an earlier confirmed score', async () => {
+  const {state,calls}=await harness({grade:{revision:2,status:'confirmed',score:80}})
+  state.form.score='0http:/'
+  await state.publish()
+  assert.equal(calls.length,1)
+  assert.equal(state.grade.value.published,null)
 })
 
 test('cancelled refresh and route navigation retain unsaved inputs; native reload gets a warning', async () => {
@@ -108,7 +111,7 @@ test('cancelled refresh and route navigation retain unsaved inputs; native reloa
   assert.equal(await guards.leave(), false)
   assert.equal(await guards.update(), false)
   assert.equal(state.form.score, '80')
-  assert.equal(calls.length, 1)
+  assert.equal(calls.filter(c=>c.action!=='dialog').length, 1)
   let prevented = false
   state.beforeUnload({ preventDefault: () => { prevented = true } })
   assert.equal(prevented, true)

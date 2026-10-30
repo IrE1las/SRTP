@@ -167,6 +167,7 @@ async function flowHarness(view, options = {}) {
     getOperationStation:invoke('station', async () => ({sections:[{name:'1DG'}]})),
     getOperationClasses:invoke('classes', async () => ({items:[{name:'信号一班',student_count:2},{name:'信号二班',student_count:1}],total:2})),
     deleteOperation:invoke('delete', async () => {}),
+    getOperationDeletion:invoke('deletion', async () => ({versions:2,sessions:5,learning_attempts:1,exams:1,exam_attempts:1,grade_publications:1,active_sessions:0})),
     updateOperation:invoke('update', async (id, data) => {
       stored = {...stored,...data,status:'draft',number:stored.status === 'published' ? stored.number + 1 : stored.number,revision:stored.revision+1}; return structuredClone(stored)
     }),
@@ -210,6 +211,19 @@ test('library forwards page, title/class search and status to the server', async
   assert.equal(state.rows.value.length,1)
   state.search.value='调车'; state.filter.value='published'; state.applyFilters()
   assert.deepEqual(calls.findLast(item=>item.name==='push').args,[{path:operationBase,query:{search:'调车',status:'published'}}])
+})
+
+test('disabled question force deletion previews counts, confirms the irreversible scope, and sends force explicitly',async()=>{
+  const {state,calls}=await flowHarness('OperationQuestions',{question:{disabled:true,status:'disabled'}})
+  await state.remove(sample({disabled:true,status:'disabled'}))
+  assert.ok(calls.find(item=>item.name==='deletion'))
+  const confirmation=calls.find(item=>item.name==='confirm')
+  assert.match(confirmation.args[0],/1 场关联考试/)
+  assert.match(confirmation.args[0],/所有关联历史记录/)
+  assert.deepEqual(calls.find(item=>item.name==='delete').args,[1,true])
+  const cancelled=await flowHarness('OperationQuestions',{question:{disabled:true},confirm:async()=>{throw new Error('cancel')}})
+  await cancelled.state.remove(sample({disabled:true}))
+  assert.ok(!cancelled.calls.some(item=>item.name==='delete'))
 })
 
 test('old question/session links redirect into the independent workspace without creating a session', async () => {

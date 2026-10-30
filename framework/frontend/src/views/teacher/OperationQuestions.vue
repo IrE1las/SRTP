@@ -14,7 +14,7 @@
           <el-table-column label="题目" min-width="240"><template #default="{ row }"><router-link :to="destination(row.id, row.status === 'draft' ? 'edit' : 'review')" class="op-title-link">{{ row.title || '未命名题目' }}</router-link><div class="op-help">v{{ row.number }}<span v-if="row.published_version && row.published_version !== row.number"> · 已发布 v{{ row.published_version }}</span></div></template></el-table-column>
           <el-table-column label="状态" width="110"><template #default="{ row }"><span class="op-status" :class="row.status">{{ operationStatus(row.status) }}</span></template></el-table-column>
           <el-table-column label="目标班级" min-width="180"><template #default="{ row }"><div v-if="row.classes.length" class="op-tags"><el-tag v-for="name in row.classes" :key="name" type="info" effect="plain">{{ name }}</el-tag></div><span v-else class="op-muted">尚未设置</span></template></el-table-column>
-          <el-table-column label="操作" min-width="220"><template #default="{ row }"><div class="op-row-actions"><router-link :to="destination(row.id, 'review')">查看题目</router-link><router-link v-if="!row.disabled" :to="destination(row.id)">{{ row.status === 'published' ? '修改题目' : '编辑草稿' }}</router-link><el-button v-if="!row.disabled" link type="danger" :disabled="working" @click="disable(row)">停用</el-button><el-button link type="danger" :disabled="working" @click="remove(row)">删除</el-button></div></template></el-table-column>
+          <el-table-column label="操作" min-width="220"><template #default="{ row }"><div class="op-row-actions"><router-link :to="destination(row.id, 'review')">查看题目</router-link><router-link v-if="!row.disabled" :to="destination(row.id)">{{ row.status === 'published' ? '修改题目' : '编辑草稿' }}</router-link><el-button v-if="!row.disabled" link type="danger" :disabled="working" @click="disable(row)">停用</el-button><el-button link type="danger" :disabled="working" @click="remove(row)">{{ row.disabled ? '强制删除' : '删除' }}</el-button></div></template></el-table-column>
         </el-table>
         <div v-else-if="!loading && !notice" class="op-empty"><h2>{{ filtered ? '没有找到匹配的题目' : '还没有操作题' }}</h2><p>{{ filtered ? '试试其他关键词，或清除筛选查看全部题目。' : '从一道练习开始：填写任务，操作站场录制答案，然后发布。' }}</p><el-button v-if="filtered" @click="clearFilters">清除筛选</el-button><router-link v-else :to="newLocation" class="op-primary-link">新建第一道题</router-link></div>
       </div>
@@ -30,7 +30,7 @@ import { useUserStore } from '@/store/user'
 import ListPager from '@/components/ListPager.vue'
 import { pageNumber } from '@/domain/pagination'
 import { operationBase, operationLocation, operationReturn, operationStatus, operationError } from '@/domain/operationPresentation'
-import { listOperations, disableOperation, deleteOperation } from '@/api/operations'
+import { listOperations, disableOperation, deleteOperation, getOperationDeletion } from '@/api/operations'
 import '@/features/operationQuestions/operation.css'
 import '@/features/operationQuestions/learning.css'
 const user = useUserStore(), route = useRoute(), router = useRouter()
@@ -68,9 +68,18 @@ async function disable(row) {
   try { await disableOperation(row.id); await load() } catch (error) { notice.value = operationError(error) } finally { working.value = false }
 }
 async function remove(row) {
-  try { await ElMessageBox.confirm(`永久删除“${row.title || '未命名题目'}”及其全部版本、标准答案和录制/预览日志？此操作无法恢复。`, '删除操作题', { type:'warning', confirmButtonText:'永久删除', cancelButtonText:'取消' }) } catch { return }
+  if (working.value) return
   working.value = true; notice.value = ''
-  try { await deleteOperation(row.id); await load() } catch (error) { notice.value = operationError(error) } finally { working.value = false }
+  try {
+    const force = Boolean(row.disabled)
+    let message = `永久删除“${row.title || '未命名题目'}”及其全部版本、标准答案和录制/预览日志？此操作无法恢复。`
+    if (force) {
+      const impact = await getOperationDeletion(row.id)
+      message = `强制删除“${row.title || '未命名题目'}”？\n将永久删除 ${impact.versions} 个题目版本、${impact.sessions} 份操作记录、${impact.learning_attempts} 份学习答卷、${impact.exams} 场关联考试、${impact.exam_attempts} 份考试答卷及 ${impact.grade_publications} 版已发布成绩，包括关联评语和审计。\n${impact.active_sessions ? `其中 ${impact.active_sessions} 个进行中会话也将结束并删除。\n` : ''}此操作无法恢复，所有关联历史记录都会一并删除。`
+    }
+    try { await ElMessageBox.confirm(message, force ? '强制删除已停用题目' : '删除操作题', { type:'warning', confirmButtonText:force ? '强制删除' : '永久删除', cancelButtonText:'取消' }) } catch { return }
+    await deleteOperation(row.id, force); await load()
+  } catch (error) { notice.value = operationError(error) } finally { working.value = false }
 }
 watch(() => route.fullPath, load, { immediate: true })
 </script>

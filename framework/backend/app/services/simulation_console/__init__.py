@@ -1,1 +1,1 @@
-"""Independent teaching simulation console for the data.xls station."""
+"""Standard-station engine and shared console primitives for retained workflows."""

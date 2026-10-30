@@ -1,7 +1,8 @@
 import request from '@/utils/request'
 const root = '/operations'
 export const getOperationClasses = () => request.get(root + '/classes')
-export const deleteOperation = id => request.delete(`${root}/questions/${id}`)
+export const deleteOperation = (id, force = false) => request.delete(`${root}/questions/${id}`, { params: { force } })
+export const getOperationDeletion = id => request.get(`${root}/questions/${id}/deletion`)
 export const getOperationStation = () => request.get(root + '/station')
 export const listOperations = (page = 1, filters = {}) => request.get(root + '/questions', { params: { page, ...filters } })
 export const getOperation = id => request.get(`${root}/questions/${id}`)
