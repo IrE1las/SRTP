@@ -10,6 +10,8 @@ from app.models.operation import OperationQuestion, OperationVersion
 from app.schemas.exam import ExamDraft, ExamEdit, Revision, Begin, Sync, Submit
 from app.schemas.operation import Click
 from app.services import exams as service, operations as ops
+from app.services import exam_grades as grades
+from app.schemas.exam_grade import GradeDraft, GradeRevision
 
 router = APIRouter()
 manager = require_roles('teacher', 'admin')
@@ -114,6 +116,21 @@ def click(sid: str, body: Click, db: Session = Depends(get_db), user: User = Dep
 @router.post('/attempts/{sid}/submit')
 def submit(sid: str, body: Submit, db: Session = Depends(get_db), user: User = Depends(student)):
     return transaction(db, service.submit, user, sid, body.expected_sequence)
+
+
+@router.put('/attempts/{sid}/grade')
+def save_grade(sid: str, body: GradeDraft, db: Session = Depends(get_db), user: User = Depends(manager)):
+    return transaction(db, grades.save, user, sid, body)
+
+
+@router.post('/attempts/{sid}/grade/confirm')
+def confirm_grade(sid: str, body: GradeRevision, db: Session = Depends(get_db), user: User = Depends(manager)):
+    return transaction(db, grades.confirm, user, sid, body.revision)
+
+
+@router.post('/attempts/{sid}/grade/publish')
+def publish_grade(sid: str, body: GradeRevision, db: Session = Depends(get_db), user: User = Depends(manager)):
+    return transaction(db, grades.publish, user, sid, body.revision)
 
 
 @router.get('/attempts/{sid}/log.json')

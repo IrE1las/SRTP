@@ -1,4 +1,4 @@
-"""Server-clock exams, serialized SQLite mutations, and idempotent sealing. No AI/grading."""
+"""Server-clock exams, serialized SQLite mutations, and idempotent sealing. No AI evaluation."""
 from contextlib import contextmanager
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
@@ -195,9 +195,10 @@ def settle_all(db):
             settle(db, attempt, at)
 
 
-def summary(db, attempt):
+def summary(db, attempt, user=None):
+    from app.services import exam_grades as grades
     exam = db.get(Exam, attempt.exam_id)
-    return {'session_id': attempt.session_id, 'exam_id': exam.id, 'name': exam.name,
+    result = {'session_id': attempt.session_id, 'exam_id': exam.id, 'name': exam.name,
             'status': 'submitted' if attempt.submitted_at is not None else 'active',
             'started_at': iso(attempt.started_at), 'deadline': iso(attempt.deadline),
             'submitted_at': iso(attempt.submitted_at), 'finish_reason': attempt.finish_reason,
@@ -206,6 +207,14 @@ def summary(db, attempt):
             'restore_deadline': iso(attempt.exited_at + timedelta(seconds=60)) if attempt.fullscreen_state == 'outside' and attempt.exited_at else None,
             'revision': attempt.revision, 'message': COMPLETED if attempt.submitted_at is not None else None,
             'server_now': iso(now())}
+    if user is not None and user.role != 'student':
+        result['grade'] = grades.manager_view(db, attempt.session_id)
+    else:
+        released = grades.public_version(grades.published(db, attempt.session_id))
+        if released is not None:
+            result['grade'] = released
+            result['message'] = '考试成绩已发布'
+    return result
 
 
 def detail(db, user, attempt, *, refresh=False):
@@ -224,10 +233,12 @@ def detail(db, user, attempt, *, refresh=False):
             engine, session = unpack(ops.reference_station_package(), record.engine_state)
             console = ops.response(db, record, engine, session)
     participant = db.get(ExamParticipant, (exam.id, attempt.student_id))
-    result = {**summary(db, attempt), 'question': question, 'opens_at': iso(exam.opens_at),
+    result = {**summary(db, attempt, user), 'question': question, 'opens_at': iso(exam.opens_at),
               'closes_at': iso(exam.closes_at), 'duration_minutes': exam.duration_minutes,
               'identity': participant.identity_snapshot, 'console': console}
     if user.role != 'student':
+        from app.services import exam_grades as grades
+        result['grade'] = grades.manager_view(db, attempt.session_id, evidence=True)
         result['control_events'] = [row.content for row in db.scalars(select(ExamControlEvent).where(
             ExamControlEvent.session_id == attempt.session_id).order_by(ExamControlEvent.id))]
         result['automatic_evaluation'] = None
@@ -356,7 +367,7 @@ def list_exams(db, user, number):
             'upcoming' if now() < exam.opens_at else 'missed' if now() >= exam.closes_at else 'open')
         row = {'id': exam.id, 'name': exam.name, 'opens_at': iso(exam.opens_at), 'closes_at': iso(exam.closes_at),
                'duration_minutes': exam.duration_minutes, 'state': state,
-               'attempt': summary(db, attempt) if attempt else None}
+               'attempt': summary(db, attempt, user) if attempt else None}
         rows.append(row)
     priority = {'active': 0, 'open': 1, 'upcoming': 2, 'missed': 3, 'submitted': 3}
     rows.sort(key=lambda row: (priority[row['state']], datetime.fromisoformat(row['opens_at']).timestamp()
@@ -375,7 +386,7 @@ def history(db, user, number, eid=None):
     for attempt in db.scalars(statement):
         settle(db, attempt, now())
         if user.role != 'student' or attempt.submitted_at is not None:
-            item = summary(db, attempt)
+            item = summary(db, attempt, user)
             if user.role != 'student':
                 item['identity'] = db.get(ExamParticipant, (attempt.exam_id, attempt.student_id)).identity_snapshot
             rows.append(item)

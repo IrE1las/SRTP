@@ -1,4 +1,4 @@
-"""Frozen exam eligibility and durable attempts. S5 deliberately has no grade model."""
+"""Frozen exam eligibility and durable attempts; manual grades live in separate S6 tables."""
 from datetime import datetime
 from sqlalchemy import DateTime, ForeignKey, JSON, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column

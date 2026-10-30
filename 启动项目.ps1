@@ -110,7 +110,20 @@ function Wait-ProjectService($Name, $ServiceId, $Url) {
         }
         try {
             $response = Invoke-WebRequest -Uri $Url -UseBasicParsing -TimeoutSec 2
-            if ($response.StatusCode -eq 200) { Write-Host "[$Name] Ready: $Url"; return }
+            if ($response.StatusCode -eq 200) {
+                if ($Name -eq 'backend') {
+                    $health = $response.Content | ConvertFrom-Json
+                    if ($health.status -ne 'ok' -or $health.service -ne 'railway-interlocking-api' -or $health.stage -ne 'S6') {
+                        Write-Host '[backend] The responding service is not the current S6 application.' -ForegroundColor Red
+                        throw 'Unexpected backend health version.'
+                    }
+                }
+                # Do not accept another process response after our process has exited.
+                if (Get-Process -Id $ServiceId -ErrorAction SilentlyContinue) {
+                    Write-Host "[$Name] Ready: $Url"
+                    return
+                }
+            }
         } catch {}
         if ($watch.Elapsed.TotalSeconds - $lastProgress -ge 3) {
             Write-Host ("[$Name] Waiting for response ... {0}s" -f [int]$watch.Elapsed.TotalSeconds)
@@ -123,6 +136,24 @@ function Wait-ProjectService($Name, $ServiceId, $Url) {
 
 function Start-ProjectService($Port, $Executable, $Arguments, $Directory, $Name) {
     Write-Host ("[launch] Starting/checking {0} on port {1} ..." -f $Name, $Port)
+    # Some Windows networking providers omit a live listener from CIM. Reuse
+    # an owned saved process before trying to start another copy on its port.
+    $recordPath = Join-Path $runtimeDir 'services.json'
+    if (Test-Path -LiteralPath $recordPath) {
+        $savedServices = Get-Content -LiteralPath $recordPath -Raw | ConvertFrom-Json
+        [int]$savedId = 0
+        if ([int]::TryParse([string]$savedServices.$Name, [ref]$savedId) -and $savedId -gt 0) {
+            $savedProcess = Get-CimInstance Win32_Process -Filter "ProcessId = $savedId"
+            $ownedCommand = if ($Name -eq 'backend') {
+                $savedProcess.CommandLine -like '*uvicorn main:app*'
+            } else {
+                $savedProcess.CommandLine -like "*$projectRoot*" -and $savedProcess.CommandLine -like '*vite.js*'
+            }
+            if ($savedProcess -and $savedProcess.ExecutablePath -eq $Executable -and $ownedCommand) {
+                return $savedId
+            }
+        }
+    }
     $listener = Get-NetTCPConnection -State Listen -LocalPort $Port -ErrorAction SilentlyContinue | Select-Object -First 1
     if ($listener) {
         $processInfo = Get-CimInstance Win32_Process -Filter "ProcessId = $($listener.OwningProcess)"

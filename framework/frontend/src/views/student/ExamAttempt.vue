@@ -5,11 +5,12 @@
     <template v-else-if="attempt.status === 'submitted'">
       <section class="exam-finished">
         <div class="exam-finish-heading">
-          <div><h1>{{ completedMessage }}</h1><h2>{{ attempt.name }}</h2></div>
+          <div><h1>{{ attempt.message || completedMessage }}</h1><h2>{{ attempt.name }}</h2></div>
           <router-link class="el-button el-button--primary exam-return-button" :to="{path:'/student/exams/history',query:{page:route.query.back || 1}}"><span aria-hidden="true">←</span>返回历史考试</router-link>
         </div>
         <dl class="exam-facts"><div><dt>交卷原因</dt><dd>{{ attempt.finish_reason_text }}</dd></div><div><dt>交卷时间（北京时间）</dt><dd>{{ beijingTime(attempt.submitted_at) }}</dd></div><div><dt>已保存的业务操作</dt><dd>{{ attempt.console?.events?.length ?? 0 }} 条</dd></div></dl>
-        <div class="op-actions-group"><el-button @click="download">下载本人日志</el-button></div>
+        <section v-if="attempt.grade" class="exam-published-grade" aria-label="已发布成绩"><div><span>最终成绩</span><strong>{{ attempt.grade.score }}<small> / 100</small></strong></div><div><p v-if="attempt.grade.comment" class="op-preserve">{{ attempt.grade.comment }}</p><p class="op-help">第 {{ attempt.grade.version }} 版 · 发布于 {{ beijingTime(attempt.grade.published_at) }}</p></div></section>
+        <div class="op-actions-group"><el-button :loading="loading" @click="initialize">刷新成绩</el-button><el-button @click="download">下载本人日志</el-button></div>
         <OperationLog :events="attempt.console?.events || []" title="本人操作日志" />
       </section>
     </template>
@@ -52,6 +53,7 @@ function capture(fullscreen) {
 async function accept(data) {
   if (disposed) return
   if (attempt.value && (data.revision < attempt.value.revision || attempt.value.status === 'submitted' && data.status !== 'submitted')) return
+  if (attempt.value?.grade && (!data.grade || data.grade.version < attempt.value.grade.version)) return
   attempt.value = data; serverOffset = Date.parse(data.server_now) - Date.now()
   serverAnchor = Date.parse(data.server_now); performanceAnchor = performance.now(); estimatedNow.value = serverAnchor
   if (data.status === 'submitted') {

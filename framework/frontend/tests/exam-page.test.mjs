@@ -92,6 +92,16 @@ test('expiry pauses the page immediately, and stale responses cannot reopen a se
   assert.equal(state.attempt.value.revision,4)
 })
 
+test('published zero and correction versions survive delayed older responses with the same exam revision', async () => {
+  const {state}=await harness({initial:{status:'submitted',revision:4,grade:{score:0,version:1,comment:'已发布'}}})
+  assert.equal(state.attempt.value.grade.score,0)
+  await state.accept(sample({status:'submitted',revision:4,grade:{score:90,version:2,comment:'更正已发布'}}))
+  await state.accept(sample({status:'submitted',revision:4,grade:{score:0,version:1}}))
+  await state.accept(sample({status:'submitted',revision:4}))
+  assert.equal(state.attempt.value.grade.score,90)
+  assert.equal(state.attempt.value.grade.version,2)
+})
+
 test('closing an online page reports its durable exit with keepalive; repeat lifecycle events reuse the same ID', async () => {
   const {state,calls,storage}=await harness()
   state.beforeUnload();state.beforeUnload()
@@ -105,7 +115,7 @@ test('closing an online page reports its durable exit with keepalive; repeat lif
   assert.equal(calls.filter(c=>c.name==='keepalive').length,2)
 })
 
-test('exam route is outside campus navigation, with a dedicated exam console and no grade or answer fields', async () => {
+test('exam route is outside campus navigation, with a dedicated exam console and no automatic scores or answers', async () => {
   const {source}=await harness()
   assert.ok(source.includes('exam-mode'))
   for(const field of ['standard_log','standard_session_id','ai_text','outcome.score','final_score']) assert.ok(!source.includes(field))

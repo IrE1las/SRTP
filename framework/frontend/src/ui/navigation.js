@@ -30,7 +30,7 @@ export function navigationGroups(role) {
 export function pageLabel(path, role) {
   if (path === '/student/exams') return '考试界面'
   if (path === '/student/exams/history') return '历史考试'
-  if (path.startsWith('/exams/manage/attempts/')) return '考试操作记录'
+  if (path.startsWith('/exams/manage/attempts/')) return '考试批阅'
   if (path === '/exams/manage/new') return '新建考试'
   if (/^\/exams\/manage\/\d+$/.test(path)) return '考试详情'
   if (path === '/exams/manage') return '考试管理'

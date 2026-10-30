@@ -14,6 +14,7 @@ from app.services.s4_migration import require_learning_schema
 from app.api import operation_learning
 from app.api import exams
 from app.services.s5_migration import require_exam_schema
+from app.services.s6_migration import require_grade_schema
 from app.services import exams as exam_service
 import asyncio
 import logging
@@ -47,6 +48,7 @@ def on_startup():
     require_operation_schema(engine)
     require_learning_schema(engine)
     require_exam_schema(engine)
+    require_grade_schema(engine)
     Base.metadata.create_all(bind=engine)
     _ensure_default_admin()
     with SessionLocal() as db:
@@ -87,7 +89,7 @@ async def stop_exam_clock():
 
 @app.get('/api/health', tags=['health'])
 def health_check():
-    return {'status':'ok', 'service':'railway-interlocking-api', 'stage':'S5'}
+    return {'status':'ok', 'service':'railway-interlocking-api', 'stage':'S6'}
 
 app.include_router(operations.router, prefix='/api/operations', tags=['operations'])
 app.include_router(operation_learning.router, prefix='/api/operation-learning', tags=['operation-learning'])

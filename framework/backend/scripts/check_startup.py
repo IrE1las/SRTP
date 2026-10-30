@@ -21,18 +21,20 @@ def main():
     from app.services.s3_migration import require_operation_schema
     from app.services.s4_migration import require_learning_schema
     from app.services.s5_migration import require_exam_schema
+    from app.services.s6_migration import require_grade_schema
     try:
         require_current_schema(engine)
         require_account_schema(engine)
         require_operation_schema(engine)
         require_learning_schema(engine)
         require_exam_schema(engine)
+        require_grade_schema(engine)
     except RuntimeError as exc:
         print(str(exc), flush=True)
         return 2
     finally:
         engine.dispose()
-    print('Database schema is ready for S5.', flush=True)
+    print('Database schema is ready for S6.', flush=True)
     return 0
 
 if __name__ == '__main__':
