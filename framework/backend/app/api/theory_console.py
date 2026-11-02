@@ -18,7 +18,8 @@ reader=require_roles('student','teacher','admin')
 
 class TheoryConsoleStore:
     """At most one active isolated console per owner/question; no grading or shared station."""
-    def __init__(self):
+    def __init__(self,session_label='本题操作台'):
+        self.session_label=session_label
         self.engine=ReferenceSimulationService(reference_station_package())
         self.bindings={}
         self.lock=RLock()
@@ -38,7 +39,7 @@ class TheoryConsoleStore:
     def call(self,key,user_id,sid,action,*args):
         with self.lock:
             if self.bindings.get(sid)!=(key,user_id):
-                raise SimulationError('本题操作台会话不存在、已重新初始化或无权访问')
+                raise SimulationError(f'{self.session_label}会话不存在、已重新初始化或无权访问')
             return action(sid,user_id,*args)
 
 store=TheoryConsoleStore()

@@ -17,6 +17,7 @@ const children = [
   { path: 'student/learn/theory/attempts/:attemptId([0-9]+)', component: () => import('@/views/student/TheoryAttemptDetail.vue'), meta: { roles: ['student'] } },
   { path: 'student/learn/theory/:topicId([1-6])', component: () => import('@/views/student/TheoryTopic.vue'), meta: { roles: ['student'] } },
   { path: 'student/learn/operations', component: () => import('@/views/student/OperationCatalogue.vue'), meta: { roles: ['student'] } },
+  { path: 'student/learn/simulation', component: () => import('@/views/student/SimulationPractice.vue'), meta: { roles: ['student'] } },
   { path: 'student/learn/operations/history', component: () => import('@/views/student/OperationHistory.vue'), meta: { roles: ['student'] } },
   { path: 'student/learn/operations/attempts/:attemptId', component: () => import('@/views/student/OperationAttempt.vue'), meta: { roles: ['student'] } },
   { path: 'operations/reviews', component: () => import('@/views/teacher/OperationReviews.vue'), meta: { roles: ['teacher','admin'] } },

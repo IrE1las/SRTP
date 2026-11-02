@@ -2,6 +2,14 @@ import request from '@/utils/request'
 export function createTheoryConsoleClient(questionKey) {
   if (!/^lab-0[1-4]-0[1-3]$/.test(questionKey)) throw new Error('本专题不使用联锁仿真操作台')
   const root = '/lab-topics/questions/' + encodeURIComponent(questionKey) + '/console'
+  return createConsoleClient(root)
+}
+
+export function createPracticeConsoleClient() {
+  return createConsoleClient('/simulation-practice')
+}
+
+function createConsoleClient(root) {
   const session = id => root + '/sessions/' + encodeURIComponent(id)
   return {
     getStationPackage: () => request.get(root + '/station'),

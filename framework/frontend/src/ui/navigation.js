@@ -6,6 +6,7 @@ export function navigationForRole(role) {
     { title: '学习界面', path: '/student/learn', children: [
       { title: '理论学习', path: '/student/learn/theory' },
       { title: '操作学习', path: '/student/learn/operations' },
+      { title: '仿真操作', path: '/student/learn/simulation' },
     ] },
     { title: '考试界面', path: '/student/exams', overview: true, children: [{ title: '历史考试', path: '/student/exams/history' }] },
   ]

@@ -1,12 +1,14 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { navigationForRole, navigationGroups, roleHomeMap } from '../src/ui/navigation.js'
+import { navigationForRole, navigationGroups, roleHomeMap, pageLabel } from '../src/ui/navigation.js'
 
-test('student navigation has exactly three ordered roots and two study children', () => {
+test('student navigation has three ordered roots and parallel theory, operation and simulation pages', () => {
   const nav = navigationForRole('student')
   assert.deepEqual(nav.map(i=>i.title), ['首页','学习界面','考试界面'])
   assert.equal(nav[0].children, undefined)
-  assert.deepEqual(nav[1].children.map(i=>i.title), ['理论学习','操作学习'])
+  assert.deepEqual(nav[1].children.map(i=>i.title), ['理论学习','操作学习','仿真操作'])
+  assert.equal(nav[1].children[2].path, '/student/learn/simulation')
+  assert.equal(pageLabel('/student/learn/simulation', 'student'), '仿真操作')
   assert.deepEqual(nav[2].children, [{title:'历史考试',path:'/student/exams/history'}])
   assert.equal(nav[2].overview, true)
 })

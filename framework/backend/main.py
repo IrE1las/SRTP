@@ -13,6 +13,7 @@ from app.services.s3_migration import require_operation_schema
 from app.services.s4_migration import require_learning_schema
 from app.api import operation_learning
 from app.api import exams
+from app.api import simulation_practice
 from app.services.s5_migration import require_exam_schema
 from app.services.s6_migration import require_grade_schema
 from app.services import exams as exam_service
@@ -101,3 +102,4 @@ app.include_router(settings.router, prefix='/api/settings', tags=['settings'])
 app.include_router(lab_topics.router, prefix='/api/lab-topics', tags=['theory'])
 
 app.include_router(theory_console.router, prefix='/api/lab-topics', tags=['theory-console'])
+app.include_router(simulation_practice.router, prefix='/api/simulation-practice', tags=['simulation-practice'])

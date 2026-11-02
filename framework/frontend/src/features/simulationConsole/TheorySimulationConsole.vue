@@ -1,16 +1,20 @@
 <template>
-  <div class="simulation-page">
+  <div class="simulation-page" :class="{ 'practice-console': practice }">
     <div class="page-intro">
-      <div><p class="eyebrow">COMPUTER BASED INTERLOCKING</p><h2>联锁仿真操作台</h2>
-        <p>选择始端与终端办理进路；先按功能按钮，再选择对应设备。红色提示说明操作未通过的原因。</p></div>
+      <div><p class="eyebrow">{{ practice ? '自由练习 · 专题 1—4 标准站' : 'COMPUTER BASED INTERLOCKING' }}</p>
+        <h1 v-if="practice">仿真操作</h1><h2 v-else>联锁仿真操作台</h2>
+        <p v-if="practice">自由办理进路、操纵道岔、模拟行车与设备故障。可随时切换全屏，或重新初始化后再练习。</p>
+        <p v-else>选择始端与终端办理进路；先按功能按钮，再选择对应设备。红色提示说明操作未通过的原因。</p></div>
     </div>
     <div ref="consoleRoot" class="console-shell" v-loading="loading">
       <nav class="console-menu" aria-label="操作台菜单">
-        <strong>{{ station?.station_name || '联锁仿真' }}</strong><span class="mode-label">教学仿真</span>
+        <strong>{{ station?.station_name || '联锁仿真' }}</strong><span class="mode-label">{{ practice ? '自由练习' : '教学仿真' }}</span>
         <button @click="showRoutes = !showRoutes; showDevices=false; showActivity=false">进路与核对</button><button @click="showDevices = !showDevices; showRoutes=false; showActivity=false">设备练习</button>
         <button @click="showActivity = !showActivity; showDevices=false; showRoutes=false">活动进路 {{ activeRoutes.length }}</button>
         <button @click="replaying ? closeReplay() : openReplay()">{{ replaying ? '返回实时' : '操作回放' }}</button>
-        <button @click="showHelp = !showHelp">操作说明</button><button class="fullscreen-button" @click="toggleFullscreen">{{ isFullscreen ? '退出全屏' : '全屏站场' }}</button>
+        <button @click="showHelp = !showHelp">操作说明</button>
+        <button v-if="practice" @click="newSession" :disabled="loading || busy || replaying || !snapshot">{{ confirmNew ? '确认重新初始化' : '重新初始化' }}</button>
+        <button class="fullscreen-button" :aria-pressed="isFullscreen" @click="toggleFullscreen">{{ isFullscreen ? '退出全屏' : '全屏站场' }}</button>
       </nav>
       <div v-if="loadError" class="load-error" role="alert">{{ loadError }}<button @click="boot">重试加载</button></div>
       <div v-if="replaying" class="replay-bar"><strong>只读回放</strong><input v-model.number="replayIndex" type="range" min="0" :max="Math.max(0,replayFrames.length-1)" aria-label="回放时间轴" /><span>{{ replayIndex+1 }} / {{ replayFrames.length }}</span><button @click="closeReplay">结束回放</button></div>
@@ -31,7 +35,7 @@
           <p>带铅封操作须输入教学口令，默认 0000。人工解锁期间信号关闭、锁闭保持，倒计时完成且区段空闲后释放。</p>
           <p>空闲浅蓝，锁闭白色，占用红色；定位绿色，反位黄色，失表示红闪。</p>
           <p v-if="source === 'reference'">本站独立使用原软件 {{ station.counts.candidate_routes }} 条进路定义。通过按钮以 TA 标识；同按钮多路径按可用条件选排。引导须先将道岔就位，选择进站始端和接车终端，并每 15 秒内办理引导保持。</p>
-          <p v-if="source === 'reference'">区故解先确认区段恢复空闲，再按功能、输入口令、点击区段。区间请求后，可在本题设备练习中模拟邻站同意。</p>
+          <p v-if="source === 'reference'">区故解先确认区段恢复空闲，再按功能、输入口令、点击区段。区间请求后，可在设备练习中模拟邻站同意。</p>
         </div>
       </div></div>
       <div class="function-region" aria-label="常用功能按钮区">
@@ -46,7 +50,7 @@
         <small>默认教学口令为 0000；可由管理员通过服务器配置修改。</small><div><button type="button" @click="cancelPin">取消</button><button type="submit">确认</button></div>
       </form></div>
     <div v-if="showDevices && station" class="device-workbench">
-      <div><strong>设备练习</strong><span>先选择设备，在本题独立操作台观察故障、占用和恢复。</span></div><p>{{ inspected ? `${inspected.type} ${inspected.name}：${inspectedState}` : '尚未选择设备' }}</p>
+      <div><strong>设备练习</strong><span>先选择设备，在{{ practice ? '自由练习' : '本题独立' }}操作台观察故障、占用和恢复。</span></div><p>{{ inspected ? `${inspected.type} ${inspected.name}：${inspectedState}` : '尚未选择设备' }}</p>
       <template v-if="inspected?.type === '道岔' && canControlTrain"><button @click="inject('SET_SWITCH_INDICATION', inspected.name)">{{ '本端失表示' }}</button><button @click="inject('RESTORE_SWITCH_INDICATION', inspected.name)">{{ '恢复本端表示' }}</button></template>
       <template v-if="inspected?.type === '区段' && canControlTrain"><button @click="inject('SET_SECTION_OCCUPANCY', inspected.name, { kind:'vehicle' })">车列占用</button><button @click="inject('SET_SECTION_OCCUPANCY', inspected.name, { kind:'fault' })">故障占用</button><button @click="inject('CLEAR_SECTION_OCCUPANCY', inspected.name)">恢复空闲</button></template>
       <div v-if="source === 'reference'"><p>闭塞采用本地邻站模拟，设备状态与各区间分别保存。</p></div>
@@ -56,7 +60,7 @@
       </div>
       <label>新会话区间许可<select v-model="intervalAvailable"><option :value="true">已具备</option><option :value="false">未具备（条件反例）</option></select></label><button @click="newSession" :disabled="busy || replaying">{{ confirmNew ? '确认重新初始化' : '重新初始化操作台' }}</button>
     </div>
-    <section class="activity-panel" v-if="station && showActivity"><div class="activity-heading"><strong>活动进路</strong><span>推进本题模拟车辆，观察占用、信号关闭及正常解锁。</span></div>
+    <section class="activity-panel" v-if="station && showActivity"><div class="activity-heading"><strong>活动进路</strong><span>推进{{ practice ? '站场' : '本题' }}模拟车辆，观察占用、信号关闭及正常解锁。</span></div>
       <p v-if="!activeRoutes.length" class="empty-route">暂无活动进路。{{ '调车示例：D3 → D7。' }}</p>
       <div class="route-cards"><div v-for="route in activeRoutes" :key="route.id" class="route-card"><strong>{{ routeName(route.route_id) }}</strong><span>{{ statusText(route) }}</span><button :disabled="busy || replaying || stale || !canControlTrain || ['setting','track_proving','cancelling','clearing','manual_unlocking','closed_locked'].includes(route.status)" @click="advance(route.id)">仿真行车 · 推进一步</button></div></div>
     </section>
@@ -65,7 +69,8 @@
       <template v-else><label>查找进路<input v-model="routeQuery" placeholder="如 XD、D3、S5" /></label><div class="audit-scroll"><table><thead><tr><th>进路</th><th>按钮顺序</th><th>状态 / 来源</th></tr></thead><tbody><tr v-for="route in filteredRoutes" :key="route.id"><td>{{ route.name || route.id }}</td><td>{{ route.button_sequence.join(' → ') }}</td><td :class="{ 'audit-blocked':route.status!=='ready' }">{{ route.status === 'ready' ? '可办理' : route.reasons.join('；') }}<template v-if="source === 'reference'"> · 原文件第 {{ route.source_row }} 行<span v-for="warning in route.warnings" :key="warning">；{{ warning }}</span></template></td></tr></tbody></table></div></template>
     </section>
     </div>
-    <p class="under-note">本题使用独立联锁仿真操作台。模拟操作不会代填或提交答题栏；操作台重启后重新初始化，已提交的理论作答保留。</p>
+    <p v-if="practice" class="under-note">自由练习不限时、不计分。刷新页面可继续当前练习；重新初始化或服务重启后，站场恢复初始状态。全屏时按 Esc 可退出。</p>
+    <p v-else class="under-note">本题使用独立联锁仿真操作台。模拟操作不会代填或提交答题栏；操作台重启后重新初始化，已提交的理论作答保留。</p>
   </div>
 </template>
 
@@ -75,9 +80,9 @@ import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/store/user'
 import ReferenceStationDiagram from './ReferenceStationDiagram.vue'
 import { COMMANDS } from './standardDisplay'
-import { createTheoryConsoleClient } from '@/api/theoryConsole'
-const props=defineProps({questionKey:{type:String,required:true}})
-const { advanceSimulationTrain,clearStationSelection,createSimulationSession,getSimulationReplay,getSimulationSnapshot,getStationPackage,operateConsole,pressStationButton }=createTheoryConsoleClient(props.questionKey)
+import { createPracticeConsoleClient, createTheoryConsoleClient } from '@/api/theoryConsole'
+const props=defineProps({questionKey:{type:String,default:''},practice:{type:Boolean,default:false}})
+const { advanceSimulationTrain,clearStationSelection,createSimulationSession,getSimulationReplay,getSimulationSnapshot,getStationPackage,operateConsole,pressStationButton }=props.practice ? createPracticeConsoleClient() : createTheoryConsoleClient(props.questionKey)
 const userStore=useUserStore(), consoleRoot=ref(null), source=ref('reference'), station=ref(null), snapshot=ref(null)
 const loading=ref(true), busy=ref(false), stale=ref(false), loadError=ref(''), isFullscreen=ref(false)
 const showRoutes=ref(false), showDevices=ref(false), showActivity=ref(false), showHelp=ref(false), inspected=ref(null), intervalAvailable=ref(true), confirmNew=ref(false)
@@ -85,7 +90,7 @@ const replaying=ref(false), replayFrames=ref([]), replayIndex=ref(0), acknowledg
 const pending=ref(null), pinCommand=ref(null), pin=ref(''), pinInput=ref(null), now=ref(Date.now())
 let poller, ticker, lastPoll=0, disposed=false
 let commandQueue=Promise.resolve()
-const storageKey=computed(()=>props.questionKey+'-'+`srtp-console-${source.value}-${userStore.user?.id || 'anonymous'}`)
+const storageKey=computed(()=>(props.practice ? 'free-practice' : props.questionKey)+'-'+`srtp-console-${source.value}-${userStore.user?.id || 'anonymous'}`)
 const canControlTrain=computed(()=>true)
 const visibleCommands=computed(()=>COMMANDS.filter(c=>!c.referenceOnly || source.value==='reference'))
 const displaySnapshot=computed(()=>replaying.value ? replayFrames.value[replayIndex.value] : snapshot.value)
@@ -117,7 +122,7 @@ async function boot(){
   catch{loadError.value='站场加载失败，请确认后端已启动并重新登录。';stale.value=true}finally{loading.value=false}
 }
 async function startNewSession(){snapshot.value=await createSimulationSession(intervalAvailable.value,[],source.value);sessionStorage.setItem(storageKey.value,snapshot.value.session_id);acknowledged.value=0;confirmNew.value=false;stale.value=false}
-async function newSession(){if(!confirmNew.value){confirmNew.value=true;notify('再点一次清空本题模拟状态；答题草稿保留');return}busy.value=true;try{clearPending();await startNewSession()}finally{busy.value=false}}
+async function newSession(){if(!confirmNew.value){confirmNew.value=true;notify(props.practice ? '再点一次重新初始化，清空当前练习状态' : '再点一次清空本题模拟状态；答题草稿保留');return}busy.value=true;try{clearPending();await startNewSession();inspected.value=null}catch{ElMessage.error('重新初始化失败，请检查连接后重试')}finally{busy.value=false}}
 function runCommand(action){commandQueue=commandQueue.then(async()=>{if(disposed || !snapshot.value || replaying.value || stale.value)return;busy.value=true;try{const response=await action(snapshot.value.session_id,snapshot.value.version);snapshot.value=response.snapshot;if(!response.accepted)ElMessage.warning(response.message)}catch{try{snapshot.value=await getSimulationSnapshot(snapshot.value.session_id);ElMessage.warning('操作未完成，已刷新状态，请重新选择')}catch{stale.value=true}}finally{busy.value=false}});return commandQueue}
 async function pressButton(button){if(pending.value){const signal=station.value.buttons.find(b=>b.name===button)?.signal;if(signal)await selectSignal(signal);return}await runCommand((id,version)=>pressStationButton(id,button,version))}
 async function chooseCommand(command){if(command.unavailable || replaying.value)return;clearPending();if(command.type==='CLEAR_SELECTION'){await runCommand((id,version)=>clearStationSelection(id,version));return}if(command.sealed){pinCommand.value=command;await nextTick();pinInput.value?.focus()}else{pending.value={...command,deadline:Date.now()+15000};if(command.fixedTarget)await executeTarget(command.fixedTarget)}}
@@ -146,4 +151,14 @@ onBeforeUnmount(()=>{disposed=true;document.removeEventListener('fullscreenchang
 .device-workbench,.activity-panel,.route-audit{padding:18px;border:1px solid #cbd3da;border-radius:5px;background:white;color:#30465a;font-size:14px}.device-workbench>div,.activity-heading{display:flex;align-items:center;gap:15px}.device-workbench span,.activity-heading span{color:#6b7d8d;font-size:12px}.device-workbench button,.device-workbench select,.route-card button{padding:6px 10px;margin:0 8px 8px 0;border:1px solid #b3c0cc;border-radius:3px;background:#f5f7fa;color:#23415e}.device-workbench label{display:inline-flex;align-items:center;gap:7px;margin-right:10px}.device-workbench p{line-height:1.6}.route-cards{display:flex;flex-wrap:wrap;gap:12px}.route-card{display:grid;gap:8px;border:1px solid #d2dbe4;padding:12px;min-width:210px}.route-card strong{font-weight:500}.route-card button:disabled{opacity:.5;cursor:not-allowed}.activity-heading{margin-bottom:12px}.empty-route{color:#6b7d8d;margin-bottom:0}.route-audit label{display:flex;gap:10px;align-items:center;margin-bottom:12px}.route-audit input{padding:6px 9px;border:1px solid #c3ccd4}.audit-scroll{max-height:320px;overflow:auto}.route-audit table{border-collapse:collapse;width:100%;text-align:left;font-size:13px}.route-audit th,.route-audit td{padding:9px;border-bottom:1px solid #e1e7ec}.route-audit th{position:sticky;top:0;background:#eff3f6}.audit-blocked{color:#ab6117}.under-note{font-size:12px;line-height:1.7;color:#6b7d8d;margin:0}
 .device-workbench,.activity-panel,.route-audit{position:absolute;z-index:5;right:14px;top:125px;width:min(520px,calc(100% - 28px));max-height:calc(100% - 240px);overflow:auto;box-sizing:border-box;box-shadow:0 8px 28px #0008}.activity-heading{flex-wrap:wrap}
 @media(max-width:1100px){.function-region{display:flex}.function-button{flex:0 0 85px}.console-menu .mode-label{display:none}.console-menu button{padding:8px}.page-intro{align-items:flex-start}.activity-heading{align-items:flex-start;flex-direction:column;gap:6px}.console-shell{height:780px}}
+.practice-console .page-intro h1{margin:6px 0 10px;color:#183b60;font-size:30px;line-height:1.3}
+.practice-console .page-intro .eyebrow{font-size:13px;letter-spacing:1px}
+.practice-console .console-shell{height:clamp(650px,calc(100dvh - 280px),940px)}
+.practice-console .console-menu{flex-wrap:wrap;flex-shrink:0;gap:2px 0}
+.practice-console .console-menu button{white-space:nowrap;touch-action:manipulation}
+.practice-console .console-shell:fullscreen{width:100%;height:100dvh;min-height:0;box-sizing:border-box;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+.practice-console button:focus-visible,.practice-console input:focus-visible,.practice-console select:focus-visible{outline:3px solid #0075b7;outline-offset:-3px}
+.practice-console .help-panel{max-height:calc(100% - 140px);overflow:auto;box-sizing:border-box}
+.practice-console .pin-dialog{max-width:calc(100% - 32px);box-sizing:border-box}
+@media(max-width:600px){.practice-console .console-menu strong{flex:1 0 100%;padding:8px 0}.practice-console .console-menu button{padding:8px 6px}.practice-console .hint-region{flex-wrap:wrap}.practice-console .hint-region time{margin-left:auto}.practice-console .device-workbench>div{flex-wrap:wrap;gap:6px}}
 </style>

@@ -193,6 +193,11 @@ test('router separates catalogue/topic/history and restricts teacher pages; admi
     assert.notEqual(catalogue,question)
     assert.notEqual(question,history)
     assert.notEqual(history,catalogue)
+    const simulation=router.resolve('/student/learn/simulation')
+    assert.equal(simulation.matched.at(-1).path,'/student/learn/simulation')
+    assert.deepEqual(simulation.meta.roles,['student'])
+    await router.push('/student/learn/simulation')
+    assert.equal(router.currentRoute.value.path,role==='student'?'/student/learn/simulation':homes[role])
     if(role!=='teacher') {
       await router.push('/teacher/questions/students/7')
       assert.equal(router.currentRoute.value.path,homes[role])

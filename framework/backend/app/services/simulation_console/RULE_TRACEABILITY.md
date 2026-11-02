@@ -19,4 +19,6 @@
 
 ## S1返修的平台边界
 
-TheorySimulationConsole.vue与api/theory_console.py仅服务六专题中的1—4，接口绑定规范题目键和当前用户，拒绝5/6专题及跨用户、跨题会话。模拟行车、故障和占用只影响本题观察状态，不写入LabAttempt。5—6仍由TheoryStationCanvas.vue显示原图联锁表资料。旧独立自由仿真路由/API不恢复。
+TheorySimulationConsole.vue与api/theory_console.py为六专题中的1—4提供题内操作台，接口绑定规范题目键和当前用户，拒绝5/6专题及跨用户、跨题会话。模拟行车、故障和占用只影响本题观察状态，不写入LabAttempt。5—6仍由TheoryStationCanvas.vue显示原图联锁表资料。
+
+2026-11-02按用户新增需求，学生“学习界面”增加与理论学习、操作学习平行的“仿真操作”（/student/learn/simulation）。同一组件以practice模式复用标准站图形及联锁引擎，通过/api/simulation-practice使用独立内存会话存储，绑定当前学生，不绑定题目，不写学习答卷、考试或成绩。全屏为自愿的显示切换，不套用考试限时、退出次数或交卷规则；刷新恢复本标签页当前会话，显式初始化或服务重启后重新开始。旧/api/simulation-console及/student/simulation-console等历史入口继续移除，不恢复旧练习/评分系统，也不更改标准站专业规则。
