@@ -1,0 +1,82 @@
+[
+  {
+    "source_id": "GS",
+    "name": "甘肃省高等教育自学考试课程考试大纲：车站信号自动控制（13367）",
+    "url": "https://www.ganseea.cn/uploads/allimg/20240529/30-2405291606452A.pdf",
+    "file": "GANSU-13367.pdf",
+    "scope": "2024年3月甘肃省自考13367课程示例及兰州交通大学标识参考答案；6502四线制道岔电路语境。",
+    "count": 4,
+    "sha256": "c63b13b14e74168b5d2eb414673d681cb924923c4e2124b4df1c97b02041745d",
+    "retold_characters": 159
+  },
+  {
+    "source_id": "S1",
+    "name": "石家庄铁道大学刘玉芝在线开放课程：车站联锁·进路",
+    "url": "https://cdnvideo.stdu.edu.cn/cemsvideo/wl224/ziyuan/8-1.pdf",
+    "file": "STDU-8-1.pdf",
+    "scope": "石家庄铁道大学该公开课程讲义的进路划分说明；未核定讲义出版年份。",
+    "count": 2,
+    "sha256": "21b8ef27817d3c598a10e43246bf0ec11f1d256fd8b25ab535a00eee4ab392c2",
+    "retold_characters": 73
+  },
+  {
+    "source_id": "S2",
+    "name": "石家庄铁道大学刘玉芝在线开放课程：车站联锁关系",
+    "url": "https://cdnvideo.stdu.edu.cn/cemsvideo/wl224/ziyuan/8-2.pdf",
+    "file": "STDU-8-2.pdf",
+    "scope": "石家庄铁道大学该公开课程讲义的联锁关系与符号语境；未核定出版年份。",
+    "count": 3,
+    "sha256": "b7e5dc9605f620d55cb08e6e3dd7e478b3fce778c2dfb84a72a2523d5a815972",
+    "retold_characters": 83
+  },
+  {
+    "source_id": "S3",
+    "name": "石家庄铁道大学刘玉芝在线开放课程：联锁图表",
+    "url": "https://cdnvideo.stdu.edu.cn/cemsvideo/wl224/ziyuan/8-3.pdf",
+    "file": "STDU-8-3.pdf",
+    "scope": "石家庄铁道大学该公开课程的信号平面布置图读图约定；未核定出版年份。",
+    "count": 3,
+    "sha256": "c1e3895c20d6c34c206e133448a30d18aeb45543b272862883fd8b7cdec21468",
+    "retold_characters": 93
+  },
+  {
+    "source_id": "S5",
+    "name": "石家庄铁道大学刘玉芝在线开放课程：计算机联锁",
+    "url": "https://cdnvideo.stdu.edu.cn/cemsvideo/wl224/ziyuan/8-5.pdf",
+    "file": "STDU-8-5.pdf",
+    "scope": "石家庄铁道大学该公开课程列举的计算机联锁结构及型号；历史教学语境，未核定出版年份。",
+    "count": 2,
+    "sha256": "a33b0a691b365a71959cd7294e8228d34f07a83eaad258f2606f27b5288975a0",
+    "retold_characters": 75
+  },
+  {
+    "source_id": "NRA",
+    "name": "国家铁路局2025年第5号公告附件：TB10419—2018局部修订条文",
+    "url": "https://source.nra.gov.cn/xxgk/gkml/ztjg/bzgf/gcjshzjbz/jsbz/202505/P020250514534589293214.pdf",
+    "file": "NRA-2025.pdf",
+    "scope": "2025年4月22日公开发布的铁路信号工程施工质量验收标准局部修订；CBTC制式检验场景，非本站运行评分规则。",
+    "count": 3,
+    "sha256": "80a84af10b9393b15a7d50e1a97d55c35c2b279f5f12c2f5399e5cf5972cc528",
+    "retold_characters": 119
+  },
+  {
+    "source_id": "TJ",
+    "name": "王燕岑、张程：基于数据安全校核技术的城市轨道交通信号系统站场数据生产方案，城市轨道交通研究2021年第4期",
+    "url": "https://umt1998.tongji.edu.cn/cn/article/pdf/preview/10.16037/j.1007-869x.2021.04.019.pdf",
+    "file": "TONGJI-2021.pdf",
+    "scope": "2021年该论文提出的城市轨道交通联锁/ATS应用数据生产及验证方法；属于联锁表数据质量扩展，不是行车规章。",
+    "count": 3,
+    "sha256": "82aad1e5000402fd67fcba15ddec27605313abca29f659c12d8f6b67e98365e1",
+    "retold_characters": 137
+  },
+  {
+    "source_id": "HC",
+    "name": "湖南高速铁路职业技术学院域名公开城轨表格题库（题名和编者未核定）",
+    "url": "https://jcclx.hcrt.edu.cn/upload/20210427/6087d63201c10.pdf",
+    "file": "HCRT-QB.pdf",
+    "scope": "院校网站2021年目录下公开的城市轨道交通表格题库；题名、编者和具体线路未核定，不外推国铁/本站，也不声称教师独立复核。",
+    "count": 4,
+    "sha256": "6279619f7a131fc7f499143c59fe1a6a815b1b787d943eed73bd745a1ae37793",
+    "retold_characters": 148
+  }
+]

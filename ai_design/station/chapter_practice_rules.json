@@ -1,0 +1,1689 @@
+{
+  "version": 1,
+  "notes": "用户授权即时练习后的独立判分规则；不改变原资料题或正式实验评分。答案签名不符时停止自动出题。填空保守匹配经确认的等价写法。",
+  "questions": [
+    {
+      "id": "PPT-PDF-001",
+      "signature": "6f1cbeb79e024fbbfeee97ea6c09ae9f3a468178c8162aca95df19291e0804d9",
+      "kind": "cell",
+      "accepted": [
+        [
+          "信号机"
+        ],
+        [
+          "进路"
+        ],
+        [
+          "道岔"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "PPT-PDF-002",
+      "signature": "98fbcb2fc7495929d369df5cfd8aef90706d6620f76d6e86c979a52d6fbba3f2",
+      "kind": "cell",
+      "accepted": [
+        [
+          "双动道岔"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "PPT-PDF-003",
+      "signature": "52cb9c09c7d8a17a322ea0fc0899055398bb1bb84a2e5bd7329bdb6dd1b8ac54",
+      "kind": "cell",
+      "accepted": [
+        [
+          "始端"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "PPT-PDF-004",
+      "signature": "512fb21e1b26ac56541bb7aa23b955b76ce9a6b8e0223195d8b7d07c0894f755",
+      "kind": "cell",
+      "accepted": [
+        [
+          "内锁闭"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "PPT-PDF-005",
+      "signature": "60075bad6896797f1e1dbd072c8088c2beaf06d6e63268fb2b9c46e82442ff8d",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-PDF-006",
+      "signature": "abb41f2534b076ec4f61a75ed93a9b21248de798478cf64f381d193f1722aa1a",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-PDF-007",
+      "signature": "89421288fe065eda48cebed4de6a519b2248ee0d26d83e2d87f9d1648327d1b6",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-PDF-008",
+      "signature": "64d51d2165057f9391fb3a6800498308ded1e83306106c386cc53ca8d6b0b92c",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-PDF-009",
+      "signature": "eb89ba6a5d2c7b6a2060ef1ff15fbcb1e281222a5f42b7db6aa064ac917a7225",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-PDF-010",
+      "signature": "450e5a471d026ef08c082c6e15d66b2fc214fcadcb17ef5d19d6a6df71177ef2",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-PDF-011",
+      "signature": "ee3b31bdc9cc84d60f23f72e324c98b6c35a18f6e41f25d5f52b6515f2d3f2dc",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-PDF-012",
+      "signature": "9f2f238b3ea79d318f41382575710e475ea952cffcbbbd3bd71cff1fa8f7bf15",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-PDF-013",
+      "signature": "cf82c0f5c8746a63422fb06b77b9bae76da6b3c8458461f2fd22be14d21c19f5",
+      "kind": "cell",
+      "accepted": [
+        [
+          "停车"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "PPT-PDF-014",
+      "signature": "460e3d9d31330068b45d7b85220dd827f02f4be9b497a5420cd6896cf2ec3898",
+      "kind": "cell",
+      "accepted": [
+        [
+          "落下",
+          "失磁落下",
+          "释放"
+        ],
+        [
+          "吸起",
+          "励磁吸起"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "PPT-PDF-015",
+      "signature": "0a8ffe7bcec7a520b582682f1d124aa26dae91fa6127ddd2bdfa604b27747613",
+      "kind": "cell",
+      "accepted": [
+        [
+          "失磁",
+          "失磁落下",
+          "落下"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "PPT-PDF-016",
+      "signature": "8ada65c4b67de39ec67959814fe74a198a64a4672cd0e37dc3017859ec0e6dea",
+      "kind": "cell",
+      "accepted": [
+        [
+          "表示"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "PPT-PDF-017",
+      "signature": "fe961d6918cc37a68db5309e52a69a021b3b8e5cce4b4386adb7487408e94319",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-PDF-018",
+      "signature": "fd35d2fc50de100bb389027ff1343e6ae01641a0c77bda6d73dbdfb6dc1d2aa9",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-PDF-019",
+      "signature": "242b870754585aa640a4e5847e973e753202bb9cb5c3250d0b69edf77ddb2789",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-PDF-020",
+      "signature": "4ca899ecb531aefb6be377175281fc7738445e16816a828515f456506d576157",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-PDF-021",
+      "signature": "b2d3d6df43d5dc6a003766157f9579964f57f8450c18219f16d660f8fe347c67",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-PDF-022",
+      "signature": "c262fc9d43bbb36e9776bb00764d6c6c2cab6957c0e23eff8706c611849c292d",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-PDF-023",
+      "signature": "0abdf1861dd4b4e96bf06a062e3854c7107a72eb3f4902b8e912ab0b42910b90",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-PDF-024",
+      "signature": "6a69f07d808bd8ac26c0a481295217bd4f83beaf9b1e8182d857c4390804dac2",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-UNLOCK-001",
+      "signature": "511e9eaf777408bd8d06bd1d4f4dc60ce0384ebaeea1782bbdbbdaf885ff7b42",
+      "kind": "cell",
+      "accepted": [
+        [
+          "ZQA"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "PPT-UNLOCK-002",
+      "signature": "4b91a50f1103ef58a96a4e15f5178eb79e4e08a8e63f1756e87bcd5830d2e37e",
+      "kind": "cell",
+      "accepted": [
+        [
+          "ZRA"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "PPT-UNLOCK-003",
+      "signature": "3b001a40361c9552d60bb3380e619d929cc2790d2561ce130f0d6c07afc4e58a",
+      "kind": "cell",
+      "accepted": [
+        [
+          "预先锁闭"
+        ],
+        [
+          "接近锁闭"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "PPT-UNLOCK-004",
+      "signature": "8b7702ddd452214a105039897cfb675617ed66d5b836c4037058fe76908223bb",
+      "kind": "cell",
+      "accepted": [
+        [
+          "RJJ"
+        ],
+        [
+          "XCJ"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "PPT-UNLOCK-005",
+      "signature": "87d95c74736059cddf42d947057416b1e031bdcf5d77d1f848e5a2c6a1be2490",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-UNLOCK-006",
+      "signature": "e58c6603e354c71c14bc579ad38ddba48d9b847df43dbe422311bba6e438fb54",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-UNLOCK-007",
+      "signature": "4cdcc29a6d7bf213c8bc8aa84b70cd353f596bb67a1f6bb9912468afefcf95ea",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-UNLOCK-008",
+      "signature": "85d0647cb8a4384567b50af6fe0cf3e43e80a8f8704ef9d9f68dd405e8f2193b",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-UNLOCK-009",
+      "signature": "0150611171126ce2d0f6eb7c8d7d74d953fc1611b152d982b292905e67cc6cc1",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-UNLOCK-010",
+      "signature": "f135a5f16e3247e2f5e0c485e8a9d4761fcca4cacb8a3da256beb8a45174b845",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-UNLOCK-011",
+      "signature": "8865c94e3b8c12ba4fcf6ea6d126b0f54be86fbb6485b9939a293bad0656ee28",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-UNLOCK-012",
+      "signature": "b633fa555bb9ff73531e8773dacbb82e0c85a975178fb564862b0983a6ac0cce",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-UNLOCK-013",
+      "signature": "ea7ad9d1afc07f5ca6da17526d2f15ae07fe7c0c98b8a8cecc558d18e24c2483",
+      "kind": "cell",
+      "accepted": [
+        [
+          "一次解锁"
+        ],
+        [
+          "分段解锁"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "PPT-UNLOCK-014",
+      "signature": "5d70faadc3008e58f85fbfc88ee65dd812494ce3da5fec90f121582abeb783ee",
+      "kind": "cell",
+      "accepted": [
+        [
+          "两",
+          "2",
+          "二"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "PPT-UNLOCK-015",
+      "signature": "143af866b8d7d3cf0f9ea2408ad5791d2ea13bfd6b2e1acd2e1542ca621d8787",
+      "kind": "cell",
+      "accepted": [
+        [
+          "FDGJ"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "PPT-UNLOCK-016",
+      "signature": "7dcb1e1508122b73b1f5ec12b4bb78cd6e6d25e1292cd2aa14fba34a259a73db",
+      "kind": "cell",
+      "accepted": [
+        [
+          "关闭",
+          "关闭信号"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "PPT-UNLOCK-017",
+      "signature": "51eaee7cd1f7ef43d7459c26df08ea39f88ba27f80ebcd440ff075891cfd3a99",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-UNLOCK-018",
+      "signature": "20178c5b290e0e590c4c105cb0dc15bc1f74d80a9f355326e2807bf088e15e82",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-UNLOCK-019",
+      "signature": "3182d5554866f955a3a15bca53a3b8fc1c921243e123d4a24381b1a883352928",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-UNLOCK-020",
+      "signature": "02336448b1d2593a1b3be53125bc1cd0a9323d95d41909845e54b8159aeb3610",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-UNLOCK-021",
+      "signature": "ee152cd4208fcf7df5e5cf7e9a4a1276df5f2e936625bd138e21321ec16566ed",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-UNLOCK-022",
+      "signature": "499b95a919aa1ea5859b169e394031b1bcd9cd883239d56cb62e5dc4ccf7fb19",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-UNLOCK-023",
+      "signature": "87d496b48f67c814e04bfe1c0fc6654c5497d35e98096291776cff4928e8475d",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-UNLOCK-024",
+      "signature": "c27162a48d7354816cdf71617d6ab7c9a97f65ded37871fa72509262019402e7",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-TABLE-001",
+      "signature": "12b6cfa36f22d0ad441d01322a997f8c60f1a477ed39ee5a34bf3cf440f58f9d",
+      "kind": "cell",
+      "accepted": [
+        [
+          "车站信号平面布置图",
+          "车站信号平面图",
+          "信号平面布置图"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "PPT-TABLE-002",
+      "signature": "04f7fa1b7f25eb991234ccdb22126bab5f02d2e2e93b572734973ae0a90dcc95",
+      "kind": "cell",
+      "accepted": [
+        [
+          "位置"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "PPT-TABLE-003",
+      "signature": "d3b440f07ef99cd29716fc86ae20ce16d5f844d03870e6f5b827f255b9ec36f5",
+      "kind": "cell",
+      "accepted": [
+        [
+          "本咽喉",
+          "本咽喉区"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "PPT-TABLE-004",
+      "signature": "efb2a0f24ad13ace53888d3b4e1e9066b6c672e76c5efde3640845acb6eec4b4",
+      "kind": "cell",
+      "accepted": [
+        [
+          "发车口"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "PPT-TABLE-005",
+      "signature": "0c8764b686600660c910f8ed5964eeccf7a5e7a0199f2a568995659799dcb5f2",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-TABLE-006",
+      "signature": "b0ae081db41247c6d534f3130cbfc316e443673b2ea3ba1611f55b4ffef5e05a",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-TABLE-007",
+      "signature": "fdfcf119d752ff4b4d8fe09cf80c7cd77eac323abd7d6cf2ef9f08d7f8cdca1a",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-TABLE-008",
+      "signature": "dbe3778f127e9a19cfbc49630d9898e78ecc6d0ac1a6e04e1d1ca56749ae3629",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-TABLE-009",
+      "signature": "3d1b39f2ed675ac95749aae6ae5b6c1250688655dd06aeefcba8bbff7268ee66",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-TABLE-010",
+      "signature": "ee27fa0a10378f0a68a2070ad581e1ef2a1d84d97282ec574e62213b4b8af3fb",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-TABLE-011",
+      "signature": "c393ae5ad17159cde9ccfb77c12dab37a67f1a1691d41fef45359c441b9c5373",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-TABLE-012",
+      "signature": "16ec1cbe8678eab31b226d95b0ddc6ddf04aaf01bfd15aca6620cc6934523d59",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-TABLE-013",
+      "signature": "a51562c3025e892f94a61a485b97c8a0846fec6a1fcf63ce2bb70051b8f15695",
+      "kind": "cell",
+      "accepted": [
+        [
+          "基本"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "PPT-TABLE-014",
+      "signature": "1391e25fac76cce37d6367623c7e3db431396f4a5fcb12dad90337791baf2905",
+      "kind": "cell",
+      "accepted": [
+        [
+          "基本"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "PPT-TABLE-015",
+      "signature": "c8e5ec7a91f7b4bb93dc4caa8185abfb556b81dd45e8075348f9a46b785e3205",
+      "kind": "cell",
+      "accepted": [
+        [
+          "相反"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "PPT-TABLE-016",
+      "signature": "0a58093e2f67e3b458ab27780fee1a8f9e28c10f131c73dc2247c5571dcc8162",
+      "kind": "cell",
+      "accepted": [
+        [
+          "大",
+          "大括号",
+          "花括号",
+          "花",
+          "{}"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "PPT-TABLE-017",
+      "signature": "621cfa1e0ebd4aab410ce5e96d4b44eaacb1ce4499c5195e76fdb81897c91388",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-TABLE-018",
+      "signature": "eaf0def509d36868b1ae7370fceb84a1e90d7a8b62fc54c1da58002c261be14e",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-TABLE-019",
+      "signature": "411d38dd7c4e0e0bba8aac1f9031734e0f375fc29b22d15b130c64e5d2afb902",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-TABLE-020",
+      "signature": "70bf560f855e15567b18d2ecf58590203e257d109d4ca3e402d2950e5b30dd3f",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-TABLE-021",
+      "signature": "a295bd95621d12083df4e11e66272842dc569cd57777c71c2599a11fbe8b27a6",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-TABLE-022",
+      "signature": "aa65674b00b41096f56b99007b822a89f31dce0b2b1db8cf5436f2a1232660b5",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-TABLE-023",
+      "signature": "b700835fef8a105d54423ab234eda2e3c9886dcf9b2358bf6b2830bdc28c26f4",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "PPT-TABLE-024",
+      "signature": "3c0bcf156b3eff3a770802c9825d380a6c73fde74885401d3af5531065d68d3d",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-001",
+      "signature": "0c9f21d70450d0cdee395db262630d6955dc8a2bea84c73f8aee4c54e92b9671",
+      "kind": "cell",
+      "accepted": [
+        [
+          "AJ"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "CW11-002",
+      "signature": "9b99405b9a9493639ee63291aefb4d96958924d029e172fda8e5b36d526bbfe2",
+      "kind": "cell",
+      "accepted": [
+        [
+          "LJJ"
+        ],
+        [
+          "LFJ"
+        ],
+        [
+          "DJJ"
+        ],
+        [
+          "DFJ"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "CW11-003",
+      "signature": "1393596015a638fe40be1da2aea0b76bc86b400bbf9ea71d46e1681e94dcb416",
+      "kind": "cell",
+      "accepted": [
+        [
+          "右"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "CW11-004",
+      "signature": "2750e68d9257139de0b13386875c567a77613cd436dcadb1d4d3f647b656ab13",
+      "kind": "cell",
+      "accepted": [
+        [
+          "2",
+          "二",
+          "两"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "CW11-005",
+      "signature": "3b2c5268254e5d3b79e41c8f1a7eb16f1b9756cecbe564961be26a8013f9924c",
+      "kind": "cell",
+      "accepted": [
+        [
+          "DD"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "CW11-006",
+      "signature": "aa0ce6361d55c6bc2a4b6e12293057ef4069c893736761bbdbe6a1304068a0ae",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-007",
+      "signature": "40e6b870bb7a5cee0435b8385db3f0215e7498a4bf4fd1c0e36d906eb2ce4400",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-008",
+      "signature": "57425cb707f8e4650f07835c3d49e9c6003fb0fdae9a9aad477762c152c70c3f",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-009",
+      "signature": "61626f76286cd067a1af8fb103ff191a385992f624d62b8f6a9dabe713592e33",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-010",
+      "signature": "f039d63c55cda900e30e038af98266840038bf54ed9c74b83bb01305685469f8",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-011",
+      "signature": "0e3efe32b3d99340451c9ed6d7b39ff5ffd5b33463f09f4a5bbcd793664a49fb",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-012",
+      "signature": "71c5614668053e9f84b17db81ddf0dfc5866343a08ffb8896c33cba065974c55",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-013",
+      "signature": "b679e14fac2f45dbf575c7131f90970bad8c1bb6428770eed1d372cc3bbbb143",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-014",
+      "signature": "8b89aae38b122a1ca11161acea502a8b64d026d31cf5a4e06822ee5be2d3bd46",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-015",
+      "signature": "2abad47a72b22f11e0d0fcc11cd28abc5607b2db0ce81c0001c84b31323dc23d",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-016",
+      "signature": "dbb5fc3c4e8ad3b5df718a40afe3a62ad4cd1cdd58c50e8ac5913964762c6a7f",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-017",
+      "signature": "40fa999b958e93866e593ac6542b3115fa9a89b071bd319ea83fec2b35210273",
+      "kind": "cell",
+      "accepted": [
+        [
+          "2LJ"
+        ],
+        [
+          "1LJ"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "CW11-018",
+      "signature": "2b4cc6048b42507d4f5a00143de811b4f26d8aef0c9135054defc4d3a947ec3b",
+      "kind": "cell",
+      "accepted": [
+        [
+          "JYJ"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "CW11-019",
+      "signature": "c7e83003ac4113695eda1201e42834cd3e50f7f733bdbf4155f9f7a69eb3eb7e",
+      "kind": "cell",
+      "accepted": [
+        [
+          "KF-3分"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "CW11-020",
+      "signature": "02e7db05fd21dff5c086e33e986f63effca60d0bf495da1db68b1248a3cbee0a",
+      "kind": "cell",
+      "accepted": [
+        [
+          "1",
+          "一"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "CW11-021",
+      "signature": "9a1ea015c56bd1eb3076643ba18b8f060d56b415a69d09e4a53cc4a155da2ced",
+      "kind": "cell",
+      "accepted": [
+        [
+          "1XCJ"
+        ],
+        [
+          "2XCJ"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "CW11-022",
+      "signature": "92635344f7b15e339f44f2dc963a5924b307fc6145cd0b9b225895165faf7825",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-023",
+      "signature": "83e564ce2241792768ffbda3016bdb1a0189eca745e3ed9a8e40d7b65e7601ab",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-024",
+      "signature": "489b36675b0fcdaa7a8606ab17f95fd08f4a0f465c1d4f670ceb2cf95b3bfd7b",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-025",
+      "signature": "d94215d6b03bf554fab590da579433637169a013c5148031e3860d2f270fb6c8",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-026",
+      "signature": "37e9db4db846d989ce2aa0fca9b23fafb0f2854b2194ce345d99f392bfaec3ec",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-027",
+      "signature": "d81f3e22c2be89193a05f99ff9f4239d9695ed7d9590a0182d4f174797c63b83",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-028",
+      "signature": "30485f931645ce81cd1cd8b34ff8da509686c28418267f1db46dd9620b762715",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-029",
+      "signature": "0e4a34a7b0181c10d876677e9a59f42a87e5530a1c703e7ca188c769966e86f5",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-030",
+      "signature": "dece294f4509aef0b0973ad11d239eb97b86c5d9582435aba6cc2f141f85ff22",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-031",
+      "signature": "c34e841be5b4b7231769293ae5bd1587df32689f23de068d246395beb412237d",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-032",
+      "signature": "cd247c14c80e069c40aa8c75f440eebd68b63c0d03fecc79860624730145822d",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-033",
+      "signature": "1590c5aca09e2ccce80abff5854734a1fd47adbc5edd35b3506e03dafcc53bab",
+      "kind": "cell",
+      "accepted": [
+        [
+          "落下",
+          "失磁落下",
+          "释放"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "CW11-034",
+      "signature": "2bc570c48f9b6e9b097bd5bd4957ee4744e98000972d87be5277daed42421742",
+      "kind": "cell",
+      "accepted": [
+        [
+          "落下",
+          "失磁落下",
+          "释放"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "CW11-035",
+      "signature": "a17a3019fe58a5c0a82ebb249a8188659e95afc49f19d03becdfffa76bf53ac1",
+      "kind": "cell",
+      "accepted": [
+        [
+          "3—4",
+          "3-4",
+          "3－4",
+          "3、4"
+        ],
+        [
+          "1—2",
+          "1-2",
+          "1－2",
+          "1、2"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "CW11-036",
+      "signature": "c3a0fa3a33724ef4ad8502a162148bd845904f01085ea460fc0c933de9a5a138",
+      "kind": "cell",
+      "accepted": [
+        [
+          "吸起",
+          "励磁吸起"
+        ],
+        [
+          "落下",
+          "失磁落下",
+          "释放"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "CW11-037",
+      "signature": "dcc3063f1d685a3bbabe512468d1e21ddbde6c1cf6b7563c6efe68591dfaecac",
+      "kind": "cell",
+      "accepted": [
+        [
+          "8",
+          "八"
+        ],
+        [
+          "12、13",
+          "12,13",
+          "12，13",
+          "12和13",
+          "12与13",
+          "13、12",
+          "13,12",
+          "13和12"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "CW11-038",
+      "signature": "98a09b821507fc230545d24472085c4143dba4cb04c80e5710563dcdb6e5db03",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-039",
+      "signature": "d912e71f6769ee64ecb9aff1ba9f38de1e3a6c430ef737f0a97583fa94562af7",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-040",
+      "signature": "9a11006d75213b6d7f499e258c43c95387a9cd8c381bfdfb76f6750c604cd808",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-041",
+      "signature": "329bf91080137ec4504495b112b027e632acfc1dd67188ac8865724e40266bee",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-042",
+      "signature": "7683883f271ba4fb655a2bda6754f848abc378937981899f4d916425e0b11f9e",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-043",
+      "signature": "d48584eee79cd3dc84b6ab76e81c3121c7087e2eab7de81321b50418b97165e6",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-044",
+      "signature": "3dc51359648ed806f567c2bdf25524bf0b65fc62ea9343489bd01af4a9ac0dd7",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-045",
+      "signature": "e78b82e9e4dc3092c002e4643fc3db89bd758e9755e074564df7ddc1be10e692",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-046",
+      "signature": "f9be3ef70328166d54efd071bb2e6954ec31f7a5c81d0a38b7311f4efcbeb633",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-047",
+      "signature": "d2ee4bbe6efb47e7644deca336d83a3bb4c72b35d77fa5f3cf26099bcf83fdac",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-048",
+      "signature": "808e081d7fab59d7e867e9a3354556305a7271cf52981e73b9b7621a279342f7",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-049",
+      "signature": "fd48989751ca3abd56325819028deae35c876218bd7e4cfed7622f36d5b587ca",
+      "kind": "cell",
+      "accepted": [
+        [
+          "安全"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "CW11-050",
+      "signature": "e985699c50ddbf21cc245568e140f5b2d8142f02da61380e78ec3967f928ea05",
+      "kind": "cell",
+      "accepted": [
+        [
+          "吸起",
+          "励磁吸起"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "CW11-051",
+      "signature": "de75ea4847715bbb85a41b38a3d72487182f1fe8a02707504eedf0a2baafd1c4",
+      "kind": "cell",
+      "accepted": [
+        [
+          "GDJ"
+        ],
+        [
+          "KZ-GDJ"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "CW11-052",
+      "signature": "37fd2bf050eabd45075887ed46bb0b9eb63cd6c616b806528fbcb49adfb78c87",
+      "kind": "cell",
+      "accepted": [
+        [
+          "吸起",
+          "励磁吸起"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "CW11-053",
+      "signature": "9a539675e7d8cf46abec64fb70309eeba1a89ed2dd0c7e308fdcd78eff13eb0f",
+      "kind": "cell",
+      "accepted": [
+        [
+          "红闪",
+          "红灯闪烁",
+          "红色闪光",
+          "红色闪烁"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "CW11-054",
+      "signature": "af8edc1e55b4e1162c4b51a68cc96958ba64417d6755915e6fb11bedffbcbf87",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-055",
+      "signature": "7621ad5e5c4f42f00a3c9dc9128fa6db9bb631484d36d584c8b3eb5ade018bb3",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-056",
+      "signature": "b1f915c157ad8180c1864d1f10ad35224c04bd4729c391b8d1e93035305bf3f9",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-057",
+      "signature": "0c730606f419c7b9f19b588eb3562f4611db54b5d180f1450851520fe526e002",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-058",
+      "signature": "3e933f038f07a2e27f8e1d952dfe93c806a9d1a3683e1aebf046519f684631b3",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-059",
+      "signature": "c9b1325bd7e46f387aab12968f5cb149347761c69de54f2519e054677f001b7d",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-060",
+      "signature": "06d53293ef32544e556cb8f22c41eb5d9d87e8e3290617002010979af8e0d6dc",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-061",
+      "signature": "87aa4630354c7bd89f0d27a9bd696b9fd3b88050c46e189b86ad6666f5f80457",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-062",
+      "signature": "6d31db260a15ae60c2d09f1091deab92dea4e90dee2bae62627a3ff2ad37520b",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-063",
+      "signature": "0133c4bec1eb6dd4d787e163743ed134c4e3e56ae0da2774d69f758e4ef94bdf",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-064",
+      "signature": "225ab56b170f98e440c058c081995d27fce2acec4fc73d095f24533609e2297d",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-065",
+      "signature": "8624409ed4777427c293b61b0e0776b0e76f66ae7442b71f0ea4d766dbe5d95f",
+      "kind": "cell",
+      "accepted": [
+        [
+          "联锁表"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "CW11-066",
+      "signature": "f00aa8292202cf404d8933fd92c55ee53a3301e2e1be562bbe3290f18fda5724",
+      "kind": "cell",
+      "accepted": [
+        [
+          "定位"
+        ],
+        [
+          "反位"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "CW11-067",
+      "signature": "9fc0919619522b009629cfde1613c051ce4499706832d0db67a881fc43f1ebbd",
+      "kind": "cell",
+      "accepted": [
+        [
+          "1",
+          "一"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "CW11-068",
+      "signature": "d61801e4f3c52e2e118a3f9744700bbae06d0a38e2d8deac80ef9333c7aa7547",
+      "kind": "cell",
+      "accepted": [
+        [
+          "离去"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "CW11-069",
+      "signature": "4ee413658b2319420911aa2ac134b0779c51fb4fc5c5f371ac91e0f3ea2652f3",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-070",
+      "signature": "970ddac671aaec3a4a9ccc6a8a772a2f21fb606e7a9a909a2f2ac865ad605691",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-071",
+      "signature": "e276f54ab0f45ab66ce1b463c67d7a0bbc0ba947d0df995e7811b2e7a8857f1d",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-072",
+      "signature": "2d55a2a8a87407f4b60ce91ef32d122421519a12f93574eec7f4c17241eb6da3",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-073",
+      "signature": "5b1b36c553e509db7fcb5508838f5d3700968dc94f1de08747051c00c69323fc",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-074",
+      "signature": "6c668989feb477ff50bc6dd3cca50ce567ea68b11406de81cf6b117a5272fa49",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-075",
+      "signature": "9406f02853d8608cfc978a4b0552f639ab5a361c91d4925dc4754710aa61d81c",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-077",
+      "signature": "0f0256f7a01cb2c909192ef4ff8b925e294d1cf7ecabf79259fcc4f1e806f0a7",
+      "kind": "cell",
+      "accepted": [
+        [
+          "XJJ"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "CW11-078",
+      "signature": "acb8af8267cdaf389f91bc6ac7c7752d8317adac977db433e62280cdb5988631",
+      "kind": "cell",
+      "accepted": [
+        [
+          "一",
+          "1"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "CW11-079",
+      "signature": "44a9621570e673fda68cee7a8da898ee8c0bcb3104a6aa4cd6914c2c66e1d5d8",
+      "kind": "cell",
+      "accepted": [
+        [
+          "DJ"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "CW11-080",
+      "signature": "d1426345a8f7501ee9c03b608c4cac7d99c790da1ef5fd618b1cd0f2f3fe2f4e",
+      "kind": "cell",
+      "accepted": [
+        [
+          "开放"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "CW11-081",
+      "signature": "c2a8df8bbf98509337aa2bd36412fcdc285f35e461b37bcba00fa574954c19ba",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-082",
+      "signature": "b16052826dcebc2aa1034a49bccac0bc542bb79b04a5c1b9c6b60f9918fb8347",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-083",
+      "signature": "2cfcaaac62a599f37e628ec0a7e28096b9ce212ccb9f7ae3777a02633a4825c5",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-085",
+      "signature": "c87963041ffbda2b076523a6fb6df1690dec12e35d8bf3998737f57079b1180f",
+      "kind": "choice",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-086",
+      "signature": "581007e823a8956685f98d338aba57cd36568e694381aed66db5eb7af6eff832",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-087",
+      "signature": "e87bd84fb2a52916cd7f06a0d6432dd98f26236047895b77a29e9cd314deff97",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "CW11-088",
+      "signature": "731259d1b1e0f93f7c504fa59a0d1318a1548997e6620fc0c7e4467e748c27e5",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "WEB11-001",
+      "signature": "78b322f8bada793be7fb286567eee5421de3c95a488fad0d95be08139f4db489",
+      "kind": "multi",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "WEB11-002",
+      "signature": "e9382ab249d14c58963da19d8c1322bd531e571782eb151a2f8d4405cae5fdfd",
+      "kind": "cell",
+      "accepted": [
+        [
+          "3.5",
+          "3.50",
+          "3.500"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "WEB11-003",
+      "signature": "fda26f15e61d745f00d304a5257181d938d19d42c22e68842453b91e35ce049a",
+      "kind": "cell",
+      "accepted": [
+        [
+          "交流"
+        ],
+        [
+          "落下",
+          "失磁落下",
+          "释放"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "WEB11-004",
+      "signature": "f22718a6acaccce756ae628365914ed5aacae25ff43ca083b350403ece33257b",
+      "kind": "cell",
+      "accepted": [
+        [
+          "断线"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "WEB11-005",
+      "signature": "ad2223c593161e987d2edcb8d0a816f0806deb674e999f68457f666a8293718d",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "WEB11-006",
+      "signature": "94609061295b739276ca8547718987653663c953cd0216d5c8e125556207a1f9",
+      "kind": "cell",
+      "accepted": [
+        [
+          "站界标"
+        ],
+        [
+          "警冲标"
+        ]
+      ],
+      "unordered": true
+    },
+    {
+      "id": "WEB11-007",
+      "signature": "d4d721ebd0aae2b6f1b289a94aff0ca022e0d63c5fa59d9341bc09cec9e66742",
+      "kind": "cell",
+      "accepted": [
+        [
+          "抵触"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "WEB11-008",
+      "signature": "50e8c243d6c333188028be7d8db241b0b7b305179402a8083bdc99c55bd10ec6",
+      "kind": "cell",
+      "accepted": [
+        [
+          "<>",
+          "〈〉",
+          "＜＞",
+          "尖括号",
+          "角括号"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "WEB11-009",
+      "signature": "c54995f6c1c67fae1c0770e1ff935819e445e1e573dc75118e7288d6517668eb",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "WEB11-010",
+      "signature": "2db4dfe8786a055230c3f903482b8b88f0c8c0d33c33d04928a5a03ac3ab3a88",
+      "kind": "cell",
+      "accepted": [
+        [
+          "粗"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "WEB11-011",
+      "signature": "805b04f043c66497336334729eabbdf71dbebfe23a7941c24582c526f6d73b5c",
+      "kind": "cell",
+      "accepted": [
+        [
+          "正"
+        ],
+        [
+          "反"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "WEB11-012",
+      "signature": "9e0d9ffdfda88a48abc773134c4b50460ff53d2ff21cfa73e5938728460140ae",
+      "kind": "cell",
+      "accepted": [
+        [
+          "圆圈",
+          "圆",
+          "圈"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "WEB11-014",
+      "signature": "f30d31fdf1ae7f386f1f4c05de6fd7c6b48f1362b83b81fb606475bf5539a4ff",
+      "kind": "cell",
+      "accepted": [
+        [
+          "通信",
+          "通讯"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "WEB11-015",
+      "signature": "bf6479b7106172c603ea2cf5406205eb0740bf97ef10d31060c46ec44c5313c6",
+      "kind": "cell",
+      "accepted": [
+        [
+          "动态"
+        ],
+        [
+          "静态"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "WEB11-017",
+      "signature": "f6fd80789da102953e11ee17bb593323562a3784bc1bdfe1faad3b165d78b96a",
+      "kind": "cell",
+      "accepted": [
+        [
+          "建立"
+        ],
+        [
+          "防护"
+        ]
+      ],
+      "unordered": true
+    },
+    {
+      "id": "WEB11-018",
+      "signature": "c71fc8ed12d690a69612860a125e07a1ab84547b496d4cf9cbc5a9f6c42c0eff",
+      "kind": "cell",
+      "accepted": [
+        [
+          "无此条件"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "WEB11-019",
+      "signature": "cff12fdcb2a75841cab60c5e44ccaa37ffe75aa8706833cf55567b940d1463e3",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "WEB11-020",
+      "signature": "3f8002b99abf8e639aab9f0d3662b787562e791e74afade0fea6fb9814f74839",
+      "kind": "cell",
+      "accepted": [
+        [
+          "进路联锁表",
+          "联锁表"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "WEB11-021",
+      "signature": "139c4b5337081c5487ff988ef761cc075c2adcbbbdeaf4475a4303205efa68e7",
+      "kind": "true_false",
+      "accepted": [],
+      "unordered": false
+    },
+    {
+      "id": "WEB11-022",
+      "signature": "7e19eb5e96eba281085d098ef38de798c5581fd17467e9d1b8d86ca4cb2b013b",
+      "kind": "cell",
+      "accepted": [
+        [
+          "办理"
+        ],
+        [
+          "取消"
+        ]
+      ],
+      "unordered": true
+    },
+    {
+      "id": "WEB11-023",
+      "signature": "05c6f967636ce1efc6def422ba606deaf94a957fd88f98ab296a6c0aa66f39a9",
+      "kind": "cell",
+      "accepted": [
+        [
+          "立即停车"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "WEB11-024",
+      "signature": "11ee748c4e1d6858eaf948a58de8628ba78a7a630f3b4b4803a13719470e6288",
+      "kind": "cell",
+      "accepted": [
+        [
+          "侧面防护"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "WEB11-025",
+      "signature": "11aa62de4a2a7f58eabf4910c2d6dafc45a915eca25524242379b4fc9ce862c3",
+      "kind": "cell",
+      "accepted": [
+        [
+          "4",
+          "四"
+        ]
+      ],
+      "unordered": false
+    },
+    {
+      "id": "WEB11-026",
+      "signature": "be82003f49b7a747fe862c0c7e76113d78ba9638ca864d207934dae11ab5273c",
+      "kind": "cell",
+      "accepted": [
+        [
+          "调车专用电台"
+        ]
+      ],
+      "unordered": false
+    }
+  ]
+}

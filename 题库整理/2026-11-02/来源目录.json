@@ -1,0 +1,197 @@
+[
+  {
+    "source_id": "L01",
+    "name": "1 铁路信号概述.pdf",
+    "path": "C:\\Users\\86185\\Desktop\\桌面资料分类\\01_课程学习\\铁路ppt\\1 铁路信号概述.pdf",
+    "pages": 104,
+    "sha256": "5bc86315da175ec188810851b5014eafeb603e87840b944df32ab331478fccc8",
+    "origin": "用户提供"
+  },
+  {
+    "source_id": "L02",
+    "name": "2 铁路信号基础 继电器.pdf",
+    "path": "C:\\Users\\86185\\Desktop\\桌面资料分类\\01_课程学习\\铁路ppt\\2 铁路信号基础 继电器.pdf",
+    "pages": 75,
+    "sha256": "bcc21a78ce5b02a0f5c691933dadb9e0f1c52002da18620d5be7bd654f9b1bdd",
+    "origin": "用户提供"
+  },
+  {
+    "source_id": "L03",
+    "name": "3 铁路信号基础 信号显示设备.pdf",
+    "path": "C:\\Users\\86185\\Desktop\\桌面资料分类\\01_课程学习\\铁路ppt\\3 铁路信号基础 信号显示设备.pdf",
+    "pages": 104,
+    "sha256": "99a7926f254ba1174f7b1ad2f8b027ef8a68e0fc199bdd8045ac7fe97828d522",
+    "origin": "用户提供"
+  },
+  {
+    "source_id": "L04",
+    "name": "习题.pdf",
+    "path": "C:\\Users\\86185\\Desktop\\桌面资料分类\\01_课程学习\\铁路ppt\\习题.pdf",
+    "pages": 7,
+    "sha256": "5e4c54a5c4414ca52fc61d4739614b7a670098bace87919d01ca0986a088b1fa",
+    "origin": "用户提供"
+  },
+  {
+    "source_id": "L05",
+    "name": "第二章作业.pdf",
+    "path": "C:\\Users\\86185\\Desktop\\桌面资料分类\\01_课程学习\\铁路ppt\\第二章作业.pdf",
+    "pages": 3,
+    "sha256": "09d214994daef73ef40a527f0dd6bae0f08cb887b41424beb4cb4730b12d77c4",
+    "origin": "用户提供"
+  },
+  {
+    "source_id": "L06",
+    "name": "铁路信号基础 轨道电路.pdf",
+    "path": "C:\\Users\\86185\\Desktop\\桌面资料分类\\01_课程学习\\铁路ppt\\铁路信号基础 轨道电路.pdf",
+    "pages": 69,
+    "sha256": "40642f2837de7095b20be90ad41b322ec49a4df95202eddcf57332a0fd311571",
+    "origin": "用户提供"
+  },
+  {
+    "source_id": "L07",
+    "name": "铁路信号基础 道岔转换与锁闭设备.pdf",
+    "path": "C:\\Users\\86185\\Desktop\\桌面资料分类\\01_课程学习\\铁路ppt\\铁路信号基础 道岔转换与锁闭设备.pdf",
+    "pages": 78,
+    "sha256": "6d70172d6dc6195e30ef0979a122affb97c98b99f6e6b8340d54418ee152ca8e",
+    "origin": "用户提供"
+  },
+  {
+    "source_id": "L08",
+    "name": "微信图片_20261102172310_144_76.jpg",
+    "path": "C:\\Users\\86185\\Desktop\\桌面资料分类\\01_课程学习\\铁路ppt\\微信图片_20261102172310_144_76.jpg",
+    "pages": 1,
+    "sha256": "3774e1b5378f344145ac2a814778b8bcdfd09cda75ef25cdbd1aa645a8ad15c9",
+    "origin": "用户提供",
+    "book_page": 95
+  },
+  {
+    "source_id": "L09",
+    "name": "微信图片_20261102172312_145_76.jpg",
+    "path": "C:\\Users\\86185\\Desktop\\桌面资料分类\\01_课程学习\\铁路ppt\\微信图片_20261102172312_145_76.jpg",
+    "pages": 1,
+    "sha256": "3e05286ec1b62cd7cfbd2a27568f4dca205b4f07dd5dd8b3151ce76d1c3f1a1d",
+    "origin": "用户提供",
+    "book_page": 96
+  },
+  {
+    "source_id": "W02",
+    "name": "城市客运企业主要负责人和安全生产管理人员安全考核基础题库（2022年11月）",
+    "publisher": "交通运输部编制；济南市交通运输局政府网站公开附件",
+    "url": "https://jnjtj.jinan.gov.cn/cms_files/jcms1/web22/site/attach/0/cec38a665635445ebcc15ac97a19c333.pdf?fileName=cec38a665635445ebcc15ac97a19c333.pdf",
+    "local_file": "sources/W02-clean.pdf",
+    "physical_pages": 279,
+    "is_government_document": true,
+    "date_scope": "2022年11月题库；涉及规范按原题当时版本保留，未声称2026年继续有效",
+    "scope": "城市轨道交通",
+    "retrieved_at": "2026-11-02",
+    "sha256": "15885b3ade60e3fd1f410b8d1669b8d872c5dc6f6e1f7af336890b4f90924605",
+    "question_count": 58,
+    "used_character_count": 6384,
+    "usage_note": "政府公开组织考核的行政文件附件。保留58道相关原题及原列答案；仅规范换行与选项分隔符。政府文件例外，不以网页摘要200词限额截断题库；未使用非政府高校题库文字。",
+    "page_convention": "source_page为题干起始物理PDF页，answer_page为原列答案所在物理PDF页（均从1起）；印刷页=物理页-2。58题均逐题用完整文本区段验证题号、题干、选项、答案及两类页码。不可与浙江扫描版页码混用。",
+    "mirror_url": "https://zjjcmspublic.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/jcms_files/jcms1/web2247/site/attach/0/4afbbfc9f69b4debaacc03291ca1f931.pdf",
+    "mirror_local_file": "sources/W02.pdf",
+    "mirror_physical_pages": 296,
+    "verification": "已对清晰版物理153、163、166、174、181、182、189、190、191、200页生成PNG；对163、166、174、181、182、189、190、191、200页作视觉复核；并对浙江扫描版178、191、194、195页视觉复核。",
+    "known_discrepancies": [
+      {
+        "item": 174,
+        "scan_answer": "BE",
+        "clean_answer": "E",
+        "action": "未收录，避免静默选择版本；两个版本题干选项相同但答案不同。"
+      }
+    ],
+    "coverage": {
+      "1": 8,
+      "2": 0,
+      "3": 8,
+      "4": 42,
+      "5": 0,
+      "6": 0
+    },
+    "coverage_note": "第1/3章为设备操作与行车基础扩展，未冒充进路操作实训题；第2/5/6章未发现可核对的原题，保持空缺。第4章包含故障、安全防护及调度基础。",
+    "cross_page_questions": [
+      {
+        "source_item": "城市轨道交通专业部分第27题",
+        "source_page": 151,
+        "answer_page": 152
+      },
+      {
+        "source_item": "城市轨道交通专业部分第90题",
+        "source_page": 163,
+        "answer_page": 164
+      },
+      {
+        "source_item": "城市轨道交通专业部分第172题",
+        "source_page": 181,
+        "answer_page": 182
+      }
+    ],
+    "page_audit": {
+      "audited_questions": 58,
+      "cross_page_questions": 3,
+      "same_page_questions": 55,
+      "source_item_mismatches": 0,
+      "stem_or_options_mismatches": 0,
+      "answer_mismatches": 0
+    }
+  },
+  {
+    "name": "国家开放大学2014年秋季期末考试 轨道交通信号与通信系统 试卷2633",
+    "url": "https://www.hfou.net.cn/uploadfiles/1/202104/24/%E8%BD%A8%E9%81%93%E4%BA%A4%E9%80%9A%E4%BF%A1%E5%8F%B7%E4%B8%8E%E9%80%9A%E4%BF%A1%E7%B3%BB%E7%BB%9F_1501.pdf",
+    "local_file": "work/web_appendix/N01.pdf",
+    "scope": "2015年1月历史考试设备语境",
+    "evidence_type": "原试卷附答案页，合肥开放大学网站公开",
+    "source_id": "N01",
+    "selected_questions": 3,
+    "retold_characters": 92,
+    "retrieved_at": "2026-11-02",
+    "sha256": "6d2340342cc9791afd0b9334d3ba275fe3965c5a996f39cd6a59ed0ec2f31d84"
+  },
+  {
+    "name": "国家开放大学2018年春季期末考试 轨道交通信号与通信系统 试卷2633",
+    "url": "https://learn-bee.oss-cn-shenzhen.aliyuncs.com/beelearn/study/file/20200327/1aef70d3ac10a85d13cd52c26908af11.pdf",
+    "local_file": "work/web_appendix/N02.pdf",
+    "scope": "2018年7月轨道交通课程历史考试",
+    "evidence_type": "原试卷及答案页，第三方公开镜像",
+    "source_id": "N02",
+    "selected_questions": 4,
+    "retold_characters": 108,
+    "retrieved_at": "2026-11-02",
+    "sha256": "69a2ff765e1a937f757d66761877a79ab71c52aa225ca3dee4159fe136a40e8b"
+  },
+  {
+    "name": "铁路知识考试 车站信号自动控制试题预测 三",
+    "url": "https://m.book118.com/try_down/338115114136006102.pdf",
+    "local_file": "work/web_appendix/N03.pdf",
+    "scope": "6502继电联锁练习资料",
+    "evidence_type": "公开试读PDF逐题列答案，编者和审核机构未确认",
+    "source_id": "N03",
+    "selected_questions": 7,
+    "retold_characters": 176,
+    "retrieved_at": "2026-11-02",
+    "sha256": "e6a497453405f3c8b7edb82bcaddfd6b902c516cbd517770dfff0e683ffdef40"
+  },
+  {
+    "name": "还原Word 第四部分技师",
+    "url": "https://www.scribd.com/document/1040411182/%E8%BF%98%E5%8E%9FWord-%E7%AC%AC%E5%9B%9B%E9%83%A8%E5%88%86%E6%8A%80%E5%B8%88",
+    "scope": "铁路信号联锁表符号基础，列车和调车通用",
+    "evidence_type": "公开阅读题干，答案另据本项目既有联锁规则核对",
+    "source_id": "N04",
+    "selected_questions": 3,
+    "retold_characters": 70,
+    "retrieved_at": "2026-11-02"
+  },
+  {
+    "name": "信号工模拟练习题 含答案",
+    "url": "https://www.renrendoc.com/paper/405244243.html",
+    "local_file": "work/web_appendix/N06.html",
+    "scope": "铁路信号工练习资料",
+    "evidence_type": "公开文档简介附答案，未确认为考试机构原始标准答案",
+    "source_id": "N06",
+    "selected_questions": 3,
+    "retold_characters": 90,
+    "retrieved_at": "2026-11-02",
+    "sha256": "07a6af4b45e935a1d493c19c81839d340f02ff7c36618ae70803adfed9c52405"
+  }
+]

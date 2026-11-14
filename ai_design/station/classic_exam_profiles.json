@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "reviewed_rules_sha256": "c09da642d20008333539eb8c147b655c1dd60365e20ddb03f5cbace35443c8fc",
+  "basis": "走行次序沿用经典例题已有走行事实，并按station_topology.json核对连接；道岔角色和条件区段取interlocking_table.csv，解释服从interlocking_rules.md。",
+  "routes": {
+    "dongjiao_to_III": {"number": "2", "start_track": "III", "end_track": "III", "transitions": [], "conditions": {}},
+    "dongjiao_to_I": {"number": "3", "start_track": "III", "end_track": "I", "transitions": [{"switch": "13/15", "from": "III", "to": "I"}], "conditions": {}},
+    "dongjiao_to_4": {"number": "4", "start_track": "III", "end_track": "4", "transitions": [{"switch": "13/15", "from": "III", "to": "I"}, {"switch": "17/19", "from": "I", "to": "II"}, {"switch": "27", "from": "II", "to": "4"}], "conditions": {}},
+    "beijing_depart_5": {"number": "9", "start_track": "5", "end_track": "II", "transitions": [{"switch": "21", "from": "5", "to": "III"}, {"switch": "9/11", "from": "III", "to": "I"}, {"switch": "1/3", "from": "I", "to": "II"}], "conditions": {"23/25": "normal", "5/7": "normal"}}
+  }
+}

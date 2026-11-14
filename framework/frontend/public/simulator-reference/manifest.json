@@ -1,0 +1,347 @@
+[
+  {
+    "source": "SDM/BITMAP/BlackLR.bmp",
+    "output": "bitmap/BlackLR.png",
+    "sha256": "3eadc060b05d8eef3cf0288127fd1076b56e85f7d6fd6e9871e4d0367ec35862"
+  },
+  {
+    "source": "SDM/BITMAP/BLUEBTNDOWN.bmp",
+    "output": "bitmap/BLUEBTNDOWN.png",
+    "sha256": "73dfa4c59fb094c821742281fd8fe4bb460eb3b40aee83a3c70a48370ad24318"
+  },
+  {
+    "source": "SDM/BITMAP/BLUEBTNUP.bmp",
+    "output": "bitmap/BLUEBTNUP.png",
+    "sha256": "08cca1ca7624244e97d4e69ab9a09168cc0c4fa8f723f2d59a951540367d829e"
+  },
+  {
+    "source": "SDM/BITMAP/BTN1DOWN.bmp",
+    "output": "bitmap/BTN1DOWN.png",
+    "sha256": "73dfa4c59fb094c821742281fd8fe4bb460eb3b40aee83a3c70a48370ad24318"
+  },
+  {
+    "source": "SDM/BITMAP/BTNDOWN.BMP",
+    "output": "bitmap/BTNDOWN.png",
+    "sha256": "8de0812ab65f0b86f37e200aeb2596e3c62b1aebbaa0a5560c02e4d197066690"
+  },
+  {
+    "source": "SDM/BITMAP/BTNUP.BMP",
+    "output": "bitmap/BTNUP.png",
+    "sha256": "3bca4a9776f056b1e1c48f4e5acd182e11d0dfd165e035abb8088476cb173c00"
+  },
+  {
+    "source": "SDM/BITMAP/GreenL.bmp",
+    "output": "bitmap/GreenL.png",
+    "sha256": "705ef36c17de49321727e7c80fd4563f7fea7494416b2aed7182f7c3fc3015b7"
+  },
+  {
+    "source": "SDM/BITMAP/GreenLED.bmp",
+    "output": "bitmap/GreenLED.png",
+    "sha256": "be750ecf9f8cb80c649229e46ef658875427bf2f0070463f83f8b5c0f7814abc"
+  },
+  {
+    "source": "SDM/BITMAP/GreenR.bmp",
+    "output": "bitmap/GreenR.png",
+    "sha256": "d8ab284a2ff3ff30d60da8f0a79e197053956fac61b19122ba986a84926d0919"
+  },
+  {
+    "source": "SDM/BITMAP/LED.bmp",
+    "output": "bitmap/LED.png",
+    "sha256": "28d19c655a391807f11f9da863fb34d1cba8a8171c8d95a97c013bdff284ac1c"
+  },
+  {
+    "source": "SDM/BITMAP/Name.bmp",
+    "output": "bitmap/Name.png",
+    "sha256": "6968cc0f81b586485e329a3742b2e8baf90d3c3d337bc74daab698f7c66d95b6"
+  },
+  {
+    "source": "SDM/BITMAP/NormalL.bmp",
+    "output": "bitmap/NormalL.png",
+    "sha256": "86a287db07e65b09bc78c79ca8f417264cecca280d7ff1d037bdf55cb54493cf"
+  },
+  {
+    "source": "SDM/BITMAP/NormalR.bmp",
+    "output": "bitmap/NormalR.png",
+    "sha256": "7f9f396511cc0de5c14cf515f21e9f26a4280a5f8c6503dd35541890af77653f"
+  },
+  {
+    "source": "SDM/BITMAP/railway.bmp",
+    "output": "bitmap/railway.png",
+    "sha256": "79ef62099c766e196dea25cff443f4a500c6d3c2638cc5d1a775a14370ec3fe1"
+  },
+  {
+    "source": "SDM/BITMAP/RedL.bmp",
+    "output": "bitmap/RedL.png",
+    "sha256": "5e30420128260f95d6fa52185bdb4733a3938bab4bcc0cfa7df914495822073b"
+  },
+  {
+    "source": "SDM/BITMAP/REDLED.bmp",
+    "output": "bitmap/REDLED.png",
+    "sha256": "b6ffc441d07531dabf3db2e957ee99f65886d7f5db5f2b20e789d999af8f1486"
+  },
+  {
+    "source": "SDM/BITMAP/RedR.bmp",
+    "output": "bitmap/RedR.png",
+    "sha256": "86a6752b8aefe4ec4a1e388d7df3871887321137c0e23690136f4aedde1f2aaa"
+  },
+  {
+    "source": "SDM/BITMAP/StaName.bmp",
+    "output": "bitmap/StaName.png",
+    "sha256": "19ce92306cd6c7cdd4f1ff480cb9b8923acbd48a2adaf5fa9798e14c89f69837"
+  },
+  {
+    "source": "SDM/BITMAP/StaName1.bmp",
+    "output": "bitmap/StaName1.png",
+    "sha256": "202e6ed0ca3016b2eead71b8b00e1b03ea109c453a5706c43c0a769d7b0b02a0"
+  },
+  {
+    "source": "SDM/BITMAP/StaName2.bmp",
+    "output": "bitmap/StaName2.png",
+    "sha256": "49cd7f229f39f8b65d4629d0944b88a3d7e034499fa995533d177ce95a2b0b08"
+  },
+  {
+    "source": "SDM/BITMAP/staname3.bmp",
+    "output": "bitmap/staname3.png",
+    "sha256": "69e1e527a915ec0e6908ff67b498c219f554288105f8917df50e46551dfbed1f"
+  },
+  {
+    "source": "SDM/BITMAP/TgqDW.bmp",
+    "output": "bitmap/TgqDW.png",
+    "sha256": "095dc755a2f875a3b90421e4049dbcba430b15bbef4aa904e9da4c6bb8d97e39"
+  },
+  {
+    "source": "SDM/BITMAP/TgqFW.bmp",
+    "output": "bitmap/TgqFW.png",
+    "sha256": "00446ab3644d52a18734c72daaf807b0cae26b6f43d45cadeae50f2f629da04b"
+  },
+  {
+    "source": "SDM/BITMAP/TgqNoW.bmp",
+    "output": "bitmap/TgqNoW.png",
+    "sha256": "33f22b686b38582ef80a72e3ecf41ab7964eae9e4fd94944ec439c57766e33b3"
+  },
+  {
+    "source": "SDM/BITMAP/Timer.bmp",
+    "output": "bitmap/Timer.png",
+    "sha256": "15ce41a193608bd98a111ec7a56dffac442a99f10fbd18e3a1c1ebdff23bfacd"
+  },
+  {
+    "source": "SDM/BITMAP/WhiteLED.bmp",
+    "output": "bitmap/WhiteLED.png",
+    "sha256": "1aa0fa7fdc7c87552511c040047e7975bbbf2b4d08e09c59528fb0914fa5c233"
+  },
+  {
+    "source": "SDM/BITMAP/YDZSB.BMP",
+    "output": "bitmap/YDZSB.png",
+    "sha256": "f04dff8a2fbedacb226905e81af01cf5fb2bacad02647f0e65baa005fbe516ad"
+  },
+  {
+    "source": "SDM/BITMAP/YELLOWBTNDOWN.bmp",
+    "output": "bitmap/YELLOWBTNDOWN.png",
+    "sha256": "c75a30e486bd604cbee5073afbb8dd2509b8d822d1228361756ae34ab78fc08e"
+  },
+  {
+    "source": "SDM/BITMAP/YELLOWBTNUP.bmp",
+    "output": "bitmap/YELLOWBTNUP.png",
+    "sha256": "c0d36f0bf19d81a3865529dab1a26d21173fca3b1e612e6cbbb1f5805bce4866"
+  },
+  {
+    "source": "SDM/BITMAP/YellowL.bmp",
+    "output": "bitmap/YellowL.png",
+    "sha256": "cab734e36df269950a56cb94655db73f286385df7d7d4c3c905979a996964102"
+  },
+  {
+    "source": "SDM/BITMAP/YellowLED.bmp",
+    "output": "bitmap/YellowLED.png",
+    "sha256": "4ae11ffafb17ea5bde086719f751055b13cc3f86878ccf27f583c53e1e14fc6e"
+  },
+  {
+    "source": "SDM/BITMAP/YellowR.bmp",
+    "output": "bitmap/YellowR.png",
+    "sha256": "851da7a7549e9da0bbdf2fe8be013e89c7d52f7029fed269d91e7ca055f607d2"
+  },
+  {
+    "source": "SDM/MenuBitmap/12.bmp",
+    "output": "menubitmap/12.png",
+    "sha256": "c0046710e1e1ed9da28405963f7befd2839770e644ee6b7da18a2b2e070f4c57"
+  },
+  {
+    "source": "SDM/MenuBitmap/9.bmp",
+    "output": "menubitmap/9.png",
+    "sha256": "d05efdeaca33e252097b206517db7b6065b4395b9064fa29c6904b1988faa30e"
+  },
+  {
+    "source": "SDM/MenuBitmap/bitmap1.bmp",
+    "output": "menubitmap/bitmap1.png",
+    "sha256": "b71b8b489411d68c4ac69c7d16aa1fa77f8184332ed9c4efc2822e0d8cc8c68d"
+  },
+  {
+    "source": "SDM/MenuBitmap/CKXH.bmp",
+    "output": "menubitmap/CKXH.png",
+    "sha256": "32c3a4b131035fd609dd509ae6c2dd17f94131e89e69cf53647fa0759f3272af"
+  },
+  {
+    "source": "SDM/MenuBitmap/ClrBtn.bmp",
+    "output": "menubitmap/ClrBtn.png",
+    "sha256": "16c00525fd031cad61ef163e359dc29ddbb97ed180c689c8881376a9b9116f3a"
+  },
+  {
+    "source": "SDM/MenuBitmap/DJ.bmp",
+    "output": "menubitmap/DJ.png",
+    "sha256": "d3387cf00dba28d31b1bf2781bba58b9b5920b89b6520944124caa1537dc009b"
+  },
+  {
+    "source": "SDM/MenuBitmap/DS.bmp",
+    "output": "menubitmap/DS.png",
+    "sha256": "808c8ed5c4f9d6d94cd992fdb0bb8c8168273c4808a9a979a5d0472c98813528"
+  },
+  {
+    "source": "SDM/MenuBitmap/DSBREAK.bmp",
+    "output": "menubitmap/DSBREAK.png",
+    "sha256": "b322aae715affe7127feb2858cd90ceb8041a0a5471c3c56a8c2a40e52cf7517"
+  },
+  {
+    "source": "SDM/MenuBitmap/DSGOOD.bmp",
+    "output": "menubitmap/DSGOOD.png",
+    "sha256": "fd96483d9d84a47613f520d08c6f6b0b049b3c8aff34e247145fd3c735d818eb"
+  },
+  {
+    "source": "SDM/MenuBitmap/DW.bmp",
+    "output": "menubitmap/DW.png",
+    "sha256": "16c00525fd031cad61ef163e359dc29ddbb97ed180c689c8881376a9b9116f3a"
+  },
+  {
+    "source": "SDM/MenuBitmap/Exit.bmp",
+    "output": "menubitmap/Exit.png",
+    "sha256": "d27b72332e6069c9f518801095fdab2761e90b2a3e729564ba977a64a2f4c77d"
+  },
+  {
+    "source": "SDM/MenuBitmap/FB.bmp",
+    "output": "menubitmap/FB.png",
+    "sha256": "81414ab128620da9849c7268ec7bf23c4d4f45d31447eaa9a7796835c9f35925"
+  },
+  {
+    "source": "SDM/MenuBitmap/FLBL.bmp",
+    "output": "menubitmap/FLBL.png",
+    "sha256": "af45d600165e78725fc7ac639ca0076c541f3175bff1b161c8ad67c6fc1bd3a3"
+  },
+  {
+    "source": "SDM/MenuBitmap/FW.bmp",
+    "output": "menubitmap/FW.png",
+    "sha256": "5644fa882017e28d93b1d8debb68eed8b70e9c2fc84310517ba996f2435cbd28"
+  },
+  {
+    "source": "SDM/MenuBitmap/GDBJ.bmp",
+    "output": "menubitmap/GDBJ.png",
+    "sha256": "5644fa882017e28d93b1d8debb68eed8b70e9c2fc84310517ba996f2435cbd28"
+  },
+  {
+    "source": "SDM/MenuBitmap/GDCQ.bmp",
+    "output": "menubitmap/GDCQ.png",
+    "sha256": "808c8ed5c4f9d6d94cd992fdb0bb8c8168273c4808a9a979a5d0472c98813528"
+  },
+  {
+    "source": "SDM/MenuBitmap/GDTY.bmp",
+    "output": "menubitmap/GDTY.png",
+    "sha256": "808c8ed5c4f9d6d94cd992fdb0bb8c8168273c4808a9a979a5d0472c98813528"
+  },
+  {
+    "source": "SDM/MenuBitmap/GDZY.bmp",
+    "output": "menubitmap/GDZY.png",
+    "sha256": "6c09f9bcd6ca3726d53136d8cf2dfde9142513fe00e5f107cee65c37275d77bb"
+  },
+  {
+    "source": "SDM/MenuBitmap/JF.bmp",
+    "output": "menubitmap/JF.png",
+    "sha256": "fd96483d9d84a47613f520d08c6f6b0b049b3c8aff34e247145fd3c735d818eb"
+  },
+  {
+    "source": "SDM/MenuBitmap/JTGD.bmp",
+    "output": "menubitmap/JTGD.png",
+    "sha256": "32c3a4b131035fd609dd509ae6c2dd17f94131e89e69cf53647fa0759f3272af"
+  },
+  {
+    "source": "SDM/MenuBitmap/Left.bmp",
+    "output": "menubitmap/Left.png",
+    "sha256": "aa70e74eb65adb4693c69b707723ba787000c0c5ace0bdf3019aa8fa72776443"
+  },
+  {
+    "source": "SDM/MenuBitmap/MNZC.bmp",
+    "output": "menubitmap/MNZC.png",
+    "sha256": "d3387cf00dba28d31b1bf2781bba58b9b5920b89b6520944124caa1537dc009b"
+  },
+  {
+    "source": "SDM/MenuBitmap/NODFW.bmp",
+    "output": "menubitmap/NODFW.png",
+    "sha256": "7e1873c591e84d0194b0369c158c453f6f70f184139cb03714227df4d6bf0deb"
+  },
+  {
+    "source": "SDM/MenuBitmap/position.bmp",
+    "output": "menubitmap/position.png",
+    "sha256": "2bedf0aef9f355f883f35f564cd688fb93ca45dd4e6c9763c5fa94fdd1ce90bc"
+  },
+  {
+    "source": "SDM/MenuBitmap/QX.bmp",
+    "output": "menubitmap/QX.png",
+    "sha256": "16c00525fd031cad61ef163e359dc29ddbb97ed180c689c8881376a9b9116f3a"
+  },
+  {
+    "source": "SDM/MenuBitmap/ReFlash.bmp",
+    "output": "menubitmap/ReFlash.png",
+    "sha256": "e7e3044fd1db0959ff70477e9c19a69e5997a7f03c0bda926106f5059db2bb5b"
+  },
+  {
+    "source": "SDM/MenuBitmap/Replay.bmp",
+    "output": "menubitmap/Replay.png",
+    "sha256": "9dd4c38f5c32134c0538d91b83b9cf72b006fc4e9569506e8d845139d3d65cb0"
+  },
+  {
+    "source": "SDM/MenuBitmap/Right.bmp",
+    "output": "menubitmap/Right.png",
+    "sha256": "4b18a7383f47fb0b170c06017703cbd73de48a306ccc170e4bd6ec77a5664f2d"
+  },
+  {
+    "source": "SDM/MenuBitmap/RJ.bmp",
+    "output": "menubitmap/RJ.png",
+    "sha256": "7e1873c591e84d0194b0369c158c453f6f70f184139cb03714227df4d6bf0deb"
+  },
+  {
+    "source": "SDM/MenuBitmap/SGJS.bmp",
+    "output": "menubitmap/SGJS.png",
+    "sha256": "9c46a59cc0d3c1833d2080e459b333c379aab676441a652e448a37b591343d46"
+  },
+  {
+    "source": "SDM/MenuBitmap/Signal.bmp",
+    "output": "menubitmap/Signal.png",
+    "sha256": "ea038f70fed4060a61b82bf62e48f0ec24b6921ce0226679500e9284472c21ff"
+  },
+  {
+    "source": "SDM/MenuBitmap/SignalYD.bmp",
+    "output": "menubitmap/SignalYD.png",
+    "sha256": "16c00525fd031cad61ef163e359dc29ddbb97ed180c689c8881376a9b9116f3a"
+  },
+  {
+    "source": "SDM/MenuBitmap/SLBL.bmp",
+    "output": "menubitmap/SLBL.png",
+    "sha256": "af45d600165e78725fc7ac639ca0076c541f3175bff1b161c8ad67c6fc1bd3a3"
+  },
+  {
+    "source": "SDM/MenuBitmap/StopAlarm.bmp",
+    "output": "menubitmap/StopAlarm.png",
+    "sha256": "af45d600165e78725fc7ac639ca0076c541f3175bff1b161c8ad67c6fc1bd3a3"
+  },
+  {
+    "source": "SDM/MenuBitmap/Switch.bmp",
+    "output": "menubitmap/Switch.png",
+    "sha256": "c4a2b9272109b0349793f2ac9b8e4683c9c6c9844ca082d6c9909d24dc7fefae"
+  },
+  {
+    "source": "SDM/MenuBitmap/ZD.bmp",
+    "output": "menubitmap/ZD.png",
+    "sha256": "5644fa882017e28d93b1d8debb68eed8b70e9c2fc84310517ba996f2435cbd28"
+  },
+  {
+    "source": "SDM/MenuBitmap/ZF.bmp",
+    "output": "menubitmap/ZF.png",
+    "sha256": "6c09f9bcd6ca3726d53136d8cf2dfde9142513fe00e5f107cee65c37275d77bb"
+  }
+]
