@@ -1,17 +1,16 @@
-"""Explicit account and profile contracts; credential fields are request-only."""
+"""User request and response schemas."""
+
 from datetime import datetime
-import re
 from typing import Literal
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+from pydantic import BaseModel, ConfigDict, Field
 
 UserRole = Literal["student", "teacher", "admin"]
 
 
-class StrictRequest(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-
 class UserBase(BaseModel):
+    """Common user fields shared by requests and responses."""
+
     username: str = Field(min_length=3, max_length=50)
     real_name: str | None = Field(default=None, max_length=50)
     role: UserRole = "student"
@@ -20,61 +19,22 @@ class UserBase(BaseModel):
 
 
 class UserRegister(UserBase):
-    """Internal compatibility contract; public registration is disabled."""
-    password: str = Field(min_length=1, max_length=1024, repr=False)
+    """Request body for user registration."""
+
+    password: str = Field(min_length=6, max_length=128)
 
 
-class UserLogin(StrictRequest):
+class UserLogin(BaseModel):
+    """Request body for JSON login."""
+
     username: str = Field(min_length=3, max_length=50)
-    password: str = Field(min_length=1, max_length=1024, repr=False)
-
-
-class ContactUpdate(StrictRequest):
-    current_password: str = Field(min_length=1, max_length=1024, repr=False)
-    email: str | None = Field(default=None, max_length=254)
-    phone: str | None = Field(default=None, max_length=32)
-
-    @field_validator("email", "phone", mode="before")
-    @classmethod
-    def empty_as_null(cls, value):
-        return (value.strip() or None) if isinstance(value, str) else value
-
-    @field_validator("email")
-    @classmethod
-    def email_format(cls, value):
-        if value is not None and not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", value):
-            raise ValueError("电子邮箱格式不正确")
-        return value
-
-    @field_validator("phone")
-    @classmethod
-    def phone_format(cls, value):
-        if value is not None and not re.fullmatch(r"\+?[0-9][0-9 ()-]{4,30}[0-9]", value):
-            raise ValueError("手机号格式不正确")
-        return value
-
-
-class PasswordChange(StrictRequest):
-    current_password: str = Field(min_length=1, max_length=1024, repr=False)
-    new_password: str = Field(min_length=1, max_length=1024, repr=False)
-    confirm_password: str = Field(min_length=1, max_length=1024, repr=False)
-
-
-class PasswordReset(StrictRequest):
-    new_password: str = Field(min_length=1, max_length=1024, repr=False)
+    password: str = Field(min_length=1, max_length=128)
 
 
 class UserResponse(UserBase):
-    id: int
-    email: str | None = None
-    phone: str | None = None
-    contact_failures: int = 0
-    contact_locked: bool = False
-    is_active: bool
-    created_at: datetime
-    model_config = ConfigDict(from_attributes=True)
+    """Public user data returned to the frontend."""
 
-    @field_validator("real_name", "student_id", "class_name", "email", "phone", mode="before")
-    @classmethod
-    def missing_as_null(cls, value):
-        return None if isinstance(value, str) and not value.strip() else value
+    id: int
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)

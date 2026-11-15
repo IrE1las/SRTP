@@ -1,6 +1,5 @@
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
-import { accountError } from '@/domain/accountForms'
 
 const request = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
@@ -20,7 +19,7 @@ request.interceptors.response.use(
   (error) => {
     if (error.code === 'ERR_CANCELED') return Promise.reject(error)
     const status = error.response?.status
-    const message = accountError(error)
+    const message = error.response?.data?.detail || '请求失败，请稍后重试'
 
     if (status === 401) {
       localStorage.removeItem('railway_access_token')
@@ -32,7 +31,7 @@ request.interceptors.response.use(
       return Promise.reject(error)
     }
 
-    if (!error.config?.quiet) ElMessage.error(message)
+    ElMessage.error(message)
     return Promise.reject(error)
   },
 )

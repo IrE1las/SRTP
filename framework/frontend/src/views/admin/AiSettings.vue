@@ -19,7 +19,6 @@
           </div>
           <div>
             <strong>AI 模型配置</strong>
-            <div class="header-sub">配置 DeepSeek API 连接参数</div>
           </div>
         </div>
       </template>
@@ -49,7 +48,6 @@
             autocomplete="off"
             show-password
           />
-          <div class="form-text">用于调用 AI 大模型的 API 密钥</div>
         </el-form-item>
 
         <el-form-item>
@@ -60,7 +58,6 @@
             </span>
           </template>
           <el-input v-model="form.model" placeholder="例如：deepseek-v4-flash" />
-          <div class="form-text">AI 模型标识，不同模型能力与价格不同</div>
         </el-form-item>
 
         <el-form-item>
@@ -71,7 +68,6 @@
             </span>
           </template>
           <el-input v-model="form.baseUrl" placeholder="https://api.deepseek.com" />
-          <div class="form-text">AI 服务提供商的 API 端点地址</div>
         </el-form-item>
 
         <div class="actions">
@@ -95,7 +91,7 @@
       </template>
       <ul class="usage-list">
         <li class="mb-2"><strong>API Key</strong>：在 DeepSeek 官网 (platform.deepseek.com) 注册后获取</li>
-        <li class="mb-2"><strong>模型名称</strong>：填写服务商提供的模型标识。操作学习提交后可生成 AI 讲解；考试成绩由教师手工录入并发布。</li>
+        <li class="mb-2"><strong>模型名称</strong>：填写当前可用的模型标识，例如 <code>deepseek-v4-flash</code>。经典例题使用非思考模式组织已核验的解释内容。</li>
         <li class="mb-2"><strong>API 地址</strong>：默认为 <code>https://api.deepseek.com</code>，使用第三方代理时可修改</li>
         <li>保存后即时生效，无需重启服务</li>
       </ul>

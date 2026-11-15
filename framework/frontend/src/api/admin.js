@@ -12,14 +12,6 @@ export function updateAdminUser(userId, data) {
   return request.put(`/admin/users/${userId}`, data)
 }
 
-export function createAdminUser(data) {
-  return request.post('/admin/users', data)
-}
-
-export function resetAdminPassword(userId, data) {
-  return request.post(`/admin/users/${userId}/reset-password`, data)
-}
-
-export function unlockAdminContact(userId) {
-  return request.post(`/admin/users/${userId}/unlock-contact`)
+export function deleteAdminUser(userId) {
+  return request.delete(`/admin/users/${userId}`)
 }

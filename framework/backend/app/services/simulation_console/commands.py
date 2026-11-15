@@ -1,4 +1,4 @@
-"""Commands and session serialization shared by standard-station activities.
+"""Commands shared by free simulation and durable experiment attempts.
 
 Operate on the existing RuntimeSession, using the same route guard/arranger.
 The caller owns authorization, optimistic concurrency and persistence.
