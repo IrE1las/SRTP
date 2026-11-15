@@ -7,15 +7,15 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import admin, ai_scores, auth, exercise_runtime, exercises, interlocking, interlocking_exam, settings, statistics
+from app.api import admin, ai_scores, auth, exercise_runtime, exercises, interlocking, settings, statistics
 from app.api import shunting_data, shunting_questions
 from app.api import lab_topics
 from app.api import management
 from app.api import simulation_console
-from app.api import module_one_experiment1
 from app.api import chapter_bank
-from app.api import learning_records, operations, operation_learning, exams
+from app.api import learning_records, operations, operation_learning, exams, theory_console
 from app.services.account_upgrade import upgrade_accounts
+from app.services.study_scope import retire_study_scope
 from app.services import exams as exam_service
 from app.core.database import Base, SessionLocal, engine
 from app.core.security import get_password_hash
@@ -65,6 +65,7 @@ def _ensure_default_admin() -> None:
 def on_startup() -> None:
     """Create database tables and seed the local default admin and demo station."""
 
+    retire_study_scope(engine)
     upgrade_accounts(engine)
     Base.metadata.create_all(bind=engine)
     _ensure_default_admin()
@@ -92,13 +93,11 @@ app.include_router(ai_scores.router, prefix="/api/ai-scores", tags=["ai-scores"]
 app.include_router(statistics.router, prefix="/api/statistics", tags=["statistics"])
 app.include_router(admin.router, prefix="/api/admin", tags=["admin"])
 app.include_router(settings.router, prefix="/api/settings", tags=["settings"])
-app.include_router(interlocking_exam.router, prefix="/api", tags=["interlocking-exam"])
 app.include_router(shunting_data.router, prefix="/api/exam/shunting", tags=["shunting-data"])
 app.include_router(shunting_questions.router, prefix="/api/exam/shunting", tags=["shunting-questions"])
 app.include_router(lab_topics.router, prefix="/api/lab-topics", tags=["lab-topics"])
 app.include_router(management.router, prefix="/api/management", tags=["management"])
 app.include_router(simulation_console.router, prefix="/api/simulation-console", tags=["simulation-console"])
-app.include_router(module_one_experiment1.router, prefix="/api", tags=["module-one"])
 app.include_router(chapter_bank.router, prefix="/api/chapter-bank", tags=["chapter-bank"])
 app.include_router(learning_records.router, prefix="/api/learning-records", tags=["learning-records"])
 
@@ -138,3 +137,4 @@ async def stop_exam_clock():
             await task
         except asyncio.CancelledError:
             pass
+app.include_router(theory_console.router, prefix='/api/lab-topics', tags=['topic-standard-station'])

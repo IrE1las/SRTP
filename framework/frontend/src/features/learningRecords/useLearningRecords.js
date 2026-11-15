@@ -1,10 +1,6 @@
 import { ref } from 'vue'
 
-export const recordKinds = [
-  { id: 'all', label: '全部记录' }, { id: 'dynamic', label: '动态实验' },
-  { id: 'simulation', label: '仿真操作' }, { id: 'classic', label: '图形专项' },
-  { id: 'lab', label: '专题作答' }, { id: 'legacy', label: '教学练习' },
-]
+export const recordKinds = [{id:'all',label:'全部记录'},{id:'lab',label:'专题作答'},{id:'legacy',label:'教学练习'}]
 export function scoreText(record = {}) {
   if (typeof record.score === 'number' && Number.isFinite(record.score)) return `${record.score}${typeof record.score_max === 'number' ? ` / ${record.score_max}` : ''} 分`
   return record.score_label || '未评分'
@@ -29,8 +25,8 @@ const actions = {
 }
 export const operationLabel = value => actions[value] || value || '实验操作'
 export const feedbackLabel = source => ({ ai: 'AI教学解析', rules: '规则教学反馈', rules_fallback: '规则教学反馈', teacher: '教师评语', no_errors: '作答反馈' })[source] || '教学反馈'
-export const operationCountText = record => `${record.operation_count || 0} ${record.kind === 'lab' ? '项作答' : record.kind === 'classic' ? '次提交' : '次操作'}`
-export const errorCountText = record => `${record.error_count || 0} ${record.kind === 'simulation' ? '条操作提示' : '个错误点'}`
+export const operationCountText = record => `${record.operation_count || 0} ${record.kind === 'lab' ? '项作答' : '次操作'}`
+export const errorCountText = record => `${record.error_count || 0} 个错误点`
 const failureText = (failure, fallback) => typeof failure?.response?.data?.detail === 'string' ? failure.response.data.detail : fallback
 
 export function createLearningRecords({ get }) {

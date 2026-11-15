@@ -13,15 +13,11 @@ from tests.test_management import setup, content, create, publish, submit
 def test_all_manual_fields_have_supported_or_explicitly_limited_references(topics):
     refs = load_references(lab_topics.ROOT)
     manual = [(q.key, f) for q in topics for f in q.content['fields'] if f['kind']=='essay']
-    assert len(manual) == len(refs) == 50
+    assert len(manual) == len(refs) == 35
     for key, field in manual:
         assert 'expected' not in field
         assert field['explanation'] == explanation_text(refs[(key, field['id'])])
-    low_frequency = next(q for q in topics if q.key == 'lab-08-03')
-    for f in low_frequency.content['fields']:
-        assert refs[(low_frequency.key, f['id'])]['status'] == 'missing'
-        assert '暂不能确定' in f['explanation']
-        assert '不将任何猜测映射作为标准评分依据' in f['explanation']
+    assert not any(key.startswith(('lab-07-','lab-08-')) for key,_ in refs)
 
 
 def test_reference_hidden_before_submission_visible_after_but_never_auto_scores_essay(topics):

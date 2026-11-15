@@ -5,7 +5,7 @@
       <p class="banner-kicker"><span></span> SOUTHWEST JIAOTONG UNIVERSITY</p>
       <h1><span>{{ title.split('，')[0] }}<span class="banner-comma">，</span></span><span>{{ title.split('，')[1] }}</span></h1>
       <p class="banner-description">{{ description }}</p>
-      <router-link v-if="userStore.role !== 'teacher'" to="/student/interlocking-exam" class="banner-link">进入专项实训 <el-icon><Right /></el-icon></router-link>
+      <router-link v-if="userStore.role !== 'teacher'" to="/student/lab-topics" class="banner-link">进入实验专题 <el-icon><Right /></el-icon></router-link>
       <router-link v-else to="/teacher/exercises" class="banner-link">管理教学练习 <el-icon><Right /></el-icon></router-link>
     </div>
     <div class="banner-seal" aria-hidden="true"><span>竢实扬华</span><span>自强不息</span></div>

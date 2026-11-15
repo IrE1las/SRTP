@@ -3,7 +3,7 @@
     <el-alert title="学生视角试答；试答结果不写入学生成绩。" type="info" :closable="false"/>
     <h2><Notation :text="question.title"/></h2><p class="prompt"><Notation :text="question.prompt"/></p>
     <ul v-if="question.conditions.length"><li v-for="c in question.conditions" :key="c"><Notation :text="c"/></li></ul>
-    <ClassicStationCanvas :answer="empty" reference-mode/>
+    <StandardStationPreview v-if="question.topic<=4"/><ClassicStationCanvas v-else :answer="empty" reference-mode/>
     <form @submit.prevent="tryAnswer">
       <section v-for="f in question.fields" :key="f.id" class="preview-field"><h3><Notation :text="f.label"/><small>{{ f.points }} 分</small></h3>
         <div v-if="f.kind==='choice'||f.kind==='multi'" class="preview-options"><label v-for="option in f.options" :key="option"><input :type="f.kind==='choice'?'radio':'checkbox'" :name="f.id" :value="option" v-model="answers[f.id]"><Notation :text="option"/></label></div>
@@ -16,6 +16,7 @@
   </div>
 </template>
 <script setup>
+import StandardStationPreview from './StandardStationPreview.vue'
 import {ref,watch} from 'vue'
 import Notation from '@/components/RailwayNotation.vue'
 import ClassicStationCanvas from '@/components/ClassicExam/ClassicStationCanvas.vue'

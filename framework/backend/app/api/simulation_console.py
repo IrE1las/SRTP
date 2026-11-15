@@ -1,16 +1,12 @@
-"""Original-application console with a separately preserved teaching profile."""
+"""Standard-station free practice; sessions and replay remain memory-only."""
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from typing import Literal
-from sqlalchemy.orm import Session
 
 from app.api.deps import require_roles
 from app.models.user import User
-from app.core.database import get_db
-from app.services import learning_archive
-from app.services.simulation_console.runtime import SimulationError, simulation_service
-from app.services.simulation_console.station import public_station_package
+from app.services.simulation_console.runtime import SimulationError
 from app.services.simulation_console.reference_station import reference_station_package
 from app.services.simulation_console.reference_runtime import ReferenceSimulationService
 from app.services.simulation_console.console_commands import operate
@@ -22,12 +18,11 @@ reference_service = ReferenceSimulationService(reference_station_package())
 
 
 def service_for(session_id):
-    # The chosen service still validates ownership in _get; no cross-user access.
-    return reference_service if session_id in reference_service.sessions else simulation_service
+    return reference_service
 
 
 class SessionRequest(BaseModel):
-    source: Literal['workbook', 'reference'] = 'workbook'
+    source: Literal['reference'] = 'reference'
     interval_available: bool = True
     occupied_sections: list[str] = Field(default_factory=list)
 
@@ -70,37 +65,22 @@ def _call(action, *args):
 
 
 @router.get("/station")
-def get_station(source: Literal['workbook', 'reference'] = 'workbook', current_user: User = AnyRole) -> dict:
-    package = reference_station_package() if source == 'reference' else public_station_package()
+def get_station(source: Literal['reference'] = 'reference', current_user: User = AnyRole) -> dict:
+    package = reference_station_package()
     if current_user.role == "student":
         return {k: v for k, v in package.items() if k not in {"routes", "source"}}
     return package
 
 
 @router.post("/sessions")
-def create_session(request: SessionRequest, current_user: User = AnyRole, db: Session = Depends(get_db)) -> dict:
+def create_session(request: SessionRequest, current_user: User = AnyRole) -> dict:
     if request.occupied_sections and current_user.role not in {"teacher", "admin"}:
         raise HTTPException(status_code=403, detail="只有教师或管理员可预置占用场景")
-    service = reference_service if request.source == 'reference' else simulation_service
+    service = reference_service
     snapshot = _call(service.new_session, current_user.id, request.interval_available, request.occupied_sections)
-    learning_archive.start_console(db, current_user, snapshot, request.source)
     return snapshot
 
 
-def _record_call(db, user, session_id, command, action, *args):
-    service = service_for(session_id)
-    session = _call(service._get, session_id, user.id)
-    # Runtime uses this same reentrant lock. Persist in the same operation order.
-    with session.mutex:
-        before = service._snapshot(session)
-        try:
-            response = _call(action, *args)
-        except HTTPException as exc:
-            learning_archive.append_console(db, user, session_id, command, before,
-                {'accepted': False, 'message': str(exc.detail), 'snapshot': service._snapshot(session)})
-            raise
-        learning_archive.append_console(db, user, session_id, command, before, response)
-        return response
 
 
 @router.get("/sessions/{session_id}")
@@ -114,28 +94,23 @@ def get_replay(session_id: str, current_user: User = AnyRole) -> list[dict]:
 
 
 @router.post("/sessions/{session_id}/buttons")
-def select_button(session_id: str, request: ButtonRequest, current_user: User = AnyRole, db: Session = Depends(get_db)) -> dict:
-    return _record_call(db, current_user, session_id, {'type': 'PRESS_BUTTON', 'target': request.button},
-        service_for(session_id).select_button, session_id, current_user.id, request.button, request.version)
+def select_button(session_id: str, request: ButtonRequest, current_user: User = AnyRole) -> dict:
+    return _call(service_for(session_id).select_button, session_id, current_user.id, request.button, request.version)
 
 
 @router.post("/sessions/{session_id}/clear-selection")
-def clear_selection(session_id: str, request: VersionRequest, current_user: User = AnyRole, db: Session = Depends(get_db)) -> dict:
-    return _record_call(db, current_user, session_id, {'type': 'CLEAR_SELECTION', 'target': ''},
-        service_for(session_id).clear_selection, session_id, current_user.id, request.version)
+def clear_selection(session_id: str, request: VersionRequest, current_user: User = AnyRole) -> dict:
+    return _call(service_for(session_id).clear_selection, session_id, current_user.id, request.version)
 
 
 @router.post("/sessions/{session_id}/advance")
 def advance_train(session_id: str, request: StepRequest,
-                  current_user: User = AnyRole, db: Session = Depends(get_db)) -> dict:
-    return _record_call(db, current_user, session_id, {'type': 'ADVANCE_TRAIN', 'target': request.route_instance_id},
-        service_for(session_id).step_train, session_id, current_user.id, request.route_instance_id, request.version)
+                  current_user: User = AnyRole) -> dict:
+    return _call(service_for(session_id).step_train, session_id, current_user.id, request.route_instance_id, request.version)
 
 
 @router.post('/sessions/{session_id}/commands')
-def console_command(session_id: str, request: ConsoleCommandRequest, current_user: User = AnyRole, db: Session = Depends(get_db)) -> dict:
+def console_command(session_id: str, request: ConsoleCommandRequest, current_user: User = AnyRole) -> dict:
     service = service_for(session_id)
     command = request.model_dump(exclude={'version'})
-    def execute_allowed():
-        return operate(service, session_id, current_user.id, command, request.version)
-    return _record_call(db, current_user, session_id, command, execute_allowed)
+    return _call(operate, service, session_id, current_user.id, command, request.version)

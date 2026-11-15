@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from app.services.simulation_console import runtime, console_commands, station
+from app.services.simulation_console import runtime, console_commands
 from app.services.simulation_console.reference_station import reference_station_package
 from app.services.simulation_console.reference_runtime import ReferenceSimulationService
 from app.services.simulation_console import reference_runtime
@@ -32,16 +32,17 @@ def press(svc,snap,buttons):
     return result
 
 
-def test_native_compiler_never_consults_teaching_workbook(monkeypatch):
-    before=deepcopy(station.station_package())
-    monkeypatch.setattr(station,'station_package',lambda:pytest.fail('native compiler read teaching workbook'))
+def test_standard_station_compiles_from_its_own_sources():
+    root = Path(runtime.__file__).parent
+    assert not (root / 'source_data.json').exists()
+    assert not (root / 'station.py').exists()
     reference_station_package.cache_clear()
-    package=reference_station_package()
-    assert len(package['routes'])==199 and all(r['condition_source']=='original_application' for r in package['routes'])
+    package = reference_station_package()
+    assert len(package['routes']) == 199
+    assert all(r['condition_source'] == 'original_application' for r in package['routes'])
     assert all('checked_route_id' not in r for r in package['routes'])
-    svc=service()
-    assert press(svc,svc.new_session(21),['D9DA','S5DA'])['accepted']
-    assert before['counts']['ready_routes']==193
+    svc = service()
+    assert press(svc, svc.new_session(21), ['D9DA', 'S5DA'])['accepted']
 
 
 def test_mixed_case_and_unnamed_native_controls_are_separate():
@@ -200,14 +201,6 @@ def test_block_request_requires_peer_and_does_not_change_another_block():
     assert not result['accepted'] and result['snapshot']['blocks']['XD']['permission']
 
 
-def test_native_operations_leave_original_teaching_package_and_session_unchanged():
-    teaching=runtime.SimulationService();snap=teaching.new_session(21)
-    package=deepcopy(teaching.package)
-    svc=service();result=operate(svc,svc.new_session(21),'GUIDE_TOTAL_LOCK','X',pin='0000')
-    result=operate(svc,result['snapshot'],'BLOCK_ACCIDENT_RESET','XD',pin='0000')
-    assert teaching.package==package
-    assert teaching.snapshot(snap['session_id'],21)==snap
-    assert 'blocks' not in snap and 'guide_locks' not in snap
 
 
 @pytest.mark.parametrize('name,signals', [('D1>S5',['D1','D9']),('L_XTA>SF',['X','XI'])])
@@ -235,30 +228,3 @@ def test_composite_cancel_only_releases_selected_basic_segment(name,signals,monk
     result['snapshot']=svc.snapshot(snap['session_id'],21)
     assert result['accepted'] and result['snapshot']['routes'][0]['status']=='cancelled'
     assert not any(s['locked'] for s in result['snapshot']['sections'].values())
-
-
-def test_console_peer_http_permission_and_workbook_rejects_native_commands(client,db_session):
-    from app.models.user import User
-    from app.core.security import create_access_token
-    users=[]
-    for name,role in [('native_student','student'),('native_teacher','teacher')]:
-        user=User(username=name,password_hash='fixture',role=role)
-        db_session.add(user);users.append(user)
-    db_session.commit()
-    student,teacher=[{'Authorization':f"Bearer {create_access_token({'sub':str(u.id)})}"} for u in users]
-    root='/api/simulation-console'
-    snap=client.post(root+'/sessions',headers=student,json={'source':'reference','interval_available':False}).json()
-    url=root+'/sessions/'+snap['session_id']+'/commands'
-    response=client.post(url,headers=student,json={'type':'BLOCK_PEER_ACCEPT','target':'XD','version':snap['version']})
-    assert response.status_code==200 and not response.json()['accepted']
-    snap=response.json()['snapshot']
-    response=client.post(url,headers=student,json={'type':'BLOCK_REQUEST','target':'XD','version':snap['version']})
-    assert response.status_code==200 and response.json()['accepted']
-    snap=response.json()['snapshot']
-    response=client.post(url,headers=student,json={'type':'BLOCK_PEER_ACCEPT','target':'XD','version':snap['version']})
-    assert response.status_code==200 and response.json()['accepted']
-    snap=client.post(root+'/sessions',headers=teacher,json={'source':'workbook'}).json()
-    response=client.post(root+'/sessions/'+snap['session_id']+'/commands',headers=teacher,
-                         json={'type':'GUIDE_TOTAL_LOCK','target':'X','pin':'0000','version':snap['version']})
-    assert response.status_code==200 and not response.json()['accepted']
-    assert 'guide_locks' not in response.json()['snapshot']

@@ -1,17 +1,10 @@
-import { Calendar, Clock, Cpu, DataAnalysis, EditPen, Files, Guide, Monitor, SetUp, Share, UserFilled } from '@element-plus/icons-vue'
+import { Calendar, Clock, Cpu, DataAnalysis, EditPen, Files, Guide, Monitor, UserFilled } from '@element-plus/icons-vue'
 const study = { title: '学习空间', items: [
   { title: '客观题库', path: '/student/chapter-bank', icon: Files },
   { title: '实验专题', path: '/student/lab-topics', icon: Guide },
   { title: '仿真操作台', path: '/student/simulation-console', icon: Monitor },
 ] }
 const records = { title: '学习记录', items: [{ title: '实验学习记录', path: '/student/history', icon: Clock }] }
-const diagnosis = { title: '专项诊断', items: [
-  { title: '基础进路', path: '/student/interlocking-exam', icon: Guide, number: '01' },
-  { title: '防护道岔', path: '/student/interlocking-exam-protective', icon: SetUp, number: '02' },
-  { title: '带动道岔', path: '/student/interlocking-exam-driven', icon: Share, number: '03' },
-  { title: '条件区段', path: '/student/interlocking-exam-conditional', icon: Files, number: '04' },
-] }
-export const classicNavigation = diagnosis.items
 const teaching = { title: '教学工作台', items: [
   { title: '实验专题', path: '/student/lab-topics', icon: Guide },
   { title: '客观题库', path: '/student/chapter-bank', icon: Files },
@@ -49,6 +42,7 @@ export function navigationGroups(role) {
   return role === 'admin' ? [study, records, contentManagement, {...teaching,items:teaching.items.filter(i=>!['/teacher/grading','/teacher/lab-topics','/student/lab-topics','/student/simulation-console','/student/chapter-bank'].includes(i.path))}, operationTeaching, admin, account] : role === 'teacher' ? [teaching, records, operationTeaching, account] : role === 'student' ? [study, records, assessments, account] : []
 }
 export function pageLabel(path, role) {
+  if (path === '/student/chapter-bank/all') return '全部题目'
   if (path.startsWith('/student/exams/attempts/')) return '正式考试'
   if (path.startsWith('/exams/manage/attempts/')) return '考试批阅'
   if (path.startsWith('/exams/manage/')) return '考试设置'
@@ -59,7 +53,6 @@ export function pageLabel(path, role) {
   if (path.startsWith('/student/learn/operations/attempts/')) return '操作作答'
 
   return navigationGroups(role).flatMap(group => group.items).find(item => item.path === path)?.title
-    || classicNavigation.find(item => item.path === path)?.title
     || ({ '/student/dashboard': '学习概览', '/student/lobby': '练习大厅', '/teacher/lab-topics': '实验专题' })[path]
-    || (path.startsWith('/student/chapter-bank') ? '客观题库' : path.startsWith('/student/modules') ? '动态操作实验' : path.startsWith('/admin/questions/') ? '编辑题目' : path.startsWith('/student/exercises/') ? '进路实训' : path.startsWith('/student/history/') ? '实验回放' : path.startsWith('/student/shunting-questions') ? '原图调车题库' : path.endsWith('/edit') ? '编辑练习' : '实训工作台')
+    || (path.startsWith('/student/chapter-bank') ? '客观题库' : path.startsWith('/admin/questions/') ? '编辑题目' : path.startsWith('/student/exercises/') ? '进路实训' : path.startsWith('/student/history/') ? '实验回放' : path.startsWith('/student/shunting-questions') ? '原图调车题库' : path.endsWith('/edit') ? '编辑练习' : '实训工作台')
 }

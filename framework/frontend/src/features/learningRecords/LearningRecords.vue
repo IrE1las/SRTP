@@ -23,7 +23,7 @@
             <p v-else class="empty-note">本记录未采集逐步操作，可在“错误与教学反馈”查看已保存的提交结果。</p>
           </template>
           <section v-else class="teaching-feedback" aria-label="错误与教学反馈">
-            <div v-if="detail.errors?.length" class="error-points"><h2>{{ detail.kind === 'simulation' ? '操作提示' : '错误点' }}</h2><article v-for="(item,index) in detail.errors" :key="index"><strong>{{ item.label }}</strong><p>{{ item.message }}</p><p v-if="item.correction" class="correction">{{ item.correction }}</p><span v-if="item.devices?.length" class="related-devices">相关设备：{{ item.devices.join('、') }}</span></article></div>
+            <div v-if="detail.errors?.length" class="error-points"><h2>{{ '错误点' }}</h2><article v-for="(item,index) in detail.errors" :key="index"><strong>{{ item.label }}</strong><p>{{ item.message }}</p><p v-if="item.correction" class="correction">{{ item.correction }}</p><span v-if="item.devices?.length" class="related-devices">相关设备：{{ item.devices.join('、') }}</span></article></div>
             <p v-else class="empty-note">{{ detail.status === 'in_progress' && detail.score == null ? '本次实验尚未形成最终评分。' : '本记录暂无已判定的错误点。' }}</p>
             <article v-for="(feedback,index) in detail.feedback || []" :key="index" class="feedback-card" :class="{ 'ai-feedback': feedback.source === 'ai' }"><span class="feedback-source">{{ feedbackLabel(feedback.source) }}</span><h3 v-if="feedback.title">{{ feedback.title }}</h3><p>{{ feedback.text }}</p><time v-if="feedback.time">{{ timeText(feedback.time) }}</time></article>
             <p v-if="!detail.feedback?.length" class="empty-note">本记录尚无教学解析或教师评语。</p>

@@ -8,22 +8,18 @@ from sqlalchemy.orm import Session, defer, load_only
 from app.api.deps import get_current_user
 from app.core.database import get_db
 from app.models.user import User
-from app.models.module_one import ModuleOneAttempt, ModuleOneEvent
 from app.models.lab_topic import LabAttempt
 from app.models.exercise import Exercise
 from app.models.exercise_session import ExerciseSession
 from app.models.operation_log import OperationLog
 from app.models.ai_score import AiScore
-from app.models.learning_archive import LearningArchive, LearningArchiveEvent
 
 router = APIRouter()
-Kind = Literal['dynamic', 'lab', 'simulation', 'classic', 'legacy']
-LABELS = {'dynamic': '动态实验', 'lab': '实验专题', 'simulation': '自由仿真', 'classic': '经典图形专项', 'legacy': '教学练习'}
+Kind = Literal['lab', 'legacy']
+LABELS = {'lab':'实验专题', 'legacy':'教学练习'}
 STATUSES = {'in_progress': '进行中', 'ongoing': '进行中', 'submitted': '已提交',
             'recorded': '已记录', 'pending_review': '待教师评阅', 'graded': '已评分',
             'completed': '已完成', 'finished': '已结束', 'timeout': '已超时', 'abandoned': '已结束'}
-CLASSIC_PATHS = {'dongjiao_to_III': '/student/interlocking-exam', 'dongjiao_to_I': '/student/interlocking-exam-protective',
-                 'dongjiao_to_4': '/student/interlocking-exam-driven', 'beijing_depart_5': '/student/interlocking-exam-conditional'}
 
 
 def error(label, message, correction='', devices=None, operation_id=None):
@@ -49,36 +45,6 @@ def base(kind, record_id, title, status, started, updated, preview, path, operat
         preview=preview, continue_path=path)
 
 
-def dynamic_view(db, attempt, detailed=True):
-    events = (db.query(ModuleOneEvent).filter_by(attempt_id=attempt.id).order_by(ModuleOneEvent.after_version).all()
-              if detailed else [])
-    event_count, last_event = (len(events), events[-1].created_at if events else None) if detailed else db.query(
-        func.count(ModuleOneEvent.id), func.max(ModuleOneEvent.created_at)).filter_by(attempt_id=attempt.id).one()
-    operations = [operation(e.id, e.after_version, e.created_at, e.command.get('type', ''),
-        e.command.get('target', ''), e.response.get('accepted'), e.response.get('message', '')) for e in events]
-    # Do not derive errors from refusals: several experiments require a refusal.
-    # Until submission neither checkpoints nor inferred grading evidence is exposed.
-    result = attempt.result if attempt.status == 'submitted' else None
-    errors = [error(c['label'], c.get('message', ''), c.get('correction', ''), c.get('devices'), c.get('event_id'))
-              for c in (result or {}).get('checkpoints', []) if not c.get('passed')]
-    updates = attempt.submitted_at or last_event or attempt.started_at
-    score = (result or {}).get('score')
-    item = base('dynamic', attempt.id, attempt.question_snapshot.get('title', attempt.question_id), attempt.status,
-        attempt.started_at, updates, attempt.preview,
-        f'/student/modules/one/experiment-1/{quote(attempt.question_id)}?attempt={attempt.id}', operations, errors,
-        score, 100 if score is not None else None, operation_count=event_count)
-    if not detailed:
-        return item, {}
-    messages = [feedback('rules', '操作反馈', e.response['message'], e.created_at) for e in events if e.response.get('message')]
-    detail = dict(operations=operations, errors=errors, feedback=messages,
-        snapshots={'initial': attempt.initial_snapshot, 'latest': events[-1].response.get('snapshot') if events else attempt.initial_snapshot})
-    if result:
-        detail['assessment'] = result
-    if attempt.notes:
-        detail['notes'] = attempt.notes
-    return item, detail
-
-
 def lab_view(db, attempt, user):
     result, review, question = attempt.result, attempt.review or {}, attempt.question_snapshot
     fields = {f['id']: f for f in question.get('fields', [])}
@@ -100,7 +66,7 @@ def lab_view(db, attempt, user):
     label = None if score is not None else f"客观项 {result.get('automatic_score', 0):g} / {result.get('automatic_max', 0):g}，总分待教师评阅"
     item = base('lab', attempt.id, question.get('title', '实验专题作答'), status, attempt.created_at,
         attempt.reviewed_at or attempt.created_at, user.role != 'student',
-        f"/student/lab-topics?view=reports&q={quote(question.get('key', ''))}", operations, errors, score,
+        f"/student/lab-topics?q={quote(question.get('key', ''))}", operations, errors, score,
         result.get('total_max'), label)
     return item, dict(operations=operations, errors=errors, feedback=messages, answers=attempt.answers,
                       assessment=result, review=attempt.review)
@@ -130,75 +96,19 @@ def legacy_view(db, attempt, user):
                       snapshots={'latest': attempt.final_snapshot})
 
 
-def classic_errors(comparison):
-    errors = []
-    names = {'route_buttons': '进路按钮', 'switches': '道岔', 'hostile_signals': '敌对信号', 'track_sections': '轨道区段'}
-    for category, differences in comparison.get('details', {}).get('errors', {}).items():
-        for problem, values in differences.items():
-            if problem == 'correct' or not values:
-                continue
-            for value in values:
-                device = value.get('switch', '') if isinstance(value, dict) else str(value)
-                label = {'missing': '漏选', 'extra': '多选', 'wrong_position': '位置错误'}.get(problem, problem)
-                correction = (f"应为{'定位' if value['expected'] == 'normal' else '反位'}" if isinstance(value, dict)
-                              else '请结合联锁表核对本项设备。')
-                errors.append(error(names.get(category, category) + label, device, correction, [device]))
-    return errors
-
-
-def archive_view(db, archive, detailed=True):
-    events = (db.query(LearningArchiveEvent).filter_by(archive_id=archive.id).order_by(LearningArchiveEvent.sequence).all()
-              if detailed and archive.kind == 'simulation' else [])
-    operations = [operation(e.id, e.sequence, e.created_at, e.command.get('type', ''), e.command.get('target', ''),
-                            e.response.get('accepted'), e.response.get('message', '')) for e in events]
-    messages = list(archive.feedback) if detailed else []
-    if archive.kind == 'simulation':
-        event_count, rejection_count = (len(events), sum(e.response.get('accepted') is False for e in events)) if detailed else db.query(
-            func.count(LearningArchiveEvent.id),
-            func.coalesce(func.sum(case((LearningArchiveEvent.response['accepted'].as_boolean().is_(False), 1), else_=0)), 0)
-        ).filter_by(archive_id=archive.id).one()
-        errors = [error('命令被拒绝', e.response.get('message', ''), devices=e.response.get('devices', []), operation_id=e.id)
-                  for e in events if e.response.get('accepted') is False]
-        messages += [feedback('rules', '操作台规则反馈', e.response['message'], e.created_at) for e in events if e.response.get('message')]
-        path, label = '/student/simulation-console', '未评分（自由仿真无正式评分标准）'
-        detail = {'snapshots': {'initial': archive.initial_snapshot, 'latest': archive.latest_snapshot,
-            'frames': [{'operation_id': e.id, 'before': e.before_snapshot, 'after': e.response.get('snapshot')} for e in events]},
-            'partial_history': archive.data.get('partial_history', False)} if detailed else {}
-    else:
-        comparison, answer = archive.data.get('comparison', {}), archive.data.get('answer', {})
-        errors = classic_errors(comparison)
-        operations = [operation(archive.id, 1, archive.started_at, '提交图形答案', archive.title, None, comparison.get('message', ''))]
-        messages.insert(0, feedback('rules', '本地答案核对', comparison.get('message', ''), archive.started_at))
-        path = CLASSIC_PATHS.get(answer.get('route_type'), CLASSIC_PATHS['dongjiao_to_III'])
-        label = '核对通过（未设数值评分）' if comparison.get('all_correct') else '存在差异（未设数值评分）'
-        detail = {'answers': answer, 'assessment': comparison}
-        event_count, rejection_count = len(operations), len(errors)
-    item = base(archive.kind, archive.id, archive.title, archive.status, archive.started_at, archive.updated_at,
-                archive.preview, path, operations, errors, score_label=label,
-                operation_count=event_count, error_count=rejection_count)
-    return item, dict(**detail, operations=operations, errors=errors, feedback=messages)
-
-
 def own_records(db, user, kind='all'):
-    records = []
-    if kind in {'all', 'dynamic'}:
-        query = db.query(ModuleOneAttempt).options(defer(ModuleOneAttempt.state), defer(ModuleOneAttempt.initial_snapshot))
-        records += [dynamic_view(db, a, detailed=False) for a in query.filter_by(owner_id=user.id)]
-    if kind in {'all', 'lab'}:
-        records += [lab_view(db, a, user) for a in db.query(LabAttempt).filter_by(student_id=user.id)]
-    if kind in {'all', 'legacy'}:
-        records += [legacy_view(db, a, user) for a in db.query(ExerciseSession).filter_by(student_id=user.id)]
-    if kind in {'all', 'simulation', 'classic'}:
-        query = db.query(LearningArchive).options(defer(LearningArchive.initial_snapshot),
-            defer(LearningArchive.latest_snapshot), defer(LearningArchive.feedback)).filter_by(owner_id=user.id)
-        if kind != 'all':
-            query = query.filter_by(kind=kind)
-        records += [archive_view(db, a, detailed=False) for a in query]
+    records=[]
+    if kind in {'all','lab'}:
+        attempts=db.query(LabAttempt).filter_by(student_id=user.id).filter(
+            LabAttempt.question_snapshot['topic'].as_integer().between(1,6))
+        records += [lab_view(db,a,user) for a in attempts]
+    if kind in {'all','legacy'}:
+        records += [legacy_view(db,a,user) for a in db.query(ExerciseSession).filter_by(student_id=user.id)]
     return records
 
 
 @router.get('')
-def list_records(kind: Literal['all', 'dynamic', 'lab', 'simulation', 'classic', 'legacy'] = 'all',
+def list_records(kind: Literal['all','lab','legacy'] = 'all',
                  page: int = Query(1, ge=1), limit: int = Query(20, ge=1, le=100),
                  db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     records = own_records(db, user)
@@ -210,25 +120,13 @@ def list_records(kind: Literal['all', 'dynamic', 'lab', 'simulation', 'classic',
 
 
 @router.get('/{kind}/{record_id}')
-def record_detail(kind: Kind, record_id: str, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    models = {'dynamic': (ModuleOneAttempt, 'owner_id'), 'lab': (LabAttempt, 'student_id'),
-              'legacy': (ExerciseSession, 'student_id'), 'simulation': (LearningArchive, 'owner_id'),
-              'classic': (LearningArchive, 'owner_id')}
-    model, owner_key = models[kind]
-    if kind in {'lab', 'legacy'} and not record_id.isdigit():
-        raise HTTPException(404, '学习记录不存在')
-    query = db.query(model).filter(model.id == record_id, getattr(model, owner_key) == user.id)
-    if kind in {'simulation', 'classic'}:
-        query = query.filter_by(kind=kind)
-    attempt = query.first()
-    if attempt is None:
-        raise HTTPException(404, '学习记录不存在')
-    if kind == 'dynamic':
-        item, detail = dynamic_view(db, attempt)
-    elif kind == 'lab':
-        item, detail = lab_view(db, attempt, user)
-    elif kind == 'legacy':
-        item, detail = legacy_view(db, attempt, user)
-    else:
-        item, detail = archive_view(db, attempt)
-    return {**item, **detail}
+def record_detail(kind: str, record_id: str, db: Session=Depends(get_db), user: User=Depends(get_current_user)):
+    models={'lab':(LabAttempt,'student_id'),'legacy':(ExerciseSession,'student_id')}
+    if kind not in models or not record_id.isdigit():
+        raise HTTPException(404,'学习记录不存在')
+    model,owner=models[kind]
+    attempt=db.query(model).filter(model.id==int(record_id),getattr(model,owner)==user.id).first()
+    if attempt is None or (kind=='lab' and attempt.question_snapshot.get('topic') in (7,8)):
+        raise HTTPException(404,'学习记录不存在')
+    item,detail=lab_view(db,attempt,user) if kind=='lab' else legacy_view(db,attempt,user)
+    return {**item,**detail}

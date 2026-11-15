@@ -16,7 +16,7 @@ def setup(client,db_session):
 
 
 def content():
-    return {'title':'自编评分测试','topic':9,'sequence':1,'level':'基础','prompt':'根据原图解释道岔锁闭。',
+    return {'title':'自编评分测试','topic':6,'sequence':1,'level':'基础','prompt':'根据原图解释道岔锁闭。',
             'conditions':[],'source_section':'实验1单锁与封闭','devices':['1/3'],'diagram_mode':'station','fields':[
         {'id':'choose','kind':'multi','label':'多项辨析','points':10,'options':['甲','乙','丙'],'expected':['甲','乙'],'scoring':'partial','explanation':'甲和乙对应给定条件。'},
         {'id':'cell','kind':'cell','label':'填写符号','points':10,'expected':'{23/25}','accepted_answers':[],'matching':'tokens','explanation':'大括号表示带动。'},
@@ -53,14 +53,14 @@ def test_authoring_permissions_and_draft_visibility(client,setup,db_session):
     q=create(client,setup['admin'])
     assert q['status']=='draft' and q['published_version']==0
     assert client.get('/api/lab-topics/questions/'+q['key'],headers=setup['student']).status_code==404
-    assert len(client.get('/api/lab-topics/questions',headers=setup['student']).json())==24
+    assert len(client.get('/api/lab-topics/questions',headers=setup['student']).json())==18
     live=publish(client,setup['admin'],q)
     assert live['status']=='published' and live['published_version']==1
     public=client.get('/api/lab-topics/questions/'+q['key'],headers=setup['student']).json()
-    assert public['topic_info']['title']=='自主命题'
+    assert public['topic_info']['title']=='调车进路联锁表'
     assert public['diagram_mode']=='station'
     assert all(not set(f)&{'expected','rubric','criteria','accepted_answers'} for f in public['fields'])
-    assert len(client.get('/api/lab-topics/questions',headers=setup['student']).json())==25
+    assert len(client.get('/api/lab-topics/questions',headers=setup['student']).json())==19
 
 
 def test_published_edits_versions_and_old_attempts_remain_unchanged(client,setup,db_session):

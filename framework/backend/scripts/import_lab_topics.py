@@ -23,7 +23,7 @@ def main():
     with SessionLocal() as db:
         dataset, questions = resolve_blueprint(db)
         report = {'mode':'validate','database':str(db_path),'dataset_id':dataset.id,
-                  'topics':8,'questions':len(questions),
+                  'topics':6,'questions':len(questions),
                   'automatic_fields':sum(f['kind']!='essay' for q in questions for f in q['fields']),
                   'manual_fields':sum(f['kind']=='essay' for q in questions for f in q['fields'])}
     if args.apply:

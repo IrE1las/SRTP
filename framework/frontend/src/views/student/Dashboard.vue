@@ -10,7 +10,7 @@
       <el-col :span="6"><el-statistic title="错误操作" :value="stats.wrong_operation_count || 0" /></el-col>
     </el-row>
   </el-card>
-  <PracticePath />
+  <StudyLinks />
   </div>
 </template>
 
@@ -18,7 +18,7 @@
 import { onMounted, ref } from 'vue'
 
 import { getMyStatistics } from '@/api/statistics'
-import PracticePath from '@/components/PracticePath.vue'
+import StudyLinks from '@/components/StudyLinks.vue'
 
 const stats = ref({})
 const loading = ref(false)

@@ -34,3 +34,13 @@ def reference(qid: str, db: Session = Depends(get_db), user=reviewer):
     if row is None:
         raise HTTPException(404, '题目不存在')
     return row.content
+
+
+@router.get('/questions')
+def all_questions(chapter: int | None = Query(None, ge=1, le=6), page: int = Query(1, ge=1),
+                  limit: int = Query(20, ge=1, le=100), search: str = Query('', max_length=150),
+                  kind: Literal['objective','choice','multi','true_false','cell'] = 'objective',
+                  progress: Literal['all','correct','not_correct','unanswered'] = 'all',
+                  db: Session = Depends(get_db), user=reader):
+    return service.question_list(db, chapter, page=page, limit=limit, search=search,
+                                 kind=kind, user_id=user.id, progress=progress)

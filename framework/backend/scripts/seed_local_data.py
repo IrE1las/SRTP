@@ -15,7 +15,7 @@ sys.path.insert(0, str(BACKEND))
 from app.core.database import SessionLocal, engine
 from app.models import LabQuestion
 from app.models.shunting_route import ShuntingDataset
-from app.services.lab_topics import import_topics, resolve_blueprint
+from app.services.lab_topics import import_topics, resolve_blueprint, upgrade_standard_topics
 from app.services.shunting_data import import_reviewed_routes, validate_payload
 
 SHUNTING_PAYLOAD = ROOT / 'ai_design/station/shunting_interlocking_reviewed.json'
@@ -42,6 +42,8 @@ def main() -> None:
             report['lab_topics'] = import_topics(db)
     else:
         report['lab_topics'] = 'skipped (already present)'
+        with SessionLocal() as db, db.begin():
+            report['standard_topic_versions'] = upgrade_standard_topics(db)
     print(json.dumps(report, ensure_ascii=False, indent=2))
 
 

@@ -22,6 +22,7 @@ const routes = [
     component: AppLayout,
     meta: { requiresAuth: true },
     children: [
+      { path: 'student/chapter-bank/all', component: () => import('@/features/chapterBank/QuestionTable.vue'), meta: { roles: ['student','teacher','admin'] } },
   { path: 'student/learn/operations', component: () => import('@/views/student/OperationCatalogue.vue'), meta: { roles: ['student'] } },
   { path: 'student/learn/operations/history', component: () => import('@/views/student/OperationHistory.vue'), meta: { roles: ['student'] } },
   { path: 'student/learn/operations/attempts/:attemptId', component: () => import('@/views/student/OperationAttempt.vue'), meta: { roles: ['student'] } },
@@ -42,10 +43,6 @@ const routes = [
       { path: 'account', component: () => import('@/views/shared/ProfileHome.vue'), meta: { roles: ['student','teacher','admin'] } },
       { path: 'student/chapter-bank', component: () => import('@/features/chapterBank/ChapterBank.vue'), meta: { roles: ['student','teacher','admin'] } },
       { path: 'student/chapter-bank/:chapterId(1|2|3|4|5|6)', component: () => import('@/features/chapterBank/ChapterBank.vue'), meta: { roles: ['student','teacher','admin'] } },
-      { path: 'student/modules', component: () => import('@/features/modules/ModuleHub.vue'), meta: { roles: ['student','teacher','admin'] } },
-      { path: 'student/modules/one/experiment-1', component: () => import('@/features/modules/ExperimentOne.vue'), meta: { roles: ['student','teacher','admin'] } },
-      { path: 'student/modules/one/experiment-1/:questionId', component: () => import('@/features/modules/ExperimentOne.vue'), meta: { roles: ['student','teacher','admin'] } },
-      { path: 'student/modules/:moduleId(one|two|three)', component: () => import('@/features/modules/ModuleHub.vue'), meta: { roles: ['student','teacher','admin'] } },
 
       {
         path: '',
@@ -80,7 +77,7 @@ const routes = [
       {
         path: 'student/lab-topics',
         name: 'LabTopics',
-        component: () => import('@/features/learningSpace/ExperimentCenter.vue'),
+        component: () => import('@/views/student/LabTopics.vue'),
         meta: { requiresAuth: true, roles: ['student', 'teacher'] },
       },
       {
@@ -92,7 +89,7 @@ const routes = [
       {
         path: 'teacher/lab-topics',
         name: 'TeacherLabTopics',
-        component: () => import('@/features/learningSpace/ExperimentCenter.vue'),
+        component: () => import('@/views/student/LabTopics.vue'),
         meta: { requiresAuth: true, roles: ['teacher'] },
       },
       {
@@ -112,30 +109,6 @@ const routes = [
         name: 'ExerciseReplay',
         component: () => import('@/views/student/ExerciseReplay.vue'),
         meta: { requiresAuth: true, roles: ['student', 'teacher', 'admin'] },
-      },
-      {
-        path: 'student/interlocking-exam',
-        name: 'InterlockingExam',
-        component: () => import('@/views/student/InterlockingExam.vue'),
-        meta: { requiresAuth: true, roles: ['student'] },
-      },
-      {
-        path: 'student/interlocking-exam-protective',
-        name: 'InterlockingExamProtective',
-        component: () => import('@/views/student/InterlockingExamProtective.vue'),
-        meta: { requiresAuth: true, roles: ['student'] },
-      },
-      {
-        path: 'student/interlocking-exam-driven',
-        name: 'InterlockingExamDriven',
-        component: () => import('@/views/student/InterlockingExamDriven.vue'),
-        meta: { requiresAuth: true, roles: ['student'] },
-      },
-      {
-        path: 'student/interlocking-exam-conditional',
-        name: 'InterlockingExamConditional',
-        component: () => import('@/views/student/InterlockingExamConditional.vue'),
-        meta: { requiresAuth: true, roles: ['student'] },
       },
       {
         path: 'teacher',

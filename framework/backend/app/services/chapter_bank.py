@@ -3,8 +3,9 @@ import copy
 import json
 import re
 from pathlib import Path
-from sqlalchemy import func, or_
+from sqlalchemy import func, or_, case
 from app.models.chapter_bank import ChapterBankQuestion
+from app.models.chapter_practice import PracticeAttempt
 from app.services.chapter_bank_presentation import present_question
 
 BANK_PATH = Path(__file__).resolve().parents[4] / 'ai_design/station/chapter_question_bank.json'
@@ -85,8 +86,22 @@ def readable_options(raw):
     return result
 
 
-def question_list(db, chapter, *, page=1, limit=30, search='', kind='objective', status='all'):
-    query = db.query(ChapterBankQuestion).filter_by(chapter=chapter)
+def question_list(db, chapter=None, *, page=1, limit=30, search='', kind='objective', status='all', user_id=None, progress='all'):
+    query = db.query(ChapterBankQuestion)
+    if chapter is not None:
+        query = query.filter_by(chapter=chapter)
+    history = None
+    if user_id is not None:
+        history = db.query(PracticeAttempt.question_id.label('qid'), func.count(PracticeAttempt.id).label('attempts'),
+            func.max(case((PracticeAttempt.feedback['correct'].as_boolean().is_(True), 1), else_=0)).label('correct')
+        ).filter(PracticeAttempt.user_id == user_id, PracticeAttempt.submitted_at.is_not(None)).group_by(PracticeAttempt.question_id).subquery()
+        query = query.outerjoin(history, history.c.qid == ChapterBankQuestion.id)
+        if progress == 'correct':
+            query = query.filter(history.c.correct == 1)
+        elif progress == 'not_correct':
+            query = query.filter(func.coalesce(history.c.correct, 0) == 0)
+        elif progress == 'unanswered':
+            query = query.filter(history.c.qid.is_(None))
     if kind == 'objective':
         query = query.filter(ChapterBankQuestion.kind != 'essay')
     elif kind != 'all':
@@ -100,12 +115,21 @@ def question_list(db, chapter, *, page=1, limit=30, search='', kind='objective',
             ChapterBankQuestion.content['stem'].as_string().contains(search.strip(), autoescape=True),
             ChapterBankQuestion.content['source_reference'].as_string().contains(search.strip(), autoescape=True)))
     total = query.count()
-    records = query.order_by(ChapterBankQuestion.id).offset((page-1)*limit).limit(limit).all()
+    records = query.order_by(ChapterBankQuestion.chapter, ChapterBankQuestion.id).offset((page-1)*limit).limit(limit).all()
+    progress_by_id = {}
+    rules = {}
+    if user_id is not None:
+        progress_by_id = {qid: (attempts, bool(correct)) for qid, attempts, correct in db.query(history).filter(history.c.qid.in_([r.id for r in records]))}
+        from app.services.chapter_practice import load_rules, valid_rule
+        rules = load_rules()
     fields = ('id', 'chapter', 'stem', 'kind', 'answer_status', 'scope', 'source_reference', 'source_url', 'source_kind', 'batch')
     items = []
     for row in records:
         item = {k: row.content.get(k, '') for k in fields}
         item.update(present_question(row.content))
         item.update(has_image=bool(item['images']), notes='', options=readable_options(row.content.get('options')))
+        if user_id is not None:
+            attempted, ever_correct = progress_by_id.get(row.id, (0, False))
+            item.update(attempted=bool(attempted), ever_correct=ever_correct, can_practice=bool(valid_rule(row, rules.get(row.id))))
         items.append(item)
     return dict(total=total, page=page, limit=limit, items=items)

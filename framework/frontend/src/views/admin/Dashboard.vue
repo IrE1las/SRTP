@@ -2,7 +2,7 @@
   <div class="admin-dashboard">
   <section class="authoring-entry"><div><h2>出题与批阅</h2></div><div><router-link to="/admin/questions">管理题库</router-link><router-link to="/admin/questions/new">＋ 自行出题</router-link><router-link to="/admin/grading">进入批阅中心 →</router-link></div></section>
   <nav class="management-links"><router-link to="/admin/users">用户管理</router-link><router-link to="/operations/manage">操作题录制</router-link><router-link to="/exams/manage">正式考试管理</router-link></nav>
-  <PracticePath />
+  <StudyLinks />
   <div class="section-title-row"><div><h2>平台运行概览</h2></div><router-link to="/teacher/exercises">管理仿真练习 ↗</router-link></div>
   <el-card shadow="never" v-loading="loading" class="admin-overview-card">
     <template #header><strong>系统管理</strong></template>
@@ -31,7 +31,7 @@
 import { onMounted, ref } from 'vue'
 
 import { getAdminOverview, listAdminUsers } from '@/api/admin'
-import PracticePath from '@/components/PracticePath.vue'
+import StudyLinks from '@/components/StudyLinks.vue'
 
 const overview = ref({})
 const users = ref([])

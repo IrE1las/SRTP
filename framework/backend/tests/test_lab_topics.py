@@ -23,16 +23,16 @@ def completed(question):
 
 
 def test_report_coverage_and_source_binding(topics, db_session):
-    assert len(topics)==24
-    assert {q.topic for q in topics}==set(range(1,9))
-    assert all(sum(q.topic==topic for q in topics)==3 for topic in range(1,9))
+    assert len(topics)==18
+    assert {q.topic for q in topics}==set(range(1,7))
+    assert all(sum(q.topic==topic for q in topics)==3 for topic in range(1,7))
     assert db_session.query(ShuntingRoute).count()==35
     assert db_session.query(ShuntingQuestion).count()==0
     shunting=db_session.query(ShuntingRoute).filter_by(route_number=34).one()
     q=next(q for q in topics if q.key=='lab-06-02')
     field=next(f for f in q.content['fields'] if f['id']=='switches')
     assert field['expected']==shunting.fields['道岔']=='(17/19)、{23/25}、27'
-    assert all(q.content['conditions'] for q in topics if q.topic>=7)
+    assert all(q.topic in range(1,7) for q in topics)
 
 
 def test_all_authored_questions_evaluate_without_invented_manual_score(topics):
@@ -115,7 +115,7 @@ def test_order_and_multi_are_checked_exactly(topics):
 
 
 def test_import_is_idempotent_and_does_not_generate_old_questions(topics,db_session):
-    assert lab_topics.import_topics(db_session)=={'topics':8,'total':24,'inserted':0,'updated':0}
+    assert lab_topics.import_topics(db_session)=={'topics':6,'total':18,'inserted':0,'updated':0}
     assert db_session.query(ShuntingQuestion).count()==0
 
 
@@ -135,7 +135,7 @@ def test_student_submit_teacher_review_and_history_isolation(client,topics,db_se
     q=topics[0]
     path=f'/api/lab-topics/questions/{q.key}'
     assert client.get('/api/lab-topics/questions').status_code==401
-    assert len(client.get('/api/lab-topics/questions',headers=student).json())==24
+    assert len(client.get('/api/lab-topics/questions',headers=student).json())==18
     assert 'expected' not in client.get(path,headers=student).text
     assert client.get(path+'/rubric',headers=student).status_code==403
     assert client.get('/api/lab-topics/reviews',headers=student).status_code==403
