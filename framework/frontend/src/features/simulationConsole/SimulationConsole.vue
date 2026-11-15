@@ -35,7 +35,7 @@
           <p>带铅封操作须输入教学口令，默认 0000。人工解锁期间信号关闭、锁闭保持，倒计时完成且区段空闲后释放。</p>
           <p>空闲浅蓝，锁闭白色，占用红色；定位绿色，反位黄色，失表示红闪。</p><p>运行会话在服务重启后需新建，已归档操作可在实验学习记录中查看。</p>
           <p v-if="source === 'reference'">本站独立使用原软件 {{ station.counts.candidate_routes }} 条进路定义。通过按钮以 TA 标识；同按钮多路径按可用条件选排。引导须先将道岔就位，选择进站始端和接车终端，并每 15 秒内办理引导保持。</p>
-          <p v-if="source === 'reference'">区故解先确认区段恢复空闲，再按功能、输入口令、点击区段。区间请求后，由教师在设备练习中模拟邻站同意。</p>
+          <p v-if="source === 'reference'">区故解先确认区段恢复空闲，再按功能、输入口令、点击区段。区间请求后，在设备练习中模拟邻站同意。</p>
         </div>
       </div></div>
       <div class="function-region" aria-label="常用功能按钮区">
@@ -50,7 +50,7 @@
         <small>默认教学口令为 0000；可由管理员通过服务器配置修改。</small><div><button type="button" @click="cancelPin">取消</button><button type="submit">确认</button></div>
       </form></div>
     <div v-if="showDevices && station" class="device-workbench">
-      <div><strong>设备练习</strong><span>先在站场点击设备；故障与占用仅教师、管理员可设置。</span></div><p>{{ inspected ? `${inspected.type} ${inspected.name}：${inspectedState}` : '尚未选择设备' }}</p>
+      <div><strong>设备练习</strong><span>先在站场点击设备；可模拟故障、占用并恢复设备状态。</span></div><p>{{ inspected ? `${inspected.type} ${inspected.name}：${inspectedState}` : '尚未选择设备' }}</p>
       <template v-if="inspected?.type === '道岔' && canControlTrain"><button @click="inject('SET_SWITCH_INDICATION', inspected.name)">{{ source === 'reference' ? '本端失表示' : '设置失表示' }}</button><button @click="inject('RESTORE_SWITCH_INDICATION', inspected.name)">{{ source === 'reference' ? '恢复本端表示' : '恢复表示' }}</button></template>
       <template v-if="inspected?.type === '区段' && canControlTrain"><button @click="inject('SET_SECTION_OCCUPANCY', inspected.name, { kind:'vehicle' })">车列占用</button><button @click="inject('SET_SECTION_OCCUPANCY', inspected.name, { kind:'fault' })">故障占用</button><button @click="inject('CLEAR_SECTION_OCCUPANCY', inspected.name)">恢复空闲</button></template>
       <div v-if="source === 'reference'"><p>闭塞采用本地邻站模拟，设备状态与各区间分别保存。</p></div>
@@ -60,7 +60,7 @@
       </div>
       <label>新会话区间许可<select v-model="intervalAvailable"><option :value="true">已具备</option><option :value="false">未具备（条件反例）</option></select></label><button @click="newSession" :disabled="busy || replaying">{{ confirmNew ? '确认新建会话' : '新建仿真会话' }}</button>
     </div>
-    <section class="activity-panel" v-if="station && showActivity"><div class="activity-heading"><strong>活动进路</strong><span>仅教师或管理员推进仿真车辆；观察占用、信号关闭及正常解锁。</span></div>
+    <section class="activity-panel" v-if="station && showActivity"><div class="activity-heading"><strong>活动进路</strong><span>推进仿真车辆，观察占用、信号关闭及正常解锁。</span></div>
       <p v-if="!activeRoutes.length" class="empty-route">暂无活动进路。{{ source === 'reference' ? '调车示例：D3 → D7。' : '接车示例：XNLA → S5LA。' }}</p>
       <div class="route-cards"><div v-for="route in activeRoutes" :key="route.id" class="route-card"><strong>{{ routeName(route.route_id) }}</strong><span>{{ statusText(route) }}</span><button :disabled="busy || replaying || stale || !canControlTrain || ['setting','track_proving','cancelling','clearing','manual_unlocking','closed_locked'].includes(route.status)" @click="advance(route.id)">{{ canControlTrain ? '仿真行车 · 推进一步' : '由教师控制仿真行车' }}</button></div></div>
     </section>
@@ -88,7 +88,7 @@ const pending=ref(null), pinCommand=ref(null), pin=ref(''), pinInput=ref(null), 
 let poller, ticker, lastPoll=0
 let commandQueue=Promise.resolve()
 const storageKey=computed(()=>`srtp-console-${source.value}-${userStore.user?.id || 'anonymous'}`)
-const canControlTrain=computed(()=>['teacher','admin'].includes(userStore.role))
+const canControlTrain=computed(()=>['student','teacher','admin'].includes(userStore.role))
 const visibleCommands=computed(()=>COMMANDS.filter(c=>!c.referenceOnly || source.value==='reference'))
 const displaySnapshot=computed(()=>replaying.value ? replayFrames.value[replayIndex.value] : snapshot.value)
 const activeRoutes=computed(()=>(displaySnapshot.value?.routes || []).filter(r=>!['released','cancelled'].includes(r.status)))

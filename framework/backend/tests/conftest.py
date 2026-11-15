@@ -1,6 +1,9 @@
 """Pytest fixtures for interlocking tests."""
 
 import sys
+import os
+import atexit
+from uuid import uuid4
 from collections.abc import Generator
 from pathlib import Path
 
@@ -12,10 +15,25 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
+# Importing the application and running startup must never use the personal DB.
+TEST_DIRECTORY = ROOT_DIR.parents[1] / '.runtime' / 'isolated-tests'
+TEST_DIRECTORY.mkdir(parents=True, exist_ok=True)
+IMPORT_DATABASE = TEST_DIRECTORY / f'import-{uuid4().hex}.db'
+os.environ['DATABASE_URL'] = f'sqlite:///{IMPORT_DATABASE.as_posix()}'
+os.environ['SECRET_KEY'] = 'isolated-workflow-tests-only'
+os.environ['DEEPSEEK_API_KEY'] = ''
+
 from app.core.database import Base, get_db
 from app.models import *  # noqa: F403 - import all models for metadata
 from app.services.interlocking.seed_service import reset_station_runtime_state, seed_default_station
 from main import app
+
+
+@atexit.register
+def remove_import_database():
+    from app.core.database import engine
+    engine.dispose()
+    IMPORT_DATABASE.unlink(missing_ok=True)
 
 
 @pytest.fixture()

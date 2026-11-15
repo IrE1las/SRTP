@@ -22,16 +22,19 @@ def get_user_by_username(db: Session, username: str) -> User | None:
 def create_user(db: Session, user_in: UserRegister) -> User:
     """Create a new user with a hashed password."""
 
+    from app.services.admin_service import check_student_number, commit_account
+    student_id = (user_in.student_id or "").strip() or None
+    check_student_number(db, student_id)
     db_user = User(
         username=user_in.username,
         password_hash=get_password_hash(user_in.password),
         real_name=user_in.real_name,
         role=user_in.role,
-        student_id=user_in.student_id,
+        student_id=student_id,
         class_name=user_in.class_name,
     )
     db.add(db_user)
-    db.commit()
+    commit_account(db)
     db.refresh(db_user)
     return db_user
 
@@ -40,7 +43,7 @@ def authenticate_user(db: Session, username: str, password: str) -> User | None:
     """Authenticate username and password, returning the user on success."""
 
     user = get_user_by_username(db, username)
-    if user is None:
+    if user is None or not user.is_active:
         return None
     if not verify_password(password, user.password_hash):
         return None

@@ -6,7 +6,7 @@
       <span class="header-tool-divider"></span>
       <el-dropdown trigger="click" @command="handleCommand">
         <button class="user-menu"><span class="user-avatar">{{ displayName.slice(0, 1).toUpperCase() }}</span><span class="user-details"><strong>{{ displayName }}</strong><small v-if="displayName !== roleLabel">{{ roleLabel }}</small></span><el-icon><ArrowDown /></el-icon></button>
-        <template #dropdown><el-dropdown-menu><el-dropdown-item command="logout">退出登录</el-dropdown-item></el-dropdown-menu></template>
+        <template #dropdown><el-dropdown-menu><el-dropdown-item command="account">个人资料与密码</el-dropdown-item><el-dropdown-item command="logout">退出登录</el-dropdown-item></el-dropdown-menu></template>
       </el-dropdown>
     </div>
     <el-dialog v-model="searchOpen" title="快速前往" width="520px" class="page-search-dialog" @opened="searchInput?.focus()">
@@ -29,6 +29,7 @@ const displayName = computed(() => userStore.user?.real_name || userStore.user?.
 const currentTitle = computed(() => pageLabel(route.path, userStore.role))
 const searchResults = computed(() => navigationGroups(userStore.role).flatMap(group => group.items.map(item => ({ ...item, group: group.title }))).filter(item => (item.title + item.group).includes(query.value.trim())))
 function handleCommand(command) {
+  if (command === 'account') { router.push('/account'); return }
   if (command !== 'logout') return
   userStore.logout()
   router.push('/login')

@@ -10,6 +10,8 @@ export const roleHomeMap = {
 }
 
 const routes = [
+  { path: '/operations/manage/:questionId([0-9]+)/record', component: () => import('@/views/teacher/OperationWorkspace.vue'), meta: { requiresAuth: true, roles: ['teacher','admin'] } },
+  { path: '/student/exams/attempts/:attemptId', component: () => import('@/views/student/ExamAttempt.vue'), meta: { requiresAuth: true, roles: ['student'], examStandalone: true } },
   {
     path: '/login',
     name: 'Login',
@@ -20,6 +22,24 @@ const routes = [
     component: AppLayout,
     meta: { requiresAuth: true },
     children: [
+  { path: 'student/learn/operations', component: () => import('@/views/student/OperationCatalogue.vue'), meta: { roles: ['student'] } },
+  { path: 'student/learn/operations/history', component: () => import('@/views/student/OperationHistory.vue'), meta: { roles: ['student'] } },
+  { path: 'student/learn/operations/attempts/:attemptId', component: () => import('@/views/student/OperationAttempt.vue'), meta: { roles: ['student'] } },
+  { path: 'operations/reviews', component: () => import('@/views/teacher/OperationReviews.vue'), meta: { roles: ['teacher','admin'] } },
+  { path: 'operations/reviews/:attemptId', component: () => import('@/views/teacher/OperationAttemptReview.vue'), meta: { roles: ['teacher','admin'] } },
+  { path: 'operations/manage', component: () => import('@/views/teacher/OperationQuestions.vue'), meta: { roles: ['teacher','admin'] } },
+  { path: 'operations/manage/new', component: () => import('@/views/teacher/OperationEditor.vue'), meta: { roles: ['teacher','admin'] } },
+  { path: 'operations/manage/:questionId([0-9]+)/edit', component: () => import('@/views/teacher/OperationEditor.vue'), meta: { roles: ['teacher','admin'] } },
+  { path: 'operations/manage/:questionId([0-9]+)/review', component: () => import('@/views/teacher/OperationReview.vue'), meta: { roles: ['teacher','admin'] } },
+  { path: 'student/exams', component: () => import('@/views/student/Exams.vue'), meta: { roles: ['student'] } },
+  { path: 'student/exams/history', component: () => import('@/views/student/ExamHistory.vue'), meta: { roles: ['student'] } },
+  { path: 'teacher/exams', component: () => import('@/views/teacher/Exams.vue'), meta: { roles: ['teacher'] } },
+  { path: 'exams/manage', component: () => import('@/views/teacher/Exams.vue'), meta: { roles: ['teacher','admin'] } },
+  { path: 'exams/manage/new', component: () => import('@/views/teacher/ExamEditor.vue'), meta: { roles: ['teacher','admin'] } },
+  { path: 'exams/manage/:examId([0-9]+)', component: () => import('@/views/teacher/ExamEditor.vue'), meta: { roles: ['teacher','admin'] } },
+  { path: 'exams/manage/attempts/:attemptId', component: () => import('@/views/teacher/ExamAttempt.vue'), meta: { roles: ['teacher','admin'] } },
+  { path: 'admin/users', component: () => import('@/views/admin/UserManagement.vue'), meta: { roles: ['admin'] } },
+      { path: 'account', component: () => import('@/views/shared/ProfileHome.vue'), meta: { roles: ['student','teacher','admin'] } },
       { path: 'student/chapter-bank', component: () => import('@/features/chapterBank/ChapterBank.vue'), meta: { roles: ['student','teacher','admin'] } },
       { path: 'student/chapter-bank/:chapterId(1|2|3|4|5|6)', component: () => import('@/features/chapterBank/ChapterBank.vue'), meta: { roles: ['student','teacher','admin'] } },
       { path: 'student/modules', component: () => import('@/features/modules/ModuleHub.vue'), meta: { roles: ['student','teacher','admin'] } },

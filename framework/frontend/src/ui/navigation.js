@@ -1,4 +1,4 @@
-import { Clock, Cpu, DataAnalysis, EditPen, Files, Guide, Monitor, SetUp, Share, UserFilled } from '@element-plus/icons-vue'
+import { Calendar, Clock, Cpu, DataAnalysis, EditPen, Files, Guide, Monitor, SetUp, Share, UserFilled } from '@element-plus/icons-vue'
 const study = { title: '学习空间', items: [
   { title: '客观题库', path: '/student/chapter-bank', icon: Files },
   { title: '实验专题', path: '/student/lab-topics', icon: Guide },
@@ -27,15 +27,37 @@ const contentManagement = { title: '出题与批阅', items: [
   { title: '自行出题', path: '/admin/questions/new', icon: EditPen },
   { title: '批阅中心', path: '/admin/grading', icon: DataAnalysis },
 ] }
+const assessments = { title: '操作与考试', items: [
+  { title: '操作学习', path: '/student/learn/operations', icon: Monitor },
+  { title: '操作学习记录', path: '/student/learn/operations/history', icon: Clock },
+  { title: '正式考试', path: '/student/exams', icon: Calendar },
+  { title: '历史考试与成绩', path: '/student/exams/history', icon: DataAnalysis },
+] }
+const operationTeaching = { title: '操作与考试管理', items: [
+  { title: '操作题录制与管理', path: '/operations/manage', icon: Monitor },
+  { title: '操作学习批阅', path: '/operations/reviews', icon: EditPen },
+  { title: '正式考试管理', path: '/exams/manage', icon: Calendar },
+] }
+const account = { title: '账号', items: [{ title: '个人资料与密码', path: '/account', icon: UserFilled }] }
 const admin = { title: '平台管理', items: [
   { title: '系统管理', path: '/admin', icon: UserFilled },
+  { title: '用户管理', path: '/admin/users', icon: UserFilled },
   { title: 'AI 设置', path: '/admin/ai-settings', icon: Cpu },
 ] }
 export const roleLabels = { student: '学生', teacher: '教师', admin: '管理员' }
 export function navigationGroups(role) {
-  return role === 'admin' ? [study, records, contentManagement, {...teaching,items:teaching.items.filter(i=>!['/teacher/grading','/teacher/lab-topics','/student/lab-topics','/student/simulation-console','/student/chapter-bank'].includes(i.path))}, admin] : role === 'teacher' ? [teaching, records] : role === 'student' ? [study, records] : []
+  return role === 'admin' ? [study, records, contentManagement, {...teaching,items:teaching.items.filter(i=>!['/teacher/grading','/teacher/lab-topics','/student/lab-topics','/student/simulation-console','/student/chapter-bank'].includes(i.path))}, operationTeaching, admin, account] : role === 'teacher' ? [teaching, records, operationTeaching, account] : role === 'student' ? [study, records, assessments, account] : []
 }
 export function pageLabel(path, role) {
+  if (path.startsWith('/student/exams/attempts/')) return '正式考试'
+  if (path.startsWith('/exams/manage/attempts/')) return '考试批阅'
+  if (path.startsWith('/exams/manage/')) return '考试设置'
+  if (/^\/operations\/manage\/.*\/record$/.test(path)) return '录制标准操作'
+  if (/^\/operations\/manage\/.*\/review$/.test(path)) return '检查与发布'
+  if (path.startsWith('/operations/manage/')) return '操作题设置'
+  if (path.startsWith('/operations/reviews/')) return '操作学习批阅'
+  if (path.startsWith('/student/learn/operations/attempts/')) return '操作作答'
+
   return navigationGroups(role).flatMap(group => group.items).find(item => item.path === path)?.title
     || classicNavigation.find(item => item.path === path)?.title
     || ({ '/student/dashboard': '学习概览', '/student/lobby': '练习大厅', '/teacher/lab-topics': '实验专题' })[path]

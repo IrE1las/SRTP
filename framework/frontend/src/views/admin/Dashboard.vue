@@ -1,6 +1,7 @@
 <template>
   <div class="admin-dashboard">
   <section class="authoring-entry"><div><h2>出题与批阅</h2></div><div><router-link to="/admin/questions">管理题库</router-link><router-link to="/admin/questions/new">＋ 自行出题</router-link><router-link to="/admin/grading">进入批阅中心 →</router-link></div></section>
+  <nav class="management-links"><router-link to="/admin/users">用户管理</router-link><router-link to="/operations/manage">操作题录制</router-link><router-link to="/exams/manage">正式考试管理</router-link></nav>
   <PracticePath />
   <div class="section-title-row"><div><h2>平台运行概览</h2></div><router-link to="/teacher/exercises">管理仿真练习 ↗</router-link></div>
   <el-card shadow="never" v-loading="loading" class="admin-overview-card">
@@ -18,7 +19,7 @@
       <el-table-column prop="class_name" label="班级" />
       <el-table-column label="操作" width="120">
         <template #default="{ row }">
-          <el-button size="small" type="danger" plain @click="removeUser(row.id)">删除</el-button>
+          <router-link to="/admin/users">管理账号</router-link>
         </template>
       </el-table-column>
     </el-table>
@@ -28,9 +29,8 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
-import { ElMessageBox } from 'element-plus'
 
-import { deleteAdminUser, getAdminOverview, listAdminUsers } from '@/api/admin'
+import { getAdminOverview, listAdminUsers } from '@/api/admin'
 import PracticePath from '@/components/PracticePath.vue'
 
 const overview = ref({})
@@ -47,16 +47,12 @@ async function loadData() {
   }
 }
 
-async function removeUser(userId) {
-  await ElMessageBox.confirm('确认删除该用户？', '提示')
-  await deleteAdminUser(userId)
-  await loadData()
-}
-
 onMounted(loadData)
 </script>
 
 <style scoped>
+.management-links{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:24px}.management-links a{padding:12px 18px;background:white;border:1px solid var(--swjtu-line);border-top:3px solid var(--swjtu-gold);border-radius:7px}
+
 .authoring-entry{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:25px 28px;margin-bottom:25px;background:#eaf4fb;border:1px solid #b9d6e8;border-radius:9px}.authoring-entry span{font-size:var(--ui-text-meta);letter-spacing:2px;color:#5e8aa6}.authoring-entry h2{font-size:24px;margin:12px 0}.authoring-entry p{font-size:var(--ui-text-base);color:#586f82;line-height:1.8}.authoring-entry>div:last-child{display:flex;gap:10px;flex-wrap:wrap}.authoring-entry a{padding:11px 14px;border:1px solid #b9d6e8;background:white;border-radius:6px;font-size:var(--ui-text-base);white-space:nowrap}.authoring-entry a:last-child{background:#0075b7;color:white;border-color:#0075b7}@media(max-width:1000px){.authoring-entry{flex-direction:column;align-items:flex-start}}
 .admin-card-caption { color: #586f82; margin-left: 15px; font-size: var(--ui-text-meta); font-weight: 400; }
 .overview {
