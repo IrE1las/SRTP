@@ -95,15 +95,15 @@ def test_console_is_durable_without_poll_operations_or_pin(client, db_session, a
     assert 'private-test-pin' not in persisted and 'also-private' not in persisted
 
 
-def test_console_permission_refusal_is_recorded_only_on_owned_session(client, accounts):
+def test_student_free_practice_is_recorded_only_on_owned_session(client, accounts):
     user, teacher, _ = accounts
     sid = client.post('/api/simulation-console/sessions', headers=headers(user), json={}).json()['session_id']
     response = client.post(f'/api/simulation-console/sessions/{sid}/commands', headers=headers(user),
-                          json={'type': 'SET_SECTION_OCCUPANCY', 'target': '7DG'})
-    assert response.status_code == 403
+                          json={'type': 'SET_SECTION_OCCUPANCY', 'target': '7DG', 'payload': {'kind': 'fault'}})
+    assert response.status_code == 200 and response.json()['accepted']
     detail = client.get(f'/api/learning-records/simulation/{sid}', headers=headers(user)).json()
-    assert detail['operation_count'] == 1 and detail['operations'][0]['accepted'] is False
-    assert detail['errors'][0]['message'] == response.json()['detail']
+    assert detail['operation_count'] == 1 and detail['operations'][0]['accepted'] is True
+    assert detail['errors'] == []
     foreign = client.post(f'/api/simulation-console/sessions/{sid}/commands', headers=headers(teacher),
                           json={'type': 'SET_SECTION_OCCUPANCY', 'target': '7DG'})
     assert foreign.status_code == 409

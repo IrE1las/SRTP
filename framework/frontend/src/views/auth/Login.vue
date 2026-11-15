@@ -106,7 +106,7 @@ async function handleLogin() {
   if (!await loginFormRef.value.validate().catch(() => false)) return
   loginLoading.value = true
   try {
-    const user = await userStore.login(loginForm)
+    const user = await userStore.login({ ...loginForm })
     ElMessage.success('登录成功')
     const redirect = route.query.redirect
     router.push(typeof redirect === 'string' ? redirect : roleHomeMap[user.role])
@@ -114,6 +114,7 @@ async function handleLogin() {
     if (error.response?.status === 401) ElMessage.error('用户名或密码不正确，请重新输入')
     // Other API errors are displayed by the shared request interceptor.
   } finally {
+    loginForm.password = ''
     loginLoading.value = false
   }
 }
@@ -131,6 +132,7 @@ async function handleRegister() {
   } catch {
     // The shared request interceptor displays the registration error.
   } finally {
+    registerForm.password = ''
     registerLoading.value = false
   }
 }

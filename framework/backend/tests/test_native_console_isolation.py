@@ -250,7 +250,13 @@ def test_console_peer_http_permission_and_workbook_rejects_native_commands(clien
     snap=client.post(root+'/sessions',headers=student,json={'source':'reference','interval_available':False}).json()
     url=root+'/sessions/'+snap['session_id']+'/commands'
     response=client.post(url,headers=student,json={'type':'BLOCK_PEER_ACCEPT','target':'XD','version':snap['version']})
-    assert response.status_code==403
+    assert response.status_code==200 and not response.json()['accepted']
+    snap=response.json()['snapshot']
+    response=client.post(url,headers=student,json={'type':'BLOCK_REQUEST','target':'XD','version':snap['version']})
+    assert response.status_code==200 and response.json()['accepted']
+    snap=response.json()['snapshot']
+    response=client.post(url,headers=student,json={'type':'BLOCK_PEER_ACCEPT','target':'XD','version':snap['version']})
+    assert response.status_code==200 and response.json()['accepted']
     snap=client.post(root+'/sessions',headers=teacher,json={'source':'workbook'}).json()
     response=client.post(root+'/sessions/'+snap['session_id']+'/commands',headers=teacher,
                          json={'type':'GUIDE_TOTAL_LOCK','target':'X','pin':'0000','version':snap['version']})

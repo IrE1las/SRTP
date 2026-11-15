@@ -127,7 +127,7 @@ def clear_selection(session_id: str, request: VersionRequest, current_user: User
 
 @router.post("/sessions/{session_id}/advance")
 def advance_train(session_id: str, request: StepRequest,
-                  current_user: User = Depends(require_roles("teacher", "admin")), db: Session = Depends(get_db)) -> dict:
+                  current_user: User = AnyRole, db: Session = Depends(get_db)) -> dict:
     return _record_call(db, current_user, session_id, {'type': 'ADVANCE_TRAIN', 'target': request.route_instance_id},
         service_for(session_id).step_train, session_id, current_user.id, request.route_instance_id, request.version)
 
@@ -137,8 +137,5 @@ def console_command(session_id: str, request: ConsoleCommandRequest, current_use
     service = service_for(session_id)
     command = request.model_dump(exclude={'version'})
     def execute_allowed():
-        if request.type in {'SET_SWITCH_INDICATION', 'RESTORE_SWITCH_INDICATION',
-                            'SET_SECTION_OCCUPANCY', 'CLEAR_SECTION_OCCUPANCY', 'BLOCK_PEER_ACCEPT'} and current_user.role == 'student':
-            raise HTTPException(status_code=403, detail='只有教师或管理员可模拟设备故障、占用和邻站输入')
         return operate(service, session_id, current_user.id, command, request.version)
     return _record_call(db, current_user, session_id, command, execute_allowed)

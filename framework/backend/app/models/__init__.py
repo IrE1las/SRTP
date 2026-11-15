@@ -41,3 +41,8 @@ __all__ = [
     "Switch",
     "User",
 ]
+
+from app.models.operation import OperationQuestion, OperationVersion, OperationSession, OperationEvent
+from app.models.operation_learning import OperationAttempt, OperationReview
+from app.models.exam import Exam, ExamParticipant, ExamAttempt, ExamControlEvent
+from app.models.exam_grade import ExamGrade, ExamGradePublication, ExamGradeAudit

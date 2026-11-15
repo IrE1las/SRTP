@@ -3,6 +3,8 @@
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
+import base64
+import hashlib
 import bcrypt
 from jose import JWTError, jwt
 
@@ -18,13 +20,18 @@ def _to_bytes(password: str) -> bytes:
 def get_password_hash(password: str) -> str:
     """Hash a plain text password before storing it."""
 
-    return bcrypt.hashpw(_to_bytes(password), bcrypt.gensalt()).decode("utf-8")
+    # Fixed-length prehash avoids silently treating passwords sharing 72 bytes as equal.
+    encoded = base64.b64encode(hashlib.sha256(password.encode("utf-8")).digest())
+    return "bcrypt-sha256$" + bcrypt.hashpw(encoded, bcrypt.gensalt()).decode("utf-8")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a plain text password against the stored hash."""
 
     try:
+        if hashed_password.startswith("bcrypt-sha256$"):
+            encoded = base64.b64encode(hashlib.sha256(plain_password.encode("utf-8")).digest())
+            return bcrypt.checkpw(encoded, hashed_password.removeprefix("bcrypt-sha256$").encode("utf-8"))
         return bcrypt.checkpw(_to_bytes(plain_password), hashed_password.encode("utf-8"))
     except (ValueError, TypeError):
         return False

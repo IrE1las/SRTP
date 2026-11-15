@@ -203,8 +203,14 @@ def test_reference_http_selection_ownership_and_fault_permissions(client,db_sess
     assert snap['profile']=='reference'
     url=root+'/sessions/'+snap['session_id']
     assert client.get(url,headers=other).status_code==409
-    forbidden={'type':'SET_SECTION_OCCUPANCY','target':'IAG','payload':{'kind':'fault'},'version':snap['version']}
-    assert client.post(url+'/commands',headers=student,json=forbidden).status_code==403
+    fault={'type':'SET_SECTION_OCCUPANCY','target':'IAG','payload':{'kind':'fault'},'version':snap['version']}
+    reply = client.post(url+'/commands', headers=student, json=fault)
+    assert reply.status_code == 200 and reply.json()['accepted']
+    snap = reply.json()['snapshot']
+    assert snap['sections']['IAG']['occupied']
+    reply = client.post(url+'/commands', headers=student, json={'type':'CLEAR_SECTION_OCCUPANCY','target':'IAG','version':snap['version']})
+    assert reply.status_code == 200 and reply.json()['accepted']
+    snap = reply.json()['snapshot']
     for button in ['D3DA','D7DA']:
         reply=client.post(url+'/buttons',headers=student,json={'button':button,'version':snap['version']})
         assert reply.status_code==200 and reply.json()['accepted']
@@ -213,6 +219,8 @@ def test_reference_http_selection_ownership_and_fault_permissions(client,db_sess
     clock[0]+=.7
     snap=client.get(url,headers=student).json()
     assert snap['signals']['D3']['aspect']=='B'
-    assert client.post(url+'/advance',headers=student,json={'route_instance_id':snap['routes'][0]['id'],'version':snap['version']}).status_code==403
+    advanced = client.post(url+'/advance',headers=student,json={'route_instance_id':snap['routes'][0]['id'],'version':snap['version']})
+    assert advanced.status_code == 200 and advanced.json()['accepted']
+    snap = advanced.json()['snapshot']
     assert client.post(url+'/commands',headers=student,json={'type':'SIGNAL_UNSEAL','target':'D3','pin':'wrong','version':snap['version']}).json()['reason_code']=='INVALID_PIN'
     reference_service.sessions.pop(snap['session_id'],None)

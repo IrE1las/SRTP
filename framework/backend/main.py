@@ -1,6 +1,10 @@
 """Application entry point."""
 
+import asyncio
+import logging
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import admin, ai_scores, auth, exercise_runtime, exercises, interlocking, interlocking_exam, settings, statistics
@@ -10,7 +14,9 @@ from app.api import management
 from app.api import simulation_console
 from app.api import module_one_experiment1
 from app.api import chapter_bank
-from app.api import learning_records
+from app.api import learning_records, operations, operation_learning, exams
+from app.services.account_upgrade import upgrade_accounts
+from app.services import exams as exam_service
 from app.core.database import Base, SessionLocal, engine
 from app.core.security import get_password_hash
 from app.models.user import User
@@ -59,6 +65,7 @@ def _ensure_default_admin() -> None:
 def on_startup() -> None:
     """Create database tables and seed the local default admin and demo station."""
 
+    upgrade_accounts(engine)
     Base.metadata.create_all(bind=engine)
     _ensure_default_admin()
     with SessionLocal() as db:
@@ -94,3 +101,40 @@ app.include_router(simulation_console.router, prefix="/api/simulation-console", 
 app.include_router(module_one_experiment1.router, prefix="/api", tags=["module-one"])
 app.include_router(chapter_bank.router, prefix="/api/chapter-bank", tags=["chapter-bank"])
 app.include_router(learning_records.router, prefix="/api/learning-records", tags=["learning-records"])
+
+
+@app.exception_handler(RequestValidationError)
+async def safe_validation_error(request, exc):
+    errors = [{"loc": list(error["loc"]), "msg": error["msg"], "type": error["type"]} for error in exc.errors()]
+    return JSONResponse(status_code=422, content={"detail": errors})
+
+app.include_router(operations.router, prefix='/api/operations', tags=['operation-authoring'])
+app.include_router(operation_learning.router, prefix='/api/operation-learning', tags=['operation-learning'])
+app.include_router(exams.router, prefix='/api/exams', tags=['formal-exams'])
+
+def _settle_exams():
+    with SessionLocal() as db, exam_service.ops.LOCK:
+        exam_service.settle_all(db)
+
+async def _exam_clock():
+    while True:
+        await asyncio.sleep(1)
+        try:
+            await asyncio.to_thread(_settle_exams)
+        except Exception:
+            logging.getLogger(__name__).exception('考试到期结算失败，下次轮询重试')
+
+@app.on_event('startup')
+async def start_exam_clock():
+    _settle_exams()
+    app.state.exam_clock = asyncio.create_task(_exam_clock())
+
+@app.on_event('shutdown')
+async def stop_exam_clock():
+    task = getattr(app.state, 'exam_clock', None)
+    if task:
+        task.cancel()
+        try:
+            await task
+        except asyncio.CancelledError:
+            pass
