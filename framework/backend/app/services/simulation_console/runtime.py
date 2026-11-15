@@ -1,7 +1,11 @@
-"""Shared session, route guards and timing primitives for the standard station.
+"""Session-isolated, conservative first-stage teaching interlocking runtime.
 
-Station configuration must be injected explicitly; importing this module never
-loads a teaching station or creates a free simulation session.
+This simulator is intentionally separate from the legacy exercise engine.
+Experiment commands extend this same state machine through commands.py.
+The operator console adds checked, timed manual release in console_commands.py.
+Arbitrary train moves remain unsupported.
+Its decisions are traceable to the supplied TB/T 3027, 3578 and 3537 copies and
+to the imported workbook rows; it is not safety-certified railway software.
 """
 
 from __future__ import annotations
@@ -13,6 +17,7 @@ from threading import RLock
 from time import monotonic
 from uuid import uuid4
 
+from .station import station_package
 
 
 class SimulationError(Exception):
@@ -38,8 +43,8 @@ class RuntimeSession:
 
 
 class SimulationService:
-    def __init__(self, package: dict) -> None:
-        self.package = package
+    def __init__(self, package: dict | None = None) -> None:
+        self.package = package if package is not None else station_package()
         self.routes = {route["id"]: route for route in self.package["routes"]}
         self.buttons = {button["name"]: button for button in self.package["buttons"]}
         self.section_defs = {section["name"]: section for section in self.package["sections"]}
@@ -135,7 +140,7 @@ class SimulationService:
     def _snapshot(self, session: RuntimeSession) -> dict:
         remaining = max(0, int(session.selection_deadline - monotonic() + 0.99)) if session.selection_deadline else 0
         result = {
-            "profile": self.package.get("profile", "reference"),
+            "profile": self.package.get("profile", "workbook"),
             "session_id": session.id, "version": session.version,
             "interval_available": session.interval_available,
             "selected_buttons": list(session.selected), "selection_remaining_seconds": remaining,
@@ -187,8 +192,19 @@ class SimulationService:
                 "devices": devices or [], "snapshot": self._snapshot(session)}
 
     def _conditional_sections(self, session: RuntimeSession, route: dict) -> list[str]:
-        # Clearance semantics belong to the injected station runtime.
-        raise NotImplementedError("站场运行类必须提供本身的超限区段条件校验")
+        sections = route["overlap_sections"]
+        condition = route["overlap_condition"]
+        if not sections:
+            return []
+        if not condition:
+            return sections  # Unknown condition is checked conservatively.
+        from .station import _switches
+        demands, errors = _switches(condition)
+        if errors or not demands:
+            raise SimulationError(f"进路 {route['id']} 超限区段条件无法核验")
+        if all(session.switches.get(sid, {}).get("position") == pos for sid, pos in demands.items()):
+            return sections
+        return []
 
     @staticmethod
     def _hostile_names(route: dict) -> set[str]:
@@ -390,3 +406,6 @@ class SimulationService:
                 self._event(session, "train_exit", f"车辆出清末端 {last}；等待三点检查和 3 秒延时",
                             instance["route_id"])
             return {"accepted": True, "message": session.last_message, "snapshot": self._snapshot(session)}
+
+
+simulation_service = SimulationService()

@@ -1,46 +1,62 @@
-"""Project-local, isolated databases; application startup never touches a real database."""
-import os
+"""Pytest fixtures for interlocking tests."""
+
 import sys
+from collections.abc import Generator
 from pathlib import Path
-ROOT_DIR = Path(__file__).resolve().parents[1]
-PROJECT = ROOT_DIR.parents[1]
-if str(ROOT_DIR) not in sys.path:
-    sys.path.insert(0, str(ROOT_DIR))
-(PROJECT / '.runtime/tests').mkdir(parents=True, exist_ok=True)
-# Must happen before importing database, settings or main.
-os.environ['DATABASE_URL'] = f"sqlite:///{(PROJECT / '.runtime/tests/import-only.db').as_posix()}"
-os.environ['SECRET_KEY'] = 's1-test-key-not-for-production'
-os.environ['DEEPSEEK_API_KEY'] = ''
 
 import pytest
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
 from app.core.database import Base, get_db
-import app.models
+from app.models import *  # noqa: F403 - import all models for metadata
+from app.services.interlocking.seed_service import reset_station_runtime_state, seed_default_station
 from main import app
 
+
 @pytest.fixture()
-def db_session(tmp_path):
-    engine = create_engine(f"sqlite:///{(tmp_path / 'test_railway.db').as_posix()}", connect_args={'check_same_thread':False})
-    Base.metadata.create_all(engine)
-    db = sessionmaker(bind=engine, autocommit=False, autoflush=False)()
+def db_session(tmp_path: Path) -> Generator[Session, None, None]:
+    """Create an isolated SQLite database for each test."""
+
+    db_path = tmp_path / "test_railway.db"
+    engine = create_engine(
+        f"sqlite:///{db_path}",
+        connect_args={"check_same_thread": False},
+    )
+    TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    Base.metadata.create_all(bind=engine)
+
+    db = TestingSessionLocal()
     try:
         yield db
     finally:
         db.close()
-        engine.dispose()
+        Base.metadata.drop_all(bind=engine)
+
 
 @pytest.fixture()
-def client(db_session):
+def seeded_station(db_session: Session) -> int:
+    """Seed and reset the default station, returning its ID."""
+
+    station = seed_default_station(db_session)
+    reset_station_runtime_state(db_session, station.id)
+    return station.id
+
+
+@pytest.fixture()
+def client(db_session: Session):
+    """Create a FastAPI TestClient using the isolated database."""
+
     from fastapi.testclient import TestClient
-    def override_get_db():
+
+    def override_get_db() -> Generator[Session, None, None]:
         yield db_session
+
     app.dependency_overrides[get_db] = override_get_db
-    startup = app.router.on_startup[:]
-    app.router.on_startup.clear()
-    try:
-        with TestClient(app) as test_client:
-            yield test_client
-    finally:
-        app.dependency_overrides.clear()
-        app.router.on_startup[:] = startup
+    with TestClient(app) as test_client:
+        yield test_client
+    app.dependency_overrides.clear()
