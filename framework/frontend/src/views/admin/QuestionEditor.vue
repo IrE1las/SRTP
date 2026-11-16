@@ -9,9 +9,9 @@
           <div class="control-grid"><label class="control">所属专题<el-select v-model="form.topic" aria-label="所属专题"><el-option v-for="t in topics" :key="t.id" :value="t.id" :label="t.title"/></el-select></label><label class="control">难度<el-select v-model="form.level" allow-create filterable aria-label="难度"><el-option v-for="l in ['基础','综合','分析']" :key="l" :label="l" :value="l"/></el-select></label><label class="control">专题内排序<el-input-number v-model="form.sequence" :min="1" :max="999" aria-label="专题内排序"/></label></div>
           <label class="control">题干<el-input v-model="form.prompt" type="textarea" :rows="5" maxlength="6000" show-word-limit placeholder="说明任务、已知条件和学生需要完成的工作。" aria-label="题干"/></label>
           <label class="control">题设条件（每行一条）<el-input :model-value="form.conditions.join('\n')" @update:model-value="v=>form.conditions=lines(v)" type="textarea" :rows="3" placeholder="如：进路内区段空闲，道岔有表示。" aria-label="题设条件"/></label>
-          <div class="control-grid two"><label class="control">图示背景<el-select v-model="form.diagram_mode" aria-label="图示背景"><el-option label="原图站场" value="station"/><el-option label="原图站场＋半自动闭塞题设" value="semi_auto"/><el-option label="原图站场＋自动闭塞题设" value="auto"/></el-select></label><label class="control">标签（以逗号分隔）<el-input :model-value="form.tags.join('，')" @update:model-value="v=>form.tags=v.split(/[，,]/).map(x=>x.trim()).filter(Boolean)" aria-label="标签"/></label></div>
+          <div class="control-grid two"><label class="control">图示背景<el-input :model-value="form.topic<=4?'标准站（专题1—4）':'原图站场（专题5—6）'" readonly aria-label="图示背景"/></label><label class="control">标签（以逗号分隔）<el-input :model-value="form.tags.join('，')" @update:model-value="v=>form.tags=v.split(/[，,]/).map(x=>x.trim()).filter(Boolean)" aria-label="标签"/></label></div>
           <label class="control">命题与评分依据<el-input v-model="form.source_section" type="textarea" :rows="2" maxlength="1500" placeholder="填写对应实验报告位置，或自编题所依据的资料。" aria-label="命题依据"/></label>
-          <details class="extra-settings"><summary>关联站场设备（便于记录题目涉及的设备）</summary><el-select v-model="form.devices" multiple filterable placeholder="选择原图设备" aria-label="关联设备"><el-option v-for="d in devices" :key="d" :label="d" :value="d"/></el-select></details>
+          <details class="extra-settings"><summary>关联站场设备（便于记录题目涉及的设备）</summary><el-select v-model="form.devices" multiple filterable placeholder="选择本站设备" aria-label="关联设备"><el-option v-for="d in devices" :key="d" :label="d" :value="d"/></el-select></details>
         </section>
         <section class="fields-heading"><div><h2>答题栏与评分规则</h2><p>可组合多种题型；每个答题栏单独设置分值和解析。</p></div><el-dropdown trigger="click" @command="addField"><el-button type="primary" plain>＋ 添加答题栏</el-button><template #dropdown><el-dropdown-menu><el-dropdown-item v-for="(label,kind) in kinds" :key="kind" :command="kind">{{ label }}</el-dropdown-item></el-dropdown-menu></template></el-dropdown></section>
         <el-empty v-if="!form.fields.length" description="添加第一个答题栏"/>
@@ -48,16 +48,18 @@ import Notation from '@/components/RailwayNotation.vue'
 import QuestionPreview from '@/components/QuestionPreview.vue'
 import {getManagementMetadata,getManagedQuestion,createManagedQuestion,saveQuestionDraft,publishQuestion,previewManagedQuestion,getQuestionVersions,restoreQuestionVersion} from '@/api/management'
 const route=useRoute(),router=useRouter(),loading=ref(true),busy=ref(false),recordId=ref(null),state=ref({revision:0,published_version:0}),dirty=ref(false),savedText=ref('尚未保存'),notice=ref('')
-const topics=ref([]),devices=ref([]),activeField=ref(''),previewOpen=ref(false),previewData=ref(null),previewContent=ref(null),versionsOpen=ref(false),versions=ref([])
+const topics=ref([]),originalDevices=ref([]),standardDevices=ref([]),activeField=ref(''),previewOpen=ref(false),previewData=ref(null),previewContent=ref(null),versionsOpen=ref(false),versions=ref([])
 const kinds={choice:'单选 / 判断',multi:'多项选择',order:'时序排序',cell:'填写题',essay:'论述 / 记录'}
 const clone=value=>JSON.parse(JSON.stringify(value)),uid=()=>`f_${crypto.randomUUID().replaceAll('-','').slice(0,12)}`
 function newField(kind){const f={id:uid(),kind,label:'',points:10};if(kind==='essay')Object.assign(f,{criteria:[],rubric:[]});else{f.explanation='';if(kind==='cell')Object.assign(f,{expected:'',accepted_answers:[],matching:'tokens'});else Object.assign(f,{options:['选项1','选项2'],expected:kind==='choice'?'':kind==='order'?['选项1','选项2']:[],scoring:'exact'})}return f}
-const form=ref({title:'未命名题目',topic:9,sequence:1,level:'基础',prompt:'',conditions:[],source_section:'管理员命题',tags:[],devices:[],diagram_mode:'station',fields:[newField('essay')]})
+const form=ref({title:'未命名题目',topic:1,sequence:1,level:'基础',prompt:'',conditions:[],source_section:'管理员命题',tags:[],devices:[],diagram_mode:'standard',fields:[newField('essay')]})
+const devices=computed(()=>form.value.topic<=4?standardDevices.value:originalDevices.value)
+watch(()=>form.value.topic,topic=>{form.value.diagram_mode=topic<=4?'standard':'station'})
 const totalPoints=computed(()=>form.value.fields.reduce((s,f)=>s+(Number(f.points)||0),0)),autoPoints=computed(()=>form.value.fields.filter(f=>f.kind!=='essay').reduce((s,f)=>s+(Number(f.points)||0),0))
 let initializing=false,localKey=''
 const lines=value=>value.split('\n')
 function prepared(){const value=clone(form.value);value.conditions=value.conditions.map(x=>x.trim()).filter(Boolean);for(const f of value.fields){if(f.criteria)f.criteria=f.criteria.map(x=>x.trim()).filter(Boolean);if(f.accepted_answers)f.accepted_answers=f.accepted_answers.map(x=>x.trim()).filter(Boolean)}return value}
-function normalize(value){const result=clone(value);result.tags??=[];result.devices??=[];result.diagram_mode??=result.topic===7?'semi_auto':result.topic===8?'auto':'station';for(const f of result.fields){if(f.kind==='essay'){f.criteria??=[];f.rubric??=[]}if(f.kind==='cell'){f.accepted_answers??=[];f.matching??=f.binding?.column==='排列进路按下按钮'?'ordered':'tokens'}if(f.kind==='multi')f.scoring??='exact'}return result}
+function normalize(value){const result=clone(value);result.tags??=[];result.devices??=[];result.diagram_mode??=result.topic<=4?'standard':'station';for(const f of result.fields){if(f.kind==='essay'){f.criteria??=[];f.rubric??=[]}if(f.kind==='cell'){f.accepted_answers??=[];f.matching??=f.binding?.column==='排列进路按下按钮'?'ordered':'tokens'}if(f.kind==='multi')f.scoring??='exact'}return result}
 function draftKey(){return `srtp_editor_${JSON.parse(localStorage.getItem('railway_user')||'{}').id}_${recordId.value||'new'}`}
 watch(form,()=>{if(initializing)return;dirty.value=true;try{localStorage.setItem(draftKey(),JSON.stringify({revision:state.value.revision,content:form.value}))}catch{}},{deep:true,flush:'sync'})
 function adopt(data){initializing=true;state.value=data;recordId.value=data.id;form.value=normalize(data.content);activeField.value=form.value.fields[0]?.id||'';dirty.value=false;savedText.value='草稿已保存';initializing=false}
@@ -85,7 +87,7 @@ function formatDate(v){return new Date(v.endsWith('Z')?v:v+'Z').toLocaleString('
 function beforeUnload(e){if(dirty.value){e.preventDefault();e.returnValue=''}}
 onBeforeRouteLeave(async()=>{if(!dirty.value)return true;try{await ElMessageBox.confirm('编辑尚未保存到后台。本机已保留草稿，确定离开？','尚未保存',{confirmButtonText:'离开',cancelButtonText:'继续编辑'});return true}catch{return false}})
 watch(()=>route.params.id,id=>{if(String(id||'')!==String(recordId.value||''))load()})
-onMounted(async()=>{const meta=await getManagementMetadata();topics.value=meta.topics;const t=meta.topology;devices.value=t?[...t.signals.map(s=>s.name),...t.switches.map(s=>s.id),...t.sections.map(s=>s.name)]:[];await load();window.addEventListener('beforeunload',beforeUnload)})
+onMounted(async()=>{const meta=await getManagementMetadata();topics.value=meta.topics;const t=meta.topology;standardDevices.value=meta.standard_devices||[];originalDevices.value=t?[...t.signals.map(s=>s.name),...t.switches.map(s=>s.id),...t.sections.map(s=>s.name)]:[];await load();window.addEventListener('beforeunload',beforeUnload)})
 onBeforeUnmount(()=>window.removeEventListener('beforeunload',beforeUnload))
 </script>
 

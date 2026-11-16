@@ -1,8 +1,7 @@
 from app.models.ai_score import AiScore
+from app.models.knowledge import KnowledgeDocument, KnowledgeMigration
 from app.models.chapter_bank import ChapterBankQuestion
-from app.models.chapter_practice import PracticeAttempt, PracticeBookmark
-from app.models.module_one import ModuleOneAttempt, ModuleOneEvent
-from app.models.learning_archive import LearningArchive, LearningArchiveEvent
+from app.models.chapter_practice import PracticeAttempt, PracticeBookmark, PracticeAiThread
 from app.models.device_state import DeviceState
 from app.models.exercise import Exercise
 from app.models.exercise_session import ExerciseSession
@@ -19,8 +18,7 @@ from app.models.lab_topic import LabAttempt, LabQuestion
 from app.models.authoring import QuestionWorkspace, QuestionRevision, GradeDraft, GradeAudit, FeedbackSnippet
 
 __all__ = [
-    "LearningArchive", "LearningArchiveEvent",
-    "PracticeAttempt", "PracticeBookmark",
+    "PracticeAttempt", "PracticeBookmark", "PracticeAiThread",
     "ChapterBankQuestion",
     "QuestionWorkspace", "QuestionRevision", "GradeDraft", "GradeAudit", "FeedbackSnippet",
     "LabAttempt",
@@ -46,3 +44,6 @@ from app.models.operation import OperationQuestion, OperationVersion, OperationS
 from app.models.operation_learning import OperationAttempt, OperationReview
 from app.models.exam import Exam, ExamParticipant, ExamAttempt, ExamControlEvent
 from app.models.exam_grade import ExamGrade, ExamGradePublication, ExamGradeAudit
+from app.models.operation_assessment import (OperationAssessmentConfig, OperationEvidenceEvent,
+    ExamEvidenceSeal, ExamEvaluation, ExamAssessmentReview, ExamStudentCommentary,
+    ExamAssessmentReviewHistory, ExamPublishedAssessment)

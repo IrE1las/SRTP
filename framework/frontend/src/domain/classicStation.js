@@ -55,17 +55,6 @@ export const sections = topology.sections.map(s => {
   // Keep the below-rail track-section labels clear of terminal signal names.
   return { ...s, x: s.x_end == null && ['III', 'I', 'II'].includes(s.track) ? 1600 : (start + end) / 2, y, labelY: y + (s.track === '5' || s.track === '4' ? -25 : 28), segments }
 })
-export const exams = {
-  dongjiao_to_III: { index: '01', title: '办理一条由东郊方面至 III 股道的接车进路', subtitle: '东郊方面 → III 股道', topic: '基础进路', route: '/student/interlocking-exam' },
-  dongjiao_to_I: { index: '02', title: '办理一条由东郊方面至 I 股道的接车进路', subtitle: '东郊方面 → I 股道', topic: '防护道岔', route: '/student/interlocking-exam-protective' },
-  dongjiao_to_4: { index: '03', title: '办理一条由东郊方面至 4 股道的接车进路', subtitle: '东郊方面 → 4 股道', topic: '带动道岔', route: '/student/interlocking-exam-driven' },
-  beijing_depart_5: { index: '04', title: '办理一条由 5 股道向北京方面的发车进路', subtitle: '5 股道 → 北京方面', topic: '条件区段', route: '/student/interlocking-exam-conditional', conditions: { '23/25': 'normal', '5/7': 'normal' } },
-}
-
-export function emptyAnswer(routeType) {
-  return { route_type: routeType, route_buttons: [], switches: {}, hostile_signals: [], track_sections: [] }
-}
-export function copyAnswer(answer) { return JSON.parse(JSON.stringify(answer)) }
 export function devicePosition(kind, code) {
   if (code === photoSignalCode) return photoSignalPosition
   if (kind === 'switches') { const s = switches.find(s => s.id === code); return s && s.a }

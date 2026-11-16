@@ -4,7 +4,7 @@ The teaching/experiment SimulationService and its workbook keep their existing
 behaviour. Local block peers model an external input, not a hardware protocol.
 """
 from copy import deepcopy
-from time import monotonic
+from .clock import monotonic
 from uuid import uuid4
 
 from .runtime import SimulationService

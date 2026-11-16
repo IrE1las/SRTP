@@ -27,16 +27,16 @@
       "sha256": "dd8ebb08379105b5bd6cf4ed74d796033f23c092be8a8efdbc6fe80e8254eff9"
     },
     {
-      "path": "车站与区间控制实验/学号+姓名+实验七、八.doc",
-      "sha256": "66f1227fe3402b8c41354c3907774c328a06636366b2d164bc6923aa8a2ca5b0"
-    },
-    {
       "path": "车站与区间控制实验/学号+姓名+实验三、四.doc",
       "sha256": "87f17fc4a2543ae9aef00946933e6ab45ce060ec36ee3607ec150e9caff66704"
     },
     {
       "path": "车站与区间控制实验/学号+姓名+实验五、六.doc",
       "sha256": "6fd0657d44e7f3feed76a1bb285143f361e5dd8868fffc0adbcf8497b2062301"
+    },
+    {
+      "path": "framework/backend/app/services/simulation_console/reference_data.json",
+      "sha256": "4e55b33dd2e84bb7b96adeb7d267e396babc318c9aa4898aafbef41b4df36063"
     }
   ],
   "entries": [
@@ -51,6 +51,10 @@
         {
           "path": "车站与区间控制实验/学号+姓名+实验一、二.doc",
           "section": "实验1 · 三、1（1）—（4）"
+        },
+        {
+          "path": "framework/backend/app/services/simulation_console/reference_data.json",
+          "section": "标准站Route.txt与STADATA配置；报告实验方法适配，运行现象仍需观察"
         }
       ]
     },
@@ -58,8 +62,8 @@
       "question": "lab-01-02",
       "field": "conflict",
       "status": "partial",
-      "answer": "D1至D15由D1起始，1/3定位；由SII调车功能至D5的进路由SII起始，17/19定位。前一进路敌对栏含<19>SII，后一进路敌对栏含<1>D1；两条进路各自所需的位置使对方条件敌对成立，因而不能同时开放。",
-      "analysis": "这是条件敌对的限制，不能仅因两行轨道区段填写不同就判成互不影响。两条进路在II股道相向办理，需要保持相向防护。",
+      "answer": "标准站D1至D5的按钮为D1DA、D5DA，1/3定位，走行区段为1DG、1/19WG。SII至D1默认长调车路径也经过1/19WG和1DG，与前者走行方向相向且共用区段，不能同时开放。",
+      "analysis": "先按标准站进路面板核对实际路径，再比较共用区段、道岔及既有锁闭。原图联锁表的进路21、50和条件敌对记号不直接用于本站。",
       "missing": "缺少对应6502电路图、继电器接点条件及动作记录，不能填写确定的励磁/落下顺序。",
       "sources": [
         {
@@ -67,12 +71,12 @@
           "section": "实验1 · 三、2 A、B；实验报告问题（3）"
         },
         {
-          "path": "ai_design/station/shunting_interlocking_reviewed.json",
-          "section": "进路21、50的道岔及敌对信号列"
-        },
-        {
           "path": "ai_design/station/interlocking_rules.md",
           "section": "敌对进路与道岔位置条件"
+        },
+        {
+          "path": "framework/backend/app/services/simulation_console/reference_data.json",
+          "section": "标准站Route.txt与STADATA配置；报告实验方法适配，运行现象仍需观察"
         }
       ]
     },
@@ -80,13 +84,17 @@
       "question": "lab-01-03",
       "field": "free",
       "status": "partial",
-      "answer": "应先辨认D1至D15、D15至4股道两个基本段，分别核对始终端、道岔位置、区段与敌对条件，再比较一次办理长调车的选路、信号和锁闭记录。1/19WG空闲只是这一组实验条件，不能单凭它写成全部联锁条件已经满足。",
+      "answer": "应先辨认D1至D5、D15至4股道两个基本段，分别核对始终端、道岔位置、区段与敌对条件，再比较一次办理长调车的选路、信号和锁闭记录。1/19WG空闲只是这一组实验条件，不能单凭它写成全部联锁条件已经满足。",
       "analysis": "记录应分成办理操作、选路结果、每架信号显示、各段锁闭四部分。预计能够办理与实际已办理成功须分开。",
       "missing": "报告此工况答案留空；缺少成功/失败及具体按钮操作的实验记录。",
       "sources": [
         {
           "path": "车站与区间控制实验/学号+姓名+实验一、二.doc",
           "section": "实验1 · 三、3；实验报告问题（2）"
+        },
+        {
+          "path": "framework/backend/app/services/simulation_console/reference_data.json",
+          "section": "标准站Route.txt与STADATA配置；报告实验方法适配，运行现象仍需观察"
         }
       ]
     },
@@ -94,13 +102,17 @@
       "question": "lab-01-03",
       "field": "occupied",
       "status": "partial",
-      "answer": "实验报告问题已明确给出：在1/19WG占用的指定工况下，D1至4G分段办理能成功，一次办理不能成功。这个结论限定于报告所列工况，不能推广为任何占用都允许分段办理。",
+      "answer": "应在标准站分别记录一次办理D1至S4，以及分段办理D1至D5、D15至S4时的选路和信号结果。说明占用发生在哪一段，以及车列或故障占用的性质；报告原有结论不能替代本站的实际观察。",
       "analysis": "分段办理要分别检查两个基本段的选路和联锁条件；一次办理还涉及长进路的连续选路。需要找到在哪一阶段因占用而受阻，不能只笼统写“有车所以不能调车”。",
-      "missing": "报告没有给出完整电路解释和每架信号的观测结果；分段操作次序和具体受阻接点尚需核实。",
+      "missing": "尚需标准站同一工况下的操作、信号、锁闭与故障记录，以及对应6502电路资料。",
       "sources": [
         {
           "path": "车站与区间控制实验/学号+姓名+实验一、二.doc",
           "section": "实验1 · 三、3；实验报告问题（2）"
+        },
+        {
+          "path": "framework/backend/app/services/simulation_console/reference_data.json",
+          "section": "标准站Route.txt与STADATA配置；报告实验方法适配，运行现象仍需观察"
         }
       ]
     },
@@ -119,6 +131,10 @@
         {
           "path": "ai_design/ai/knowledge/计算机联锁基础知识.docx",
           "section": "动态状态、进路处理与采集驱动"
+        },
+        {
+          "path": "framework/backend/app/services/simulation_console/reference_data.json",
+          "section": "标准站Route.txt与STADATA配置；报告实验方法适配，运行现象仍需观察"
         }
       ]
     },
@@ -137,6 +153,10 @@
         {
           "path": "ai_design/ai/knowledge/计算机联锁基础知识.docx",
           "section": "动态状态、进路处理与采集驱动"
+        },
+        {
+          "path": "framework/backend/app/services/simulation_console/reference_data.json",
+          "section": "标准站Route.txt与STADATA配置；报告实验方法适配，运行现象仍需观察"
         }
       ]
     },
@@ -151,6 +171,10 @@
         {
           "path": "车站与区间控制实验/学号+姓名+实验一、二.doc",
           "section": "实验2 · 三、1—2；实验报告问题（2）"
+        },
+        {
+          "path": "framework/backend/app/services/simulation_console/reference_data.json",
+          "section": "标准站Route.txt与STADATA配置；报告实验方法适配，运行现象仍需观察"
         }
       ]
     },
@@ -173,6 +197,10 @@
         {
           "path": "ai_design/ai/knowledge/计算机联锁基础知识.docx",
           "section": "动态状态、进路处理与采集驱动"
+        },
+        {
+          "path": "framework/backend/app/services/simulation_console/reference_data.json",
+          "section": "标准站Route.txt与STADATA配置；报告实验方法适配，运行现象仍需观察"
         }
       ]
     },
@@ -181,12 +209,16 @@
       "field": "matrix",
       "status": "partial",
       "answer": "记录表应包含四行：XD至III股道且外方接近空闲、同进路且接近有车、XD至5股道且接近空闲、同进路且接近有车。每行填写手续、信号关闭、锁闭解除、两事件时间及证据。",
-      "analysis": "接近区段是题设补充条件，不能添造原图没有的站外区段编号；比较时先固定进路，再改变接近状态，最后比较目的股道差异。",
+      "analysis": "接近区段是题设补充条件，不能添造标准站没有的站外区段编号；比较时先固定进路，再改变接近状态，最后比较目的股道差异。",
       "missing": "四行的具体观测值及精确延时在资料中均未填写。",
       "sources": [
         {
           "path": "车站与区间控制实验/学号+姓名+实验一、二.doc",
           "section": "实验2 · 三、3—4"
+        },
+        {
+          "path": "framework/backend/app/services/simulation_console/reference_data.json",
+          "section": "标准站Route.txt与STADATA配置；报告实验方法适配，运行现象仍需观察"
         }
       ]
     },
@@ -201,6 +233,10 @@
         {
           "path": "车站与区间控制实验/学号+姓名+实验一、二.doc",
           "section": "实验2 · 三、3—4"
+        },
+        {
+          "path": "framework/backend/app/services/simulation_console/reference_data.json",
+          "section": "标准站Route.txt与STADATA配置；报告实验方法适配，运行现象仍需观察"
         }
       ]
     },
@@ -215,6 +251,10 @@
         {
           "path": "车站与区间控制实验/学号+姓名+实验一、二.doc",
           "section": "实验2 · 三、调车牵出和折返进路"
+        },
+        {
+          "path": "framework/backend/app/services/simulation_console/reference_data.json",
+          "section": "标准站Route.txt与STADATA配置；报告实验方法适配，运行现象仍需观察"
         }
       ]
     },
@@ -229,6 +269,10 @@
         {
           "path": "车站与区间控制实验/学号+姓名+实验一、二.doc",
           "section": "实验2 · 三、调车牵出和折返进路"
+        },
+        {
+          "path": "framework/backend/app/services/simulation_console/reference_data.json",
+          "section": "标准站Route.txt与STADATA配置；报告实验方法适配，运行现象仍需观察"
         }
       ]
     },
@@ -247,6 +291,10 @@
         {
           "path": "ai_design/ai/knowledge/计算机联锁基础知识.docx",
           "section": "动态状态、进路处理与采集驱动"
+        },
+        {
+          "path": "framework/backend/app/services/simulation_console/reference_data.json",
+          "section": "标准站Route.txt与STADATA配置；报告实验方法适配，运行现象仍需观察"
         }
       ]
     },
@@ -265,6 +313,10 @@
         {
           "path": "ai_design/ai/knowledge/计算机联锁基础知识.docx",
           "section": "动态状态、进路处理与采集驱动"
+        },
+        {
+          "path": "framework/backend/app/services/simulation_console/reference_data.json",
+          "section": "标准站Route.txt与STADATA配置；报告实验方法适配，运行现象仍需观察"
         }
       ]
     },
@@ -279,6 +331,10 @@
         {
           "path": "车站与区间控制实验/学号+姓名+实验三、四.doc",
           "section": "实验3 · 三、2—3；实验报告问题（1）"
+        },
+        {
+          "path": "framework/backend/app/services/simulation_console/reference_data.json",
+          "section": "标准站Route.txt与STADATA配置；报告实验方法适配，运行现象仍需观察"
         }
       ]
     },
@@ -297,6 +353,10 @@
         {
           "path": "ai_design/ai/knowledge/计算机联锁基础知识.docx",
           "section": "动态状态、进路处理与采集驱动"
+        },
+        {
+          "path": "framework/backend/app/services/simulation_console/reference_data.json",
+          "section": "标准站Route.txt与STADATA配置；报告实验方法适配，运行现象仍需观察"
         }
       ]
     },
@@ -315,6 +375,10 @@
         {
           "path": "ai_design/ai/knowledge/计算机联锁基础知识.docx",
           "section": "动态状态、进路处理与采集驱动"
+        },
+        {
+          "path": "framework/backend/app/services/simulation_console/reference_data.json",
+          "section": "标准站Route.txt与STADATA配置；报告实验方法适配，运行现象仍需观察"
         }
       ]
     },
@@ -333,6 +397,10 @@
         {
           "path": "ai_design/ai/knowledge/计算机联锁基础知识.docx",
           "section": "动态状态、进路处理与采集驱动"
+        },
+        {
+          "path": "framework/backend/app/services/simulation_console/reference_data.json",
+          "section": "标准站Route.txt与STADATA配置；报告实验方法适配，运行现象仍需观察"
         }
       ]
     },
@@ -351,6 +419,10 @@
         {
           "path": "ai_design/ai/knowledge/计算机联锁基础知识.docx",
           "section": "动态状态、进路处理与采集驱动"
+        },
+        {
+          "path": "framework/backend/app/services/simulation_console/reference_data.json",
+          "section": "标准站Route.txt与STADATA配置；报告实验方法适配，运行现象仍需观察"
         }
       ]
     },
@@ -358,7 +430,7 @@
       "question": "lab-03-03",
       "field": "analysis",
       "status": "partial",
-      "answer": "先以原图确定走行和设备关系，再按占用、出清、锁闭状态组织事件链，最后用实测或电路资料核对哪些条件满足、哪些未满足。静态站场只能提供设备位置和连通，不能提供某次实验的继电器时序。",
+      "answer": "先以标准站确定走行和设备关系，再按占用、出清、锁闭状态组织事件链，最后用实测或电路资料核对哪些条件满足、哪些未满足。静态站场只能提供设备位置和连通，不能提供某次实验的继电器时序。",
       "analysis": "基础知识明确将静态设备属性与继电器状态、锁闭状态等动态信息分开，进路条件不满足时会暂停等待。",
       "missing": "缺少对应正常解锁电路、故障过程日志及各区段状态记录。",
       "sources": [
@@ -369,6 +441,10 @@
         {
           "path": "ai_design/ai/knowledge/计算机联锁基础知识.docx",
           "section": "动态状态、进路处理与采集驱动"
+        },
+        {
+          "path": "framework/backend/app/services/simulation_console/reference_data.json",
+          "section": "标准站Route.txt与STADATA配置；报告实验方法适配，运行现象仍需观察"
         }
       ]
     },
@@ -376,7 +452,7 @@
       "question": "lab-04-01",
       "field": "diagnosis",
       "status": "supported",
-      "answer": "错误在于把“道岔有表示”和“区段空闲”当作允许转换的充分条件，漏掉进路锁闭。题干已经说明D1至D15锁闭，1/3必须保持规定的定位，不能据此总反。",
+      "answer": "错误在于把“道岔有表示”和“区段空闲”当作允许转换的充分条件，漏掉进路锁闭。题干已经说明D1至D5锁闭，1/3必须保持规定的定位，不能据此总反。",
       "analysis": "有表示说明位置反馈，空闲说明区段检测状态；它们都不能取消已有锁闭。若错误地允许改变1/3位置，将改变原定走行方向，破坏进路防护。",
       "missing": "",
       "sources": [
@@ -387,6 +463,10 @@
         {
           "path": "ai_design/station/interlocking_rules.md",
           "section": "道岔锁闭与错位后果"
+        },
+        {
+          "path": "framework/backend/app/services/simulation_console/reference_data.json",
+          "section": "标准站Route.txt与STADATA配置；报告实验方法适配，运行现象仍需观察"
         }
       ]
     },
@@ -401,6 +481,10 @@
         {
           "path": "车站与区间控制实验/学号+姓名+实验三、四.doc",
           "section": "实验4 · 三、1—3；实验报告问题（1）"
+        },
+        {
+          "path": "framework/backend/app/services/simulation_console/reference_data.json",
+          "section": "标准站Route.txt与STADATA配置；报告实验方法适配，运行现象仍需观察"
         }
       ]
     },
@@ -419,6 +503,10 @@
         {
           "path": "ai_design/ai/knowledge/计算机联锁基础知识.docx",
           "section": "动态状态、进路处理与采集驱动"
+        },
+        {
+          "path": "framework/backend/app/services/simulation_console/reference_data.json",
+          "section": "标准站Route.txt与STADATA配置；报告实验方法适配，运行现象仍需观察"
         }
       ]
     },
@@ -437,6 +525,10 @@
         {
           "path": "ai_design/ai/knowledge/计算机联锁基础知识.docx",
           "section": "动态状态、进路处理与采集驱动"
+        },
+        {
+          "path": "framework/backend/app/services/simulation_console/reference_data.json",
+          "section": "标准站Route.txt与STADATA配置；报告实验方法适配，运行现象仍需观察"
         }
       ]
     },
@@ -455,6 +547,10 @@
         {
           "path": "ai_design/ai/knowledge/计算机联锁基础知识.docx",
           "section": "动态状态、进路处理与采集驱动"
+        },
+        {
+          "path": "framework/backend/app/services/simulation_console/reference_data.json",
+          "section": "标准站Route.txt与STADATA配置；报告实验方法适配，运行现象仍需观察"
         }
       ]
     },
@@ -469,6 +565,10 @@
         {
           "path": "车站与区间控制实验/学号+姓名+实验三、四.doc",
           "section": "实验4 · 三、4、7；实验报告问题（2）"
+        },
+        {
+          "path": "framework/backend/app/services/simulation_console/reference_data.json",
+          "section": "标准站Route.txt与STADATA配置；报告实验方法适配，运行现象仍需观察"
         }
       ]
     },
@@ -487,6 +587,10 @@
         {
           "path": "ai_design/ai/knowledge/计算机联锁基础知识.docx",
           "section": "动态状态、进路处理与采集驱动"
+        },
+        {
+          "path": "framework/backend/app/services/simulation_console/reference_data.json",
+          "section": "标准站Route.txt与STADATA配置；报告实验方法适配，运行现象仍需观察"
         }
       ]
     },
@@ -675,224 +779,6 @@
         {
           "path": "ai_design/station/station_topology.json",
           "section": "本站设备与区段分布"
-        }
-      ]
-    },
-    {
-      "question": "lab-07-01",
-      "field": "lamps",
-      "status": "partial",
-      "answer": "五个阶段应为本站请求发车、邻站同意接车、本站办理发车进路后列车出发、列车到达邻站、到达复原。每个阶段分列本站表示灯、邻站表示灯、本站出站信号及办理手续。",
-      "analysis": "报告明确由两站共同办理，并要求分别记录两站表示变化；不能把“同意接车”写成“列车已到达”，也不能把一站灯色当成两站状态。",
-      "missing": "报告灯色记录全部留空，原图也无两站表示灯配置；具体灯色和按钮次序待实验确认。",
-      "sources": [
-        {
-          "path": "车站与区间控制实验/学号+姓名+实验七、八.doc",
-          "section": "实验7 · 三、1（1）①—⑤"
-        }
-      ]
-    },
-    {
-      "question": "lab-07-01",
-      "field": "coupling",
-      "status": "supported",
-      "answer": "站内进路办理确定本站列车的走行路径及道岔、区段、敌对防护；半自动闭塞还需两站共同办理请求、同意、发车、到达和复原。完成站内进路并不能代替邻站同意等区间业务阶段。",
-      "analysis": "站内区段满足走行条件，不能证明两站闭塞手续已经完成。答题应分别说明本站进路条件和两站业务状态，避免把二者混为一项。",
-      "missing": "",
-      "sources": [
-        {
-          "path": "车站与区间控制实验/学号+姓名+实验七、八.doc",
-          "section": "实验7 · 三、1（1）①—⑤"
-        },
-        {
-          "path": "ai_design/station/interlocking_rules.md",
-          "section": "进路与联锁表的职责"
-        }
-      ]
-    },
-    {
-      "question": "lab-07-02",
-      "field": "receipt",
-      "status": "partial",
-      "answer": "此工况限于本站请求发车并收到邻站回执后取消。记录须明确尚处于回执阶段，列出取消前后两站表示及双方办理的操作。",
-      "analysis": "回执阶段与已同意接车阶段不同，应分别记录，不能把第二种情形的操作和灯色直接抄到这里。",
-      "missing": "报告没有给出相应按钮、灯色和执行结果，暂不能生成完整操作标准答案。",
-      "sources": [
-        {
-          "path": "车站与区间控制实验/学号+姓名+实验七、八.doc",
-          "section": "实验7 · 三、1（2）；实验报告问题（2）"
-        }
-      ]
-    },
-    {
-      "question": "lab-07-02",
-      "field": "consent",
-      "status": "partial",
-      "answer": "此工况已收到邻站同意接车，但本站出站信号尚未开放。与收到回执工况相比，已知差异是业务阶段已推进到同意接车，应据此对照取消前后两站状态。",
-      "analysis": "“尚未开放出站信号”是本工况边界，不能加入已开放信号或列车已出发的结果。",
-      "missing": "具体取消手续及表示变化在报告中未填写，须对应实验记录。",
-      "sources": [
-        {
-          "path": "车站与区间控制实验/学号+姓名+实验七、八.doc",
-          "section": "实验7 · 三、1（2）；实验报告问题（2）"
-        }
-      ]
-    },
-    {
-      "question": "lab-07-02",
-      "field": "opened",
-      "status": "partial",
-      "answer": "此工况出站信号已经开放、列车尚未出发。应分别核对信号关闭及站内进路处理、两站闭塞复原两个过程，并确认实验始终满足列车未出发这一条件。",
-      "analysis": "不能仅因站内信号关闭或进路取消，就填写两站闭塞均已复原；需要两站状态证据。",
-      "missing": "报告仅提出需哪些步骤，没有提供操作答案或先后时序；不能据此生成可执行的按钮规程。",
-      "sources": [
-        {
-          "path": "车站与区间控制实验/学号+姓名+实验七、八.doc",
-          "section": "实验7 · 三、1（2）；实验报告问题（2）"
-        }
-      ]
-    },
-    {
-      "question": "lab-07-03",
-      "field": "meaning",
-      "status": "partial",
-      "answer": "正常到达复原对应列车到达后的正常业务阶段；取消复原对应报告列出的回执后、同意后未开信号、已开信号但未出发三种取消场景。事故复原在报告中被单列为需分析的第三类手续，不能与前两类直接等同。",
-      "analysis": "“正常复原未完成”只是题设现象，不能自动推出已经满足事故复原条件。应先明确列车和区间的事实状态。",
-      "missing": "报告没有给出事故复原的完整定义、适用条件和执行办法，不能补写为唯一标准规程。",
-      "sources": [
-        {
-          "path": "车站与区间控制实验/学号+姓名+实验七、八.doc",
-          "section": "实验7 · 实验报告问题（1）、（3）"
-        }
-      ]
-    },
-    {
-      "question": "lab-07-03",
-      "field": "checks",
-      "status": "partial",
-      "answer": "可先整理需要核实的证据：列车位置、是否完整到达、区间状态、两站业务状态、正常复原未完成的现象和双方记录。材料应能对应具体时间和工况，而非只写“发生故障”。",
-      "analysis": "这些项目用于原理分析和证据整理，不代表已取得现场事故复原的全部许可条件。题目明确不提供现场操作授权。",
-      "missing": "正式确认项目、授权及办理手续仍需相应设备规程；现有报告未给出。",
-      "sources": [
-        {
-          "path": "车站与区间控制实验/学号+姓名+实验七、八.doc",
-          "section": "实验7 · 实验报告问题（1）、（3）"
-        }
-      ]
-    },
-    {
-      "question": "lab-07-03",
-      "field": "interlock",
-      "status": "partial",
-      "answer": "应分别检查本站进路、出站信号和两站闭塞阶段：本站走行及防护条件满足，并不等于区间共同办理手续完成；闭塞状态变化也不能代替本站道岔、区段和敌对条件检查。",
-      "analysis": "报告把正常办理分为两站共同参与的阶段，本地规则则规定本站进路检查内容。二者职责应衔接，不能用站内空闲代替区间状态证据。",
-      "missing": "具体接口电路及相互制约的接点、信号输出时序未提供。",
-      "sources": [
-        {
-          "path": "车站与区间控制实验/学号+姓名+实验七、八.doc",
-          "section": "实验7 · 实验报告问题（1）、（3）"
-        },
-        {
-          "path": "ai_design/station/interlocking_rules.md",
-          "section": "办理进路及检查条件"
-        }
-      ]
-    },
-    {
-      "question": "lab-08-01",
-      "field": "offset",
-      "status": "partial",
-      "answer": "已给定的排列为1700-1、2300-1、1700-2、2300-2，按题设周期继续排列时回到1700-1。可明确1700与2300是本组标称载频，后缀-1、-2是题设中需要分别识别的配置标记，不能读成闭塞分区数量。",
-      "analysis": "交叉排列的具体技术作用和后缀对应的频率参数，是报告提出的解释问题；仅有排列本身不能证明其完整原理。",
-      "missing": "报告未写-1/-2的具体含义、偏移数值及抗干扰原理说明，不能用经验补成标准答案。",
-      "sources": [
-        {
-          "path": "车站与区间控制实验/学号+姓名+实验七、八.doc",
-          "section": "实验8 · 三、1（1）；实验报告问题（1）；图2"
-        }
-      ]
-    },
-    {
-      "question": "lab-08-02",
-      "field": "main",
-      "status": "partial",
-      "answer": "本工况为教学区间列车接近X后进入I股道停车。按时间逐分区记录车列位置、占用、低频、机车信号与X显示，并注明观测来源。",
-      "analysis": "站内进路目标是I股道；区间低频、机车信号和进站信号是不同记录对象，不能从股道空闲直接推出三者显示。",
-      "missing": "没有实验记录和区间编码条件，不能预填各时刻的低频或灯色。",
-      "sources": [
-        {
-          "path": "车站与区间控制实验/学号+姓名+实验七、八.doc",
-          "section": "实验8 · 三、1（2）—（5）"
-        }
-      ]
-    },
-    {
-      "question": "lab-08-02",
-      "field": "side",
-      "status": "partial",
-      "answer": "本工况目标改为III股道停车，其余控制条件与I股道工况一致，采用相同栏目记录。对比时分别写X显示、机车信号及低频在同一车列位置的变化。",
-      "analysis": "进站信号与机车信号要分开比较；改变进路目标并不能直接给出完整区间信息序列。",
-      "missing": "报告未填两种工况的观测数据，不能将某个推测灯色写为实测答案。",
-      "sources": [
-        {
-          "path": "车站与区间控制实验/学号+姓名+实验七、八.doc",
-          "section": "实验8 · 三、1（2）—（5）"
-        }
-      ]
-    },
-    {
-      "question": "lab-08-02",
-      "field": "why",
-      "status": "partial",
-      "answer": "可先比较站内走行目标和道岔路径，再把不同工况下观察到的区间信息、机车信号及X显示逐项对应。分析须指出哪些是图上能确定的路由差异，哪些是实验观察到的信息差异。",
-      "analysis": "原图能解释车列如何进站，不能独立确定教学区间每一分区的低频编码和机车信号变化。",
-      "missing": "区间编码配置、两工况运行日志和机车信号对照资料尚缺。",
-      "sources": [
-        {
-          "path": "车站与区间控制实验/学号+姓名+实验七、八.doc",
-          "section": "实验8 · 三、1（2）—（5）"
-        }
-      ]
-    },
-    {
-      "question": "lab-08-03",
-      "field": "f246",
-      "status": "missing",
-      "answer": "暂不能确定24.6 Hz对应的完整信息含义、运行条件和机车信号显示。现有实验报告只列出了这个问题，没有填写答案。",
-      "analysis": "低频信息与载频分组是不同内容，不能从数值大小、1700/2300等载频排列或本站静态联锁表反推唯一含义。",
-      "missing": "需提供涵盖24.6 Hz的本地教材或设备低频信息对照表，以及适用条件；必要时附对应实验记录。在此之前不将任何猜测映射作为标准评分依据。",
-      "sources": [
-        {
-          "path": "车站与区间控制实验/学号+姓名+实验七、八.doc",
-          "section": "实验8 · 实验报告问题（2）"
-        }
-      ]
-    },
-    {
-      "question": "lab-08-03",
-      "field": "f147",
-      "status": "missing",
-      "answer": "暂不能确定14.7 Hz对应的完整信息含义、运行条件和机车信号显示。现有实验报告只列出了这个问题，没有填写答案。",
-      "analysis": "低频信息与载频分组是不同内容，不能从数值大小、1700/2300等载频排列或本站静态联锁表反推唯一含义。",
-      "missing": "需提供涵盖14.7 Hz的本地教材或设备低频信息对照表，以及适用条件；必要时附对应实验记录。在此之前不将任何猜测映射作为标准评分依据。",
-      "sources": [
-        {
-          "path": "车站与区间控制实验/学号+姓名+实验七、八.doc",
-          "section": "实验8 · 实验报告问题（2）"
-        }
-      ]
-    },
-    {
-      "question": "lab-08-03",
-      "field": "f191",
-      "status": "missing",
-      "answer": "暂不能确定19.1 Hz对应的完整信息含义、运行条件和机车信号显示。现有实验报告只列出了这个问题，没有填写答案。",
-      "analysis": "低频信息与载频分组是不同内容，不能从数值大小、1700/2300等载频排列或本站静态联锁表反推唯一含义。",
-      "missing": "需提供涵盖19.1 Hz的本地教材或设备低频信息对照表，以及适用条件；必要时附对应实验记录。在此之前不将任何猜测映射作为标准评分依据。",
-      "sources": [
-        {
-          "path": "车站与区间控制实验/学号+姓名+实验七、八.doc",
-          "section": "实验8 · 实验报告问题（2）"
         }
       ]
     }

@@ -23,6 +23,8 @@ class Settings(BaseSettings):
         alias="ACCESS_TOKEN_EXPIRE_MINUTES",
     )
     deepseek_api_key: str | None = Field(default=None, alias="DEEPSEEK_API_KEY")
+    operation_assessment_enabled: bool = Field(default=True, alias="OPERATION_ASSESSMENT_ENABLED")
+    exam_commentary_enabled: bool = Field(default=True, alias="EXAM_COMMENTARY_ENABLED")
     deepseek_model: str = Field(default="deepseek-v4-flash", alias="DEEPSEEK_MODEL")
     deepseek_base_url: str = Field(
         default="https://api.deepseek.com",

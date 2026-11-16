@@ -23,6 +23,7 @@ import ReferenceStationDiagram from './ReferenceStationDiagram.vue'
 import { COMMANDS } from './standardDisplay'
 import { getOperationStation, getOperationSession, postOperationEvent } from '@/api/operations'
 import { eventEnvelope, persistableEvent } from '@/domain/operationEvents'
+import { mergeConsole } from '@/domain/operationConsole'
 const props = defineProps({ sessionId: { type: String, required: true }, readOnly: { type: Boolean, default: false }, api: { type: Object, default: null }, examMode: { type: Boolean, default: false }, pausePending: { type: Boolean, default: false } })
 const emit = defineEmits(['update'])
 const station = ref(null), result = ref(null), loading = ref(true), busy = ref(false), error = ref(''), root = ref(null)
@@ -35,6 +36,8 @@ function label(type) { return COMMANDS.find(c => c.type === type)?.label || type
 function targetLabel(type) { return ({ switch:'道岔', signal:'信号机', route:'原进路始端信号', section:'区段', block:'区间按钮' })[type] || type }
 function accept(data) {
   if (result.value && (data.revision < result.value.revision || result.value.status !== 'active' && data.status === 'active')) return
+  if(result.value && data.revision===result.value.revision && (data.state_version ?? data.snapshot?.version ?? 0)<(result.value.state_version ?? result.value.snapshot?.version ?? 0)) return
+  if (!data.snapshot && result.value?.snapshot) data = mergeConsole(result.value, data)
   result.value = data; emit('update', data)
 }
 function enqueue(action, values = {}) {

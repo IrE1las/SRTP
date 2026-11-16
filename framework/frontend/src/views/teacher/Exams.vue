@@ -1,6 +1,6 @@
 <template>
   <section class="op-page exam-page" v-loading="loading">
-    <header class="exam-masthead"><div><p class="exam-kicker">标准站 · 操作考试</p><h1>考试管理</h1><p>设置考试安排，发布给班级，查看学生操作记录。</p></div><div class="exam-tools"><el-button @click="load">刷新列表</el-button><router-link class="el-button el-button--primary" to="/exams/manage/new">新建考试</router-link></div></header>
+    <header class="exam-masthead"><div><p class="exam-kicker">标准站 · 操作考试</p><h1>考试管理</h1><p>设置考试安排，发布给班级，查看学生操作记录。</p></div><div class="exam-tools"><router-link to="/exams/grading">考试批阅</router-link><el-button @click="load">刷新列表</el-button><router-link class="el-button el-button--primary" to="/exams/manage/new">新建考试</router-link></div></header>
     <el-alert v-if="notice" :title="notice" type="error" :closable="false" role="alert" />
     <section class="exam-list-panel"><div class="exam-list-toolbar"><strong>{{ user.role === 'admin' ? '全部考试' : '我发布的考试' }}</strong><p>共 {{ total }} 场 · 时间为北京时间</p></div>
       <el-table :data="items" empty-text="暂无考试，点击“新建考试”开始设置。">

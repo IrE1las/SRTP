@@ -1,6 +1,6 @@
 """Lossless persistence adapter; standard-station business rules stay untouched."""
 from dataclasses import fields
-from time import monotonic, time
+from app.services.simulation_console.clock import monotonic, time
 from app.services.simulation_console.runtime import RuntimeSession
 from app.services.simulation_console.reference_runtime import ReferenceSimulationService
 

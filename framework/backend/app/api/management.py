@@ -87,8 +87,14 @@ def validation(operation):
 def metadata(db:Session=Depends(get_db),user:User=Depends(grader)):
     from app.models import ShuntingDataset
     from app.services.shunting_data import DATASET_KEY
+    from app.services.simulation_console.reference_station import reference_station_package
     dataset=db.query(ShuntingDataset).filter_by(dataset_key=DATASET_KEY).one_or_none()
+    standard=reference_station_package()
+    standard_devices=sorted({s['name'] for s in standard['signals']}|{s['id'] for s in standard['switches']}
+                            |{s['geometry']['group'] for s in standard['switches'] if s['geometry']['group']}
+                            |{s['id'] for s in standard['sections']})
     return {'topics':topic_catalog(),'topology':dataset.station_topology if dataset else None,
+            'standard_devices':standard_devices,
             'questions':[{'id':q.id,'title':q.content['title']} for q in db.query(LabQuestion).outerjoin(QuestionWorkspace).filter(func.coalesce(QuestionWorkspace.status,'published')!='draft').order_by(LabQuestion.topic,LabQuestion.sequence)],
             'classes':[r[0] for r in db.query(User.class_name).filter(User.class_name.is_not(None),User.class_name!='').distinct().order_by(User.class_name)]}
 
@@ -105,7 +111,7 @@ def overview(db:Session=Depends(get_db),user:User=Depends(grader)):
 
 
 @router.get('/questions')
-def questions(search:str=Query('',max_length=150),topic:int|None=Query(None,ge=1,le=9),
+def questions(search:str=Query('',max_length=150),topic:int|None=Query(None,ge=1,le=6),
               status:Literal['all','published','draft','archived']='all',page:int=Query(1,ge=1),
               limit:int=Query(20,ge=1,le=100),db:Session=Depends(get_db),user:User=Depends(editor)):
     query=db.query(LabQuestion,QuestionWorkspace).outerjoin(QuestionWorkspace)
@@ -228,7 +234,7 @@ def brief_attempt(a,u):
 
 
 @router.get('/reviews')
-def reviews(search:str=Query('',max_length=150),topic:int|None=Query(None,ge=1,le=9),question_id:int|None=None,
+def reviews(search:str=Query('',max_length=150),topic:int|None=Query(None,ge=1,le=6),question_id:int|None=None,
             class_name:str=Query('',max_length=80),status:Literal['pending','graded','all']='pending',latest_only:bool=True,
             page:int=Query(1,ge=1),limit:int=Query(20,ge=1,le=100),db:Session=Depends(get_db),user:User=Depends(grader)):
     query=review_query(db,search,topic,question_id,class_name,status,latest_only)
@@ -237,7 +243,7 @@ def reviews(search:str=Query('',max_length=150),topic:int|None=Query(None,ge=1,l
 
 
 @router.get('/reviews/export')
-def export(search:str=Query('',max_length=150),topic:int|None=Query(None,ge=1,le=9),question_id:int|None=None,
+def export(search:str=Query('',max_length=150),topic:int|None=Query(None,ge=1,le=6),question_id:int|None=None,
            class_name:str=Query('',max_length=80),status:Literal['pending','graded','all']='all',latest_only:bool=True,
            db:Session=Depends(get_db),user:User=Depends(grader)):
     def safe(v):

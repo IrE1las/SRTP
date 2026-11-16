@@ -137,6 +137,10 @@ def publish(db, user, eid, revision):
     if any(not any(u.class_name == name for u in students) for name in exam.classes):
         ops.fail('每个目标班级均须包含现有启用学生，请刷新班级名单')
     exam.question_snapshot = ops.detail(q, v)
+    from app.services.operation_assessment.configuration import freeze
+    assessment = freeze(db, v, v.initial)
+    if assessment:
+        exam.question_snapshot = {**exam.question_snapshot, 'assessment': assessment}
     for student in students:
         db.add(ExamParticipant(exam_id=eid, student_id=student.id, identity_snapshot={
             'real_name': student.real_name, 'student_id': student.student_id, 'class_name': student.class_name}))
@@ -172,6 +176,8 @@ def seal(db, attempt, reason, at):
     if attempt.submitted_at is not None:
         return
     record = db.get(OperationSession, attempt.session_id)
+    from app.services.operation_assessment import service as assessment
+    assessment.seal(db, attempt, at)
     record.status = 'submitted'
     attempt.submitted_at = at; attempt.finish_reason = reason; attempt.revision += 1
     db.flush()
@@ -195,9 +201,13 @@ def settle_all(db):
             settle(db, attempt, at)
 
 
-def summary(db, attempt, user=None):
+def summary(db, attempt, user=None, *, exam_name=None):
     from app.services import exam_grades as grades
-    exam = db.get(Exam, attempt.exam_id)
+    if exam_name is None:
+        exam = db.execute(select(Exam.id, Exam.name).where(Exam.id == attempt.exam_id)).one()
+    else:
+        from types import SimpleNamespace
+        exam = SimpleNamespace(id=attempt.exam_id,name=exam_name)
     result = {'session_id': attempt.session_id, 'exam_id': exam.id, 'name': exam.name,
             'status': 'submitted' if attempt.submitted_at is not None else 'active',
             'started_at': iso(attempt.started_at), 'deadline': iso(attempt.deadline),
@@ -210,14 +220,14 @@ def summary(db, attempt, user=None):
     if user is not None and user.role != 'student':
         result['grade'] = grades.manager_view(db, attempt.session_id)
     else:
-        released = grades.public_version(grades.published(db, attempt.session_id))
+        released = grades.public_version(grades.published(db, attempt.session_id)) if attempt.submitted_at is not None else None
         if released is not None:
             result['grade'] = released
             result['message'] = '考试成绩已发布'
     return result
 
 
-def detail(db, user, attempt, *, refresh=False):
+def detail(db, user, attempt, *, refresh=False, after_sequence=None, state_version=None):
     exam = db.get(Exam, attempt.exam_id)
     question = deepcopy(exam.question_snapshot)
     if user.role == 'student':
@@ -225,23 +235,34 @@ def detail(db, user, attempt, *, refresh=False):
         question = {key: question[key] for key in ('title', 'prompt', 'number', 'initial', 'station_version')}
     record = db.get(OperationSession, attempt.session_id)
     if refresh and user.role == 'student' and attempt.submitted_at is None:
-        console = ops.refresh(db, user, attempt.session_id, exam=True, commit=False)
+        console = ops.refresh(db, user, attempt.session_id, exam=True, commit=False,
+                              after_sequence=after_sequence, state_version=state_version)
     else:
         if record.station_version != ops.station_version():
             console = None
         else:
             engine, session = unpack(ops.reference_station_package(), record.engine_state)
-            console = ops.response(db, record, engine, session)
+            console = ops.response(db, record, engine, session, after_sequence=after_sequence, state_version=state_version)
     participant = db.get(ExamParticipant, (exam.id, attempt.student_id))
     result = {**summary(db, attempt, user), 'question': question, 'opens_at': iso(exam.opens_at),
               'closes_at': iso(exam.closes_at), 'duration_minutes': exam.duration_minutes,
               'identity': participant.identity_snapshot, 'console': console}
+    if user.role == 'student' and after_sequence is not None:
+        for key in ('question','opens_at','closes_at','duration_minutes','identity'):
+            result.pop(key, None)
     if user.role != 'student':
         from app.services import exam_grades as grades
         result['grade'] = grades.manager_view(db, attempt.session_id, evidence=True)
         result['control_events'] = [row.content for row in db.scalars(select(ExamControlEvent).where(
             ExamControlEvent.session_id == attempt.session_id).order_by(ExamControlEvent.id))]
-        result['automatic_evaluation'] = None
+        from app.services.operation_assessment import service as assessment
+        result['automatic_evaluation'] = assessment.view(db, attempt.session_id)
+        from app.services.operation_assessment.commentary import current as commentary_view
+        from app.models.operation_assessment import ExamAssessmentReview
+        reviewed = db.get(ExamAssessmentReview, attempt.session_id)
+        result['assessment_review'] = {'grade_revision': reviewed.grade_revision,
+            'evaluation_id': reviewed.evaluation_id, 'reason': reviewed.reason} if reviewed else None
+        result['student_commentary'] = commentary_view(db, attempt.session_id)
     return result
 
 
@@ -265,9 +286,15 @@ def begin(db, user, eid, fullscreen):
     initial = deepcopy(frozen['initial'])
     snapshot = engine.new_session(user.id, initial.get('interval_available', True), initial.get('occupied_sections', []))
     sid = snapshot['session_id']
-    db.add(OperationSession(id=sid, owner_id=user.id, version_id=exam.version_id, kind='exam',
-        engine_state=ops.persistent_state(engine, sid), initial_snapshot=initial, station_version=frozen['station_version']))
+    record = OperationSession(id=sid, owner_id=user.id, version_id=exam.version_id, kind='exam',
+        engine_state=ops.persistent_state(engine, sid), initial_snapshot=initial, station_version=frozen['station_version'])
+    db.add(record)
     db.flush()
+    if frozen.get('assessment'):
+        from app.services.operation_assessment import evidence
+        engine.sessions[sid].durable_events = True
+        record.engine_state = {}
+        evidence.persist(db, record, engine, engine.sessions[sid])
     attempt = ExamAttempt(session_id=sid, exam_id=eid, student_id=user.id, started_at=at,
         deadline=min(at + timedelta(minutes=exam.duration_minutes), exam.closes_at))
     db.add(attempt); db.flush()
@@ -318,12 +345,56 @@ def sync(db, user, sid, body):
         control(db, attempt, ControlEvent(event_id=uuid4(), kind='restore' if body.fullscreen else 'exit',
                                          occurred_at=received.replace(tzinfo=timezone.utc)), received)
     settle(db, attempt, received)
-    output = detail(db, user, attempt, refresh=True)
+    output = detail(db, user, attempt, refresh=True, after_sequence=body.after_sequence, state_version=body.state_version)
     output['acknowledged_events'] = [str(event.event_id) for event in body.events]
     return output
 
 
-def click(db, user, sid, body):
+def readonly_sync(db, user, sid, body):
+    """Pure observation fast path; every mutation still uses atomic()/LOCK."""
+    if body.after_sequence is None or body.events:
+        return None
+    joined = db.execute(select(ExamAttempt, OperationSession, Exam.name).join(
+        OperationSession, OperationSession.id==ExamAttempt.session_id).join(Exam,Exam.id==ExamAttempt.exam_id).where(
+        ExamAttempt.session_id==sid,ExamAttempt.student_id==user.id)).first()
+    if joined is None:
+        ops.fail('考试答卷不存在或无权访问',404)
+    attempt,record,exam_name=joined
+    at = now()
+    expected = 'inside' if body.fullscreen else 'outside'
+    if attempt.submitted_at or attempt.fullscreen_state != expected or expected != 'inside' or at >= attempt.deadline:
+        return None
+    if record.status != 'active' or record.engine_state.get('evidence_schema') != 1 or record.station_version != ops.station_version():
+        return None
+    from app.services.simulation_console import clock
+    from app.services.operation_assessment.evidence import due_epochs
+    with clock.at(at):
+        epoch=clock.time()
+        if any(due <= epoch for due in due_epochs(record.engine_state)):
+            return None
+        state=record.engine_state['session']
+        if body.state_version==state['version']:
+            pending=deepcopy(record.context.get('pending'))
+            if pending and pending['expires_at']<=epoch:
+                pending=None
+            remaining=lambda due:max(0,int((due or 0)-epoch+.99))
+            console={'snapshot':None,'events':[],'status':record.status,'pending':pending,
+                'revision':record.revision,'event_count':record.revision,'state_version':state['version'],'session_id':sid,
+                'timers':{'selection_remaining_seconds':remaining(state.get('selection_deadline')),
+                    'fault_releases':{k:remaining(v) for k,v in record.engine_state['reference']['fault_releases'].items()},
+                    'routes':[{'id':r['id'],'manual_remaining_seconds':remaining(r.get('manual_release_due')),
+                               'guide_remaining_seconds':remaining(r.get('guide_deadline'))}
+                              for r in state['routes'].values() if r['status'] not in {'cancelled','released'}]}}
+        else:
+            engine,session=unpack(ops.reference_station_package(),record.engine_state)
+            console=ops.response(db,record,engine,session,after_sequence=body.after_sequence,state_version=body.state_version)
+        result={**summary(db,attempt,user,exam_name=exam_name),'console':console}
+    result['acknowledged_events'] = []
+    db.rollback()  # Release the authentication/read connection before response serialization.
+    return result
+
+
+def click(db, user, sid, body, *, light=False):
     attempt = owned(db, user, sid)
     settle(db, attempt, now())
     previous = db.scalar(select(OperationEvent).where(OperationEvent.session_id == sid,
@@ -332,7 +403,7 @@ def click(db, user, sid, body):
         # Preserve deadline settlement even though the late action itself is rejected.
         db.commit()
         ops.fail('考试已结束或尚未恢复全屏，不能追加操作')
-    return ops.click(db, user, sid, body, exam=True, commit=False)
+    return ops.click(db, user, sid, body, exam=True, commit=False, light=light)
 
 
 def submit(db, user, sid, expected_sequence):
@@ -401,5 +472,8 @@ def download(db, user, sid):
     result = detail(db, user, attempt)
     record = db.get(OperationSession, sid)
     # Download has the same allowlist/permissions as detail. Never include a raw model.
+    from app.services.operation_assessment import evidence
+    transitions = evidence.rows(db, sid) if record.engine_state.get('evidence_schema') == 1 else []
     return {**result, 'schema_version': 1, 'kind': 'exam', 'events': ops.events(db, sid),
-            'runtime_events': record.engine_state.get('runtime_events', []), 'station_version': record.station_version}
+            'runtime_events': [e for r in transitions for e in r.content['events']] if transitions else record.engine_state.get('runtime_events', []),
+            'station_version': record.station_version}

@@ -263,3 +263,12 @@ ai_design/ai/vector_db/
 /车站与区间控制实验/联锁仿真软件/
 /车站与区间控制实验/区间信号实验系统.exe
 
+
+# Local sync staging and browser verification artifacts.
+/.tmp.driveupload/
+/.tmp.drivedownload/
+/.playwright-cli/
+/output/
+
+# Local knowledge-library source documents.
+/资料库/

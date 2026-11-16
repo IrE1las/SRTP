@@ -26,14 +26,6 @@
       "sha256": "6FD0657D44E7F3FEED76A1BB285143F361E5DD8868FFFC0ADBCF8497B2062301",
       "inline_shapes": 4,
       "source": "车站与区间控制实验\\学号+姓名+实验五、六.doc"
-    },
-    {
-      "shapes": 0,
-      "pages": 5,
-      "tables": 0,
-      "sha256": "66F1227FE3402B8C41354C3907774C328A06636366B2D164BC6923AA8A2CA5B0",
-      "inline_shapes": 2,
-      "source": "车站与区间控制实验\\学号+姓名+实验七、八.doc"
     }
   ],
   "topics": [
@@ -78,20 +70,6 @@
       "objective": "填写调车联锁表，辨认防护、带动与条件敌对。",
       "report": "学号+姓名+实验五、六.doc",
       "report_sha256": "6fd0657d44e7f3feed76a1bb285143f361e5dd8868fffc0adbcf8497b2062301"
-    },
-    {
-      "id": 7,
-      "title": "半自动闭塞办理",
-      "objective": "记录请求、同意、发车、到达、复原，分析闭塞与站内联锁结合。",
-      "report": "学号+姓名+实验七、八.doc",
-      "report_sha256": "66f1227fe3402b8c41354c3907774c328a06636366b2d164bc6923aa8a2ca5b0"
-    },
-    {
-      "id": 8,
-      "title": "ZPW-2000自动闭塞",
-      "objective": "比较载频配置，记录低频及机车信号，分析正线与侧线接车。",
-      "report": "学号+姓名+实验七、八.doc",
-      "report_sha256": "66f1227fe3402b8c41354c3907774c328a06636366b2d164bc6923aa8a2ca5b0"
     }
   ],
   "questions": [
@@ -101,7 +79,7 @@
       "sequence": 1,
       "title": "道岔单操：单锁、占用与封闭的区别",
       "source_section": "实验1 · 三、1（1）—（4）",
-      "prompt": "以原图5/7、9/11号道岔为对象。每一行均为独立工况，除列明条件外，道岔有表示、区段空闲且未被进路锁闭。分别判断能否转换，并解释“封闭”和“单锁”的区别。",
+      "prompt": "以标准站5/7、9/11号道岔为对象。每一行均为独立工况，除列明条件外，道岔有表示、区段空闲且未被进路锁闭。分别判断能否转换，并解释“封闭”和“单锁”的区别。",
       "fields": [
         {
           "id": "free",
@@ -170,15 +148,16 @@
       ],
       "level": "基础",
       "conditions": [],
-      "station_key": "original-photo-station"
+      "station_key": "standard-station",
+      "diagram_mode": "standard"
     },
     {
       "key": "lab-01-02",
       "topic": 1,
       "sequence": 2,
-      "title": "D1至D15：选路与敌对进路",
+      "title": "D1至D5：选路与敌对进路",
       "source_section": "实验1 · 三、2 A、B；实验报告问题（3）",
-      "prompt": "办理原图D1至D15调车基本进路。先填写选路所需的关键条件，再分析同时请求由SII的调车功能至D5时为何受到限制。进路编号采用核对表21号与50号。",
+      "prompt": "办理标准站D1至D5的短调车进路。填写始终端按钮、道岔位置和走行区段，再比较同时办理SII至D1长调车进路时受什么限制。本题核对依据为标准站进路定义，不套用原图联锁表的进路编号。按钮填写操作台名称，例如D1DA。",
       "fields": [
         {
           "id": "buttons",
@@ -186,8 +165,8 @@
           "kind": "cell",
           "points": 10,
           "binding": {
-            "table": "shunting",
-            "route_number": 21,
+            "table": "standard",
+            "route": "D1>D5",
             "column": "排列进路按下按钮"
           },
           "explanation": "始终端按钮共同确定短调车进路，终端按钮应按联锁表规定选取。"
@@ -198,11 +177,11 @@
           "kind": "cell",
           "points": 10,
           "binding": {
-            "table": "shunting",
-            "route_number": 21,
+            "table": "standard",
+            "route": "D1>D5",
             "column": "道岔"
           },
-          "explanation": "该进路沿II股道经1/3号道岔定位办理，反位将改变走行方向。"
+          "explanation": "标准站D1至D5要求1、3号双动道岔定位；填写1/3，反位才加圆括号。"
         },
         {
           "id": "sections",
@@ -210,15 +189,15 @@
           "kind": "cell",
           "points": 10,
           "binding": {
-            "table": "shunting",
-            "route_number": 21,
+            "table": "standard",
+            "route": "D1>D5",
             "column": "轨道区段"
           },
-          "explanation": "1DG是本段必须检查的区段，不能用道岔位置检查代替空闲检查。"
+          "explanation": "标准站该进路走行区段为1DG和1/19WG；接近区段IIAG单独用于接近条件，不填入本栏。"
         },
         {
           "id": "conflict",
-          "label": "结合原图和条件敌对，说明两条相向调车进路不能同时开放的原因；尝试从6502联锁检查角度说明。",
+          "label": "结合标准站的两条进路，说明不能同时开放的原因；哪些6502电路细节还需资料核实。",
           "kind": "essay",
           "points": 10,
           "criteria": [
@@ -230,15 +209,16 @@
       ],
       "devices": [
         "D1",
-        "D15",
-        "SII",
         "D5",
+        "SII",
         "1/3",
-        "1DG"
+        "1DG",
+        "1/19WG"
       ],
       "level": "应用",
       "conditions": [],
-      "station_key": "original-photo-station"
+      "station_key": "standard-station",
+      "diagram_mode": "standard"
     },
     {
       "key": "lab-01-03",
@@ -246,7 +226,7 @@
       "sequence": 3,
       "title": "长调车：一次办理与分段办理",
       "source_section": "实验1 · 三、3；实验报告问题（2）",
-      "prompt": "拟将车列由D1方向调至4股道。分别研究1/19WG空闲、已有车列占用两种情况，比较一次办理长调车和分段办理。原图内可先辨认D1至D15、D15至4股道两个基本段。记录应包含操作次序、能否选路、信号及锁闭现象。",
+      "prompt": "拟将车列由标准站D1调入4股道，分别研究1/19WG空闲、由车辆或故障占用两种条件下的一次办理与分段办理。标准站一次办理按D1、S4调车按钮；分段办理先研究D1至D5，再研究D15至S4。逐次记录能否选路、信号及锁闭情况，不将原报告的观测结果直接当作本软件的实测结果。",
       "fields": [
         {
           "id": "free",
@@ -283,6 +263,7 @@
       ],
       "devices": [
         "D1",
+        "D5",
         "D15",
         "S4",
         "1/19WG",
@@ -291,7 +272,8 @@
       ],
       "level": "综合",
       "conditions": [],
-      "station_key": "original-photo-station"
+      "station_key": "standard-station",
+      "diagram_mode": "standard"
     },
     {
       "key": "lab-02-01",
@@ -299,7 +281,7 @@
       "sequence": 1,
       "title": "调车取消与人工解锁的两种工况",
       "source_section": "实验2 · 三、1—2；实验报告问题（2）",
-      "prompt": "针对原图D3至D11调车进路，比较IAG空闲和有车停留两种情况。已知本题进路内各检查区段空闲。记录关闭信号、请求解锁与实际解锁的先后关系。不得把“信号关闭”直接当作“进路已解锁”。",
+      "prompt": "针对标准站D3至D11调车进路，比较IAG空闲和有车停留两种情况。已知本题进路内各检查区段空闲。记录关闭信号、请求解锁与实际解锁的先后关系。不得把“信号关闭”直接当作“进路已解锁”。",
       "fields": [
         {
           "id": "clear",
@@ -340,7 +322,8 @@
       ],
       "level": "应用",
       "conditions": [],
-      "station_key": "original-photo-station"
+      "station_key": "standard-station",
+      "diagram_mode": "standard"
     },
     {
       "key": "lab-02-02",
@@ -348,7 +331,7 @@
       "sequence": 2,
       "title": "接车进路解锁：比较两条目的股道",
       "source_section": "实验2 · 三、3—4",
-      "prompt": "以原图XD向III股道、XD向5股道接车为对象，分别比较接近区段有车与无车时的取消和人工解锁。原图未给出完整站外接近区段，本题以“XD外方接近区段占用/空闲”作为独立实验条件。",
+      "prompt": "以标准站XD至III股道、XD至5股道接车为对象，分别比较接近区段有车和无车时的取消与人工解锁。接近区段按标准站进路面板所列信息设置，记录区段名称、信号关闭、锁闭保持和实际解锁时间。",
       "fields": [
         {
           "id": "matrix",
@@ -380,10 +363,9 @@
         "21"
       ],
       "level": "综合",
-      "conditions": [
-        "题设接近区段仅用于比较工况，未添加为原图中已存在的编号设备。"
-      ],
-      "station_key": "original-photo-station"
+      "conditions": [],
+      "station_key": "standard-station",
+      "diagram_mode": "standard"
     },
     {
       "key": "lab-02-03",
@@ -391,7 +373,7 @@
       "sequence": 3,
       "title": "折返调车：车列尾部是否出清",
       "source_section": "实验2 · 三、调车牵出和折返进路",
-      "prompt": "将SIII方向车列牵出至D13前方，再由D13折返进入II股道。比较车列仅占9-15DG，以及同时占9-15DG和3DG两种情况。以题干指定的II股道为折返终点，逐段记录牵出剩余进路的处理。",
+      "prompt": "办理标准站SIII至D3的牵出进路，比较车列仅占9-15DG、以及继续运行后同时占9-15DG和3DG两种工况，再由D13向II股道折返。记录头尾位置、折返信号和未走完的牵出进路，区分实际运行观察与推测。",
       "fields": [
         {
           "id": "short",
@@ -426,6 +408,7 @@
       ],
       "devices": [
         "SIII",
+        "D3",
         "D13",
         "SII",
         "D7",
@@ -434,15 +417,16 @@
       ],
       "level": "综合",
       "conditions": [],
-      "station_key": "original-photo-station"
+      "station_key": "standard-station",
+      "diagram_mode": "standard"
     },
     {
       "key": "lab-03-01",
       "topic": 3,
       "sequence": 1,
-      "title": "D3至D9：区段占用与出清顺序",
+      "title": "D3至D7：区段占用与出清顺序",
       "source_section": "实验3 · 三、1—2的正常解锁观察方式",
-      "prompt": "按原图D3至D9的短调车进路，车列沿5DG进入3DG。本题只排序车列正向运行时的观测事件；不据此直接判定继电解锁完成。",
+      "prompt": "按标准站D3至D7的短调车进路，车列沿5DG进入3DG。本题只排序车列正向运行时的观测事件；不据此直接判定继电解锁完成。",
       "fields": [
         {
           "id": "sequence",
@@ -477,7 +461,7 @@
       ],
       "devices": [
         "D3",
-        "D9",
+        "D7",
         "5DG",
         "3DG"
       ],
@@ -485,7 +469,8 @@
       "conditions": [
         "为本题排序，假定车列跨压相邻区段：头部进入3DG时，尾部仍在5DG。"
       ],
-      "station_key": "original-photo-station"
+      "station_key": "standard-station",
+      "diagram_mode": "standard"
     },
     {
       "key": "lab-03-02",
@@ -493,7 +478,7 @@
       "sequence": 2,
       "title": "接近区段留车对调车信号的影响",
       "source_section": "实验3 · 三、2—3；实验报告问题（1）",
-      "prompt": "围绕原图D3方向调车，比较IAG一直留车与随车列前行出清；再比较D3至D11建立后立即设置3DG故障占用，以及车列已依次占用IAG、5DG后再设置同一故障。",
+      "prompt": "围绕标准站D3方向调车，比较IAG一直留车与随车列前行出清；再比较D3至D11建立后立即设置3DG故障占用，以及车列已依次占用IAG、5DG后再设置同一故障。",
       "fields": [
         {
           "id": "approach",
@@ -539,7 +524,8 @@
       ],
       "level": "综合",
       "conditions": [],
-      "station_key": "original-photo-station"
+      "station_key": "standard-station",
+      "diagram_mode": "standard"
     },
     {
       "key": "lab-03-03",
@@ -547,7 +533,7 @@
       "sequence": 3,
       "title": "区段未出清与故障解锁记录",
       "source_section": "实验3 · 三、5（4）—（5）",
-      "prompt": "选择原图从X进入I股道的接车走行路径，按IAG、5DG、3DG、9-15DG、17-23DG、IG依次模拟占用。比较3DG持续故障占用，以及车列通过后道岔失去表示两类工况。网页用于提交实验记录，不驱动真实设备。",
+      "prompt": "选择标准站从X进入I股道的接车走行路径，按IAG、5DG、3DG、9-15DG、17-23DG、IG依次模拟占用。比较3DG持续故障占用，以及车列通过后道岔失去表示两类工况。网页用于提交实验记录，不驱动真实设备。",
       "fields": [
         {
           "id": "occupied",
@@ -565,7 +551,7 @@
           "kind": "essay",
           "points": 10,
           "criteria": [
-            "定位到原图道岔",
+            "定位到标准站道岔",
             "对比车前与车下故障"
           ]
         },
@@ -591,7 +577,8 @@
       ],
       "level": "综合",
       "conditions": [],
-      "station_key": "original-photo-station"
+      "station_key": "standard-station",
+      "diagram_mode": "standard"
     },
     {
       "key": "lab-04-01",
@@ -599,7 +586,7 @@
       "sequence": 1,
       "title": "进路上有表示的道岔能否直接转换",
       "source_section": "实验4 · 实验目的；实验1 · 三、2 A（2）",
-      "prompt": "原图D1至D15进路已锁闭，道岔1/3定位且有表示。有人认为“道岔有表示、1DG也空闲，所以现在总反一定成功”。判断这一结论并给出纠正理由。",
+      "prompt": "标准站D1至D5进路已锁闭，道岔1/3定位且有表示。有人认为“道岔有表示、1DG也空闲，所以现在总反一定成功”。判断这一结论并给出纠正理由。",
       "fields": [
         {
           "id": "judge",
@@ -627,13 +614,14 @@
       ],
       "devices": [
         "D1",
-        "D15",
+        "D5",
         "1/3",
         "1DG"
       ],
       "level": "基础",
       "conditions": [],
-      "station_key": "original-photo-station"
+      "station_key": "standard-station",
+      "diagram_mode": "standard"
     },
     {
       "key": "lab-04-02",
@@ -685,7 +673,8 @@
       ],
       "level": "综合",
       "conditions": [],
-      "station_key": "original-photo-station"
+      "station_key": "standard-station",
+      "diagram_mode": "standard"
     },
     {
       "key": "lab-04-03",
@@ -693,7 +682,7 @@
       "sequence": 3,
       "title": "道岔失去表示与引导方式分析",
       "source_section": "实验4 · 三、4、7；实验报告问题（2）",
-      "prompt": "针对原图X向I股道接车，比较列车前方1/3失去表示与列车所在区段5/7失去表示，再分析引导进路已办理时5/7失去表示的情况。提出需要确认的条件和处理思路。",
+      "prompt": "针对标准站X向I股道接车，比较列车前方1/3失去表示与列车所在区段5/7失去表示，再分析引导进路已办理时5/7失去表示的情况。提出需要确认的条件和处理思路。",
       "fields": [
         {
           "id": "compare",
@@ -701,7 +690,7 @@
           "kind": "essay",
           "points": 10,
           "criteria": [
-            "原图对应区段准确",
+            "标准站对应区段准确",
             "前方/车下区分清楚",
             "观察先后明确"
           ]
@@ -737,7 +726,8 @@
       ],
       "level": "综合",
       "conditions": [],
-      "station_key": "original-photo-station"
+      "station_key": "standard-station",
+      "diagram_mode": "standard"
     },
     {
       "key": "lab-05-01",
@@ -1229,336 +1219,6 @@
       "level": "综合",
       "conditions": [
         "5/7定位是本题环境条件；填写原表完整条件式，不把它自动当作道岔答案。"
-      ],
-      "station_key": "original-photo-station"
-    },
-    {
-      "key": "lab-07-01",
-      "topic": 7,
-      "sequence": 1,
-      "title": "半自动闭塞正常办理全过程",
-      "source_section": "实验7 · 三、1（1）①—⑤",
-      "prompt": "以原图本站III股道向东郊方向发车为背景，完成两站共同办理的正常闭塞流程。先排序业务阶段，再记录两站表示灯和站内信号变化。",
-      "fields": [
-        {
-          "id": "order",
-          "label": "正常办理的业务阶段排序",
-          "kind": "order",
-          "points": 10,
-          "options": [
-            "到达复原",
-            "本站请求发车",
-            "列车到达邻站",
-            "邻站同意接车",
-            "本站办理发车进路后列车出发"
-          ],
-          "expected": [
-            "本站请求发车",
-            "邻站同意接车",
-            "本站办理发车进路后列车出发",
-            "列车到达邻站",
-            "到达复原"
-          ],
-          "explanation": "实验7的正常办理分为请求、同意、发车、到达及复原五个阶段；同意接车与列车已到达不可互换。"
-        },
-        {
-          "id": "lamps",
-          "label": "按五个阶段分别记录本站/邻站表示灯、本站出站信号和需办理的手续。",
-          "kind": "essay",
-          "points": 10,
-          "criteria": [
-            "两站分别记录",
-            "闭塞手续和站内发车进路分开",
-            "未观测到的灯色标明待实测"
-          ]
-        },
-        {
-          "id": "coupling",
-          "label": "说明为什么完成站内进路办理还不能代替两站共同办理闭塞。",
-          "kind": "essay",
-          "points": 10,
-          "criteria": [
-            "站内走行条件和区间占用许可的职责不同",
-            "结合发车方向解释"
-          ]
-        }
-      ],
-      "devices": [
-        "SIII",
-        "XD",
-        "IIIG"
-      ],
-      "level": "应用",
-      "conditions": [
-        "本题将原图经XD的东郊方向作为半自动闭塞练习接口，对端称“邻站”。",
-        "邻站和区间办理状态为教学补充条件；原图没有两站表示灯或完整区间配置。"
-      ],
-      "station_key": "original-photo-station"
-    },
-    {
-      "key": "lab-07-02",
-      "topic": 7,
-      "sequence": 2,
-      "title": "三种取消复原情形的比较",
-      "source_section": "实验7 · 三、1（2）；实验报告问题（2）",
-      "prompt": "仍以原图本站向东郊方向发车为背景。逐一比较收到回执后、收到同意但未开出站信号、出站信号已开放但列车尚未出发三种时机。",
-      "fields": [
-        {
-          "id": "receipt",
-          "label": "收到回执后取消：写出操作、两站表示及需确认的条件。",
-          "kind": "essay",
-          "points": 10,
-          "criteria": [
-            "对应回执阶段",
-            "两站状态都记录"
-          ]
-        },
-        {
-          "id": "consent",
-          "label": "已同意接车、尚未开信号时取消：与上一工况有何不同？",
-          "kind": "essay",
-          "points": 10,
-          "criteria": [
-            "明确尚未开放信号",
-            "记录条件和变化"
-          ]
-        },
-        {
-          "id": "opened",
-          "label": "出站信号已开放、列车尚未出发：说明站内进路与闭塞复原应如何协调。",
-          "kind": "essay",
-          "points": 10,
-          "criteria": [
-            "先确保关闭有关允许信号并确认列车未出发",
-            "不把取消进路等同闭塞已复原",
-            "具体按钮时序须有实验依据"
-          ]
-        }
-      ],
-      "devices": [
-        "SIII",
-        "XD",
-        "IIIG"
-      ],
-      "level": "综合",
-      "conditions": [
-        "本题将原图经XD的东郊方向作为半自动闭塞练习接口，对端称“邻站”。",
-        "邻站和区间办理状态为教学补充条件；原图没有两站表示灯或完整区间配置。"
-      ],
-      "station_key": "original-photo-station"
-    },
-    {
-      "key": "lab-07-03",
-      "topic": 7,
-      "sequence": 3,
-      "title": "事故复原与联锁结合的分析",
-      "source_section": "实验7 · 实验报告问题（1）、（3）",
-      "prompt": "在原图东郊方向的半自动闭塞练习中，正常复原未完成。请分析事故复原适用情形、必须核实的事实以及闭塞设备与本站联锁的关系。本题为原理分析，不提供现场操作授权。",
-      "fields": [
-        {
-          "id": "meaning",
-          "label": "什么是事故复原？与正常到达复原、取消复原有什么区别？",
-          "kind": "essay",
-          "points": 10,
-          "criteria": [
-            "三种复原场景分别讨论",
-            "不以“故障”代替对区间和列车事实的确认"
-          ]
-        },
-        {
-          "id": "checks",
-          "label": "拟采用事故复原前应确认什么，如何记录证据？",
-          "kind": "essay",
-          "points": 10,
-          "criteria": [
-            "列车完整到达/区间状态等事实",
-            "两站共同核实和规定手续",
-            "不将按钮作为绕过安全检查手段"
-          ]
-        },
-        {
-          "id": "interlock",
-          "label": "闭塞与本站进路、出站信号结合应注意什么？",
-          "kind": "essay",
-          "points": 10,
-          "criteria": [
-            "区间许可不能由站内区段空闲代替",
-            "信号开放与闭塞状态相互约束",
-            "提出需要实测/电路核验的项目"
-          ]
-        }
-      ],
-      "devices": [
-        "XD",
-        "SIII"
-      ],
-      "level": "综合",
-      "conditions": [
-        "本题将原图经XD的东郊方向作为半自动闭塞练习接口，对端称“邻站”。",
-        "邻站和区间办理状态为教学补充条件；原图没有两站表示灯或完整区间配置。"
-      ],
-      "station_key": "original-photo-station"
-    },
-    {
-      "key": "lab-08-01",
-      "topic": 8,
-      "sequence": 1,
-      "title": "载频分组与交叉排列",
-      "source_section": "实验8 · 三、1（1）；实验报告问题（1）；图2",
-      "prompt": "以原图X外方的教学区间为背景，沿下行方向四个教学分区依次配置1700-1、2300-1、1700-2、2300-2。结合报告图2比较反方向载频分组，并解释交叉排列。",
-      "fields": [
-        {
-          "id": "opposite",
-          "label": "反方向采用哪组标称载频（Hz）？",
-          "kind": "choice",
-          "points": 10,
-          "options": [
-            "1700与2300",
-            "2000与2600",
-            "1700与2000"
-          ],
-          "expected": "2000与2600",
-          "explanation": "实验8图2下方反方向标注2000、2600，与上方1700、2300分组不同。"
-        },
-        {
-          "id": "next",
-          "label": "重复上述四分区排列时，第五个教学分区取什么？",
-          "kind": "choice",
-          "points": 10,
-          "options": [
-            "1700-1",
-            "2300-1",
-            "1700-2",
-            "2300-2"
-          ],
-          "expected": "1700-1",
-          "explanation": "本题已给定四分区交叉排列，下一周期从1700-1重新开始；这属于题设配置推演。"
-        },
-        {
-          "id": "offset",
-          "label": "“-1”“-2”是什么意思？为什么要交叉排列？",
-          "kind": "essay",
-          "points": 10,
-          "criteria": [
-            "区分标称载频与频率配置区别",
-            "分析相邻区段相互影响",
-            "精确偏移数值须注明教材/实验依据"
-          ]
-        }
-      ],
-      "devices": [
-        "X"
-      ],
-      "level": "应用",
-      "conditions": [
-        "本题在原图X外方设置ZPW-2000教学区间，分区命名为教学分区A—D。",
-        "载频示例取自实验8图2及报告问题；不表示原图已标注这些设备或实际参数。"
-      ],
-      "station_key": "original-photo-station"
-    },
-    {
-      "key": "lab-08-02",
-      "topic": 8,
-      "sequence": 2,
-      "title": "区间低频与机车信号观察记录",
-      "source_section": "实验8 · 三、1（2）—（5）",
-      "prompt": "以列车沿教学区间接近原图X为背景，对正线方向进入I股道停车和经道岔进入III股道停车分别记录。题设只规定接车目标；具体低频与信号显示需要实验观察，不能从一张静态图反推全过程。",
-      "fields": [
-        {
-          "id": "main",
-          "label": "正线接车停车：逐分区记录占用、低频、机车信号、X显示与车列位置。",
-          "kind": "essay",
-          "points": 10,
-          "criteria": [
-            "观测事件按时间排列",
-            "每项记录来源明确",
-            "接车路径与原图一致"
-          ]
-        },
-        {
-          "id": "side",
-          "label": "侧线接车停车：按相同栏目记录，并与正线接车比较。",
-          "kind": "essay",
-          "points": 10,
-          "criteria": [
-            "控制其他工况相同",
-            "对比X与机车信号两个层次"
-          ]
-        },
-        {
-          "id": "why",
-          "label": "从车站进路与区间信息联系解释差异，指出仍需实验验证的项目。",
-          "kind": "essay",
-          "points": 10,
-          "criteria": [
-            "站内路由与区间信息分开分析",
-            "不能由站内空闲推出固定低频"
-          ]
-        }
-      ],
-      "devices": [
-        "X",
-        "IG",
-        "IIIG",
-        "5/7",
-        "23/25"
-      ],
-      "level": "综合",
-      "conditions": [
-        "本题在原图X外方设置ZPW-2000教学区间，分区命名为教学分区A—D。",
-        "载频示例取自实验8图2及报告问题；不表示原图已标注这些设备或实际参数。"
-      ],
-      "station_key": "original-photo-station"
-    },
-    {
-      "key": "lab-08-03",
-      "topic": 8,
-      "sequence": 3,
-      "title": "低频信息含义与证据核对",
-      "source_section": "实验8 · 实验报告问题（2）",
-      "prompt": "延续X外方教学区间，分别说明24.6、14.7、19.1 Hz低频信息的含义，并给出各自对应的运行条件和机车信号显示。四份报告提出了该问题，但没有填入标准答案，请提供你的实验记录或教材依据。",
-      "fields": [
-        {
-          "id": "f246",
-          "label": "24.6 Hz：含义、运行条件、机车信号及依据。",
-          "kind": "essay",
-          "points": 10,
-          "criteria": [
-            "含义与运行条件对应",
-            "机车信号说明明确",
-            "资料/观测出处可核查"
-          ]
-        },
-        {
-          "id": "f147",
-          "label": "14.7 Hz：含义、运行条件、机车信号及依据。",
-          "kind": "essay",
-          "points": 10,
-          "criteria": [
-            "区分低频信息与载频",
-            "不从数值大小猜含义",
-            "提供依据"
-          ]
-        },
-        {
-          "id": "f191",
-          "label": "19.1 Hz：含义、运行条件、机车信号及依据。",
-          "kind": "essay",
-          "points": 10,
-          "criteria": [
-            "与另外两频率比较",
-            "有实测/教材依据",
-            "避免无依据的唯一映射"
-          ]
-        }
-      ],
-      "devices": [
-        "X"
-      ],
-      "level": "综合",
-      "conditions": [
-        "本题在原图X外方设置ZPW-2000教学区间，分区命名为教学分区A—D。",
-        "载频示例取自实验8图2及报告问题；不表示原图已标注这些设备或实际参数。"
       ],
       "station_key": "original-photo-station"
     }

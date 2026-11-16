@@ -198,8 +198,8 @@ onMounted(loadSettings)
 
 <style scoped>
 .ai-settings {
-  max-width: 760px;
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
 }
 
 .settings-header {

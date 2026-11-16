@@ -4,7 +4,7 @@ Operate on the existing RuntimeSession, using the same route guard/arranger.
 The caller owns authorization, optimistic concurrency and persistence.
 """
 from copy import deepcopy
-from time import monotonic, time
+from .clock import monotonic, time
 
 from .runtime import RuntimeSession
 

@@ -1,6 +1,6 @@
 <template>
   <section class="op-page exam-page" v-loading="loading">
-    <router-link class="op-back" :to="data ? `/exams/manage/${data.exam_id}` : '/exams/manage'">← 返回考试详情</router-link>
+    <router-link class="op-back" :to="route.query.from==='grading' ? '/exams/grading' : data ? `/exams/manage/${data.exam_id}` : '/exams/manage'">{{ route.query.from==='grading'?'← 返回考试批阅':'← 返回考试详情' }}</router-link>
     <header class="exam-masthead"><div><h1>考试批阅</h1><p v-if="data">{{ data.name }} · {{ data.identity.class_name }} · {{ data.identity.student_id }} · {{ data.identity.real_name }}</p></div><el-button :disabled="working || loading" @click="refresh">刷新记录</el-button></header>
     <el-alert v-if="notice" :title="notice" type="error" :closable="false" role="alert" />
     <p v-if="success" class="exam-grade-notice" role="status">{{ success }}</p>
@@ -12,6 +12,7 @@
           <div class="exam-grade-tools"><el-button @click="download">下载考试日志</el-button></div>
         </section>
         <section class="exam-form-section"><h2>{{ data.question.title }} · v{{ data.question.number }}</h2><p class="op-preserve">{{ data.question.prompt }}</p></section>
+        <AssessmentPanel :key="data.session_id" :sid="data.session_id" :evaluation="data.automatic_evaluation" :grade="grade" :dirty="dirty" :review="data.assessment_review" @adopt="form.score = String($event)" @comment="form.comment = $event" />
         <section class="exam-form-section"><h2>学生操作</h2><OperationLog :events="data.console?.events || []" /></section>
         <section class="exam-form-section"><h2>本场考试的标准操作</h2><OperationLog :events="data.question.standard_log || []" /></section>
         <section class="exam-form-section"><details><summary>全屏事件（{{ data.control_events.length }}）</summary>
@@ -51,6 +52,7 @@ import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue'
 import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
 import OperationLog from '@/features/operationQuestions/OperationLog.vue'
+import AssessmentPanel from '@/features/exams/AssessmentPanel.vue'
 import ListPager from '@/components/ListPager.vue'
 import { getExamAttempt, downloadExam, saveExamGrade, publishExamGrade } from '@/api/exams'
 import { beijingTime, examError, examStates } from '@/domain/exams'

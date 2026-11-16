@@ -4,7 +4,8 @@ from datetime import datetime, timezone
 from hashlib import sha256
 import json
 from threading import RLock
-from time import time
+from app.services.simulation_console.clock import time
+from app.services.simulation_console import clock as simulation_clock
 from uuid import uuid4
 from fastapi import HTTPException
 from sqlalchemy import delete, func, select, text, update
@@ -36,8 +37,17 @@ def digest(value):
     return sha256(json.dumps(value, sort_keys=True, ensure_ascii=False, separators=(',', ':')).encode()).hexdigest()
 
 
+_station_digest = (None, None)
+
+
 def station_version():
-    return digest(reference_station_package())
+    # The compiler already caches an immutable package. Recompile/cache_clear or
+    # process restart replaces its identity and therefore invalidates this hash.
+    global _station_digest
+    package = reference_station_package()
+    if _station_digest[0] is not package:
+        _station_digest = (package, digest(package))
+    return _station_digest[1]
 
 
 def persistent_state(engine, sid, previous=None):
@@ -106,6 +116,12 @@ def delete_question(db, user, qid, force=False):
                                                           OperationSession.status == 'active').limit(1)):
                 fail('请先结束该题目的所有录制和预览，再删除')
         if force:
+            from app.models.operation_assessment import (ExamPublishedAssessment, ExamAssessmentReviewHistory,
+                ExamAssessmentReview, ExamStudentCommentary, ExamEvaluation, ExamEvidenceSeal)
+            publications = select(ExamGradePublication.id).where(ExamGradePublication.session_id.in_(attempts))
+            db.execute(delete(ExamPublishedAssessment).where(ExamPublishedAssessment.publication_id.in_(publications)), execution_options={'synchronize_session': False})
+            for model in (ExamAssessmentReviewHistory, ExamAssessmentReview, ExamStudentCommentary, ExamEvaluation, ExamEvidenceSeal):
+                db.execute(delete(model).where(model.session_id.in_(attempts)), execution_options={'synchronize_session': False})
             for model in (ExamGradeAudit, ExamGradePublication, ExamGrade, ExamControlEvent):
                 db.execute(delete(model).where(model.session_id.in_(attempts)), execution_options={'synchronize_session': False})
             db.execute(delete(ExamParticipant).where(ExamParticipant.exam_id.in_(exams)), execution_options={'synchronize_session': False})
@@ -113,6 +129,9 @@ def delete_question(db, user, qid, force=False):
             db.execute(delete(Exam).where(Exam.id.in_(exams)), execution_options={'synchronize_session': False})
             db.execute(delete(OperationReview).where(OperationReview.session_id.in_(learning)), execution_options={'synchronize_session': False})
             db.execute(delete(OperationAttempt).where(OperationAttempt.session_id.in_(learning)), execution_options={'synchronize_session': False})
+        from app.models.operation_assessment import OperationEvidenceEvent, OperationAssessmentConfig
+        db.execute(delete(OperationEvidenceEvent).where(OperationEvidenceEvent.session_id.in_(sessions)), execution_options={'synchronize_session': False})
+        db.execute(delete(OperationAssessmentConfig).where(OperationAssessmentConfig.version_id.in_(versions)), execution_options={'synchronize_session': False})
         db.execute(delete(OperationEvent).where(OperationEvent.session_id.in_(sessions)), execution_options={'synchronize_session': False})
         db.execute(delete(OperationSession).where(OperationSession.id.in_(sessions)), execution_options={'synchronize_session': False})
         db.execute(delete(OperationVersion).where(OperationVersion.id.in_(versions)), execution_options={'synchronize_session': False})
@@ -305,14 +324,23 @@ def events(db, sid):
         OperationEvent.session_id == sid).order_by(OperationEvent.sequence))]
 
 
-def response(db, record, engine, session):
+def response(db, record, engine, session, *, after_sequence=None, state_version=None):
     snapshot = engine._snapshot(session)
     pending = deepcopy(record.context.get('pending'))
     if pending and pending['expires_at'] <= time():
         pending = None
     snapshot.update(pending=pending, click_sequence=record.revision,
                     session_status=record.status, session_kind=record.kind)
-    return {'snapshot': snapshot, 'events': events(db, record.id), 'status': record.status,
+    light = after_sequence is not None
+    unchanged = light and state_version == snapshot['version']
+    return {'snapshot': None if unchanged else snapshot,
+            'timers': {'selection_remaining_seconds': snapshot['selection_remaining_seconds'],
+                       'fault_releases': snapshot.get('fault_releases', {}),
+                       'routes': [{'id': r['id'], 'manual_remaining_seconds': r['manual_remaining_seconds'],
+                                   'guide_remaining_seconds': r.get('guide_remaining_seconds', 0)}
+                                  for r in snapshot['routes'] if r['status'] not in {'cancelled', 'released'}]} if unchanged else None,
+            'events': [] if light else events(db, record.id), 'event_count': record.revision,
+            'state_version': snapshot['version'], 'status': record.status,
             'pending': pending, 'revision': record.revision, 'session_id': record.id}
 
 
@@ -339,24 +367,32 @@ def start_session(db, user, qid, kind):
     return response(db, record, engine, engine.sessions[sid])
 
 
-def refresh(db, user, sid, *, exam=False, commit=True):
+def refresh(db, user, sid, *, exam=False, commit=True, after_sequence=None, state_version=None):
     record = get_session(db, user, sid, exam=exam)
     engine, session = unpack(reference_station_package(), record.engine_state)
     if record.status == 'active':
-        engine.snapshot(sid, user.id)
+        tracked = record.engine_state.get('evidence_schema') == 1
+        old_version = session.version
+        if tracked:
+            from app.services.operation_assessment import evidence
+            evidence.advance(db, record, engine, session)
+        else:
+            engine.snapshot(sid, user.id)
+        if tracked and old_version == session.version:
+            return response(db, record, engine, session, after_sequence=after_sequence, state_version=state_version)
         claimed = db.execute(update(OperationSession).where(OperationSession.id == sid,
             OperationSession.state_revision == record.state_revision,
             OperationSession.revision == record.revision, OperationSession.status == 'active').values(
-                engine_state=persistent_state(engine, sid, record.engine_state),
+                engine_state=record.engine_state if tracked else persistent_state(engine, sid, record.engine_state),
                 state_revision=OperationSession.state_revision + 1))
         if claimed.rowcount != 1:
             db.rollback()
             fail('会话已变化，请重新同步')
         db.commit() if commit else db.flush()
-    return response(db, record, engine, session)
+    return response(db, record, engine, session, after_sequence=after_sequence, state_version=state_version)
 
 
-def click(db, user, sid, body, *, exam=False, commit=True):
+def click(db, user, sid, body, *, exam=False, commit=True, light=False):
     record = get_session(db, user, sid, exam=exam)
     clean = body.model_dump(mode='json', exclude={'pin', 'event_id', 'sequence'})
     fingerprint = digest(clean)
@@ -365,7 +401,7 @@ def click(db, user, sid, body, *, exam=False, commit=True):
     if previous:
         if previous.request_fingerprint != fingerprint or previous.sequence != body.sequence:
             fail('同一事件ID不得改换动作或序号')
-        result = refresh(db, user, sid, exam=exam, commit=commit)
+        result = refresh(db, user, sid, exam=exam, commit=commit, after_sequence=0 if light else None)
         result['event'] = previous.content
         return result
     if record.status != 'active':
@@ -385,7 +421,14 @@ def click(db, user, sid, body, *, exam=False, commit=True):
         if body.target_id not in known[body.target_kind]:
             fail('目标不在当前标准站设备中', 422)
     engine, session = unpack(reference_station_package(), record.engine_state)
-    engine.snapshot(sid, user.id)
+    tracked = record.engine_state.get('evidence_schema') == 1
+    if tracked:
+        from app.services.operation_assessment import evidence
+        evidence.advance(db, record, engine, session)
+    else:
+        engine.snapshot(sid, user.id)
+    selected_before = list(session.selected)
+    mode_before = 'guide' if engine._state(session).get('guide_armed') else 'normal'
     context = deepcopy(record.context)
     if context.get('pending') and context['pending']['expires_at'] <= time():
         context['pending'] = None
@@ -414,9 +457,9 @@ def click(db, user, sid, body, *, exam=False, commit=True):
             else:
                 target_kind = body.target_kind
             if not pending:
-                result = {'accepted': False, 'message': '请先选择功能按钮'}
+                result = {'accepted': False, 'reason_code': 'NO_FUNCTION_SELECTED', 'message': '请先选择功能按钮'}
             elif target_kind != ('signal' if pending['target'] == 'route' else pending['target']):
-                result = {'accepted': False, 'message': '目标类型不符，请选择' + pending['target']}
+                result = {'accepted': False, 'reason_code': 'TARGET_TYPE_MISMATCH', 'message': '目标类型不符，请选择' + pending['target']}
             else:
                 kind = pending['type']
                 actual_target = target
@@ -429,7 +472,7 @@ def click(db, user, sid, body, *, exam=False, commit=True):
                         parameters = {'signal': target}
                         target = 'route:' + instance['route_id']
                     else:
-                        result = {'accepted': False, 'message': '该信号没有仍锁闭的进路'}
+                        result = {'accepted': False, 'reason_code': 'ROUTE_NOT_LOCKED', 'message': '该信号没有仍锁闭的进路'}
                         actual_target = None
                 if actual_target:
                     result = operate(engine, sid, user.id, {'type': kind, 'target': actual_target,
@@ -442,16 +485,24 @@ def click(db, user, sid, body, *, exam=False, commit=True):
     content = {'schema_version': 1, 'event_id': str(body.event_id), 'session_id': sid,
                'sequence': body.sequence, 'action': body.action, 'button_id': button,
                'target_id': target, 'parameters': {**parameters, **({'target_kind': body.target_kind} if body.action == 'target' else {})},
-               'event_time': datetime.now(timezone.utc).isoformat(),
+               'event_time': simulation_clock.iso(),
                'engine_version': session.version,
-               'result': {'accepted': bool(result['accepted']), 'message': result['message']}}
+               'result': {'accepted': bool(result['accepted']), 'message': result['message'],
+                          'reason_code': result.get('reason_code', 'OK' if result['accepted'] else 'UNCLASSIFIED'),
+                          'devices': result.get('devices', [])}}
+    if tracked:
+        source = {**content, 'selected_before': selected_before, 'mode': mode_before,
+                  'is_command': bool(parameters or body.action == 'target' or button in COMMAND_TARGETS and body.action != 'function'),
+                  'request_routes': [r['id'] for r in engine.package['routes'] if r['button_sequence'] == selected_before + [body.button_id]]
+                      if body.action == 'button' and button == body.button_id else []}
+        evidence.persist(db, record, engine, session, source)
     # Atomic revision claim + unique constraints cover concurrent workers; a
     # losing request rolls back its event and station state together.
     claimed = db.execute(update(OperationSession).where(OperationSession.id == sid,
         OperationSession.revision == record.revision, OperationSession.state_revision == record.state_revision,
         OperationSession.status == 'active').values(revision=body.sequence,
         state_revision=OperationSession.state_revision + 1,
-        engine_state=persistent_state(engine, sid, record.engine_state), context=context))
+        engine_state=record.engine_state if tracked else persistent_state(engine, sid, record.engine_state), context=context))
     if claimed.rowcount != 1:
         db.rollback()
         fail('另一个请求已修改会话，请同步后重试')
@@ -463,7 +514,7 @@ def click(db, user, sid, body, *, exam=False, commit=True):
         db.rollback()
         fail('操作发生并发冲突，请以相同事件ID重试')
     db.refresh(record)
-    output = response(db, record, engine, session)
+    output = response(db, record, engine, session, after_sequence=0 if light else None)
     output['event'] = content
     return output
 

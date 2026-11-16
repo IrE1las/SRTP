@@ -44,7 +44,8 @@ def test_draw_and_history_share_clean_wording_and_original_grading(db_session):
 def test_source_figures_match_document_and_do_not_expose_answers(db_session):
     import_bank(db_session, load_bank())
     items = question_list(db_session, 1, limit=100)['items']
-    question = next(q for q in items if q['id'] == 'C1-009')
+    assert 'C1-009' not in {q['id'] for q in items}  # retained source, outside the 182-question scope
+    question = next(q for q in items if q['id'] == 'PPT-PDF-002')
     assert question['images'][0]['src'] == '/chapter-bank/images/fig1-5.png'
     assert 'answer' not in question
     root = Path(__file__).resolve().parents[3]

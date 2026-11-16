@@ -17,6 +17,23 @@ manager = require_roles('teacher', 'admin')
 reader = require_roles('student', 'teacher', 'admin')
 
 
+@router.get('/questions/{qid}/assessment')
+def assessment_config(qid: int, db: Session = Depends(get_db), user: User = Depends(manager)):
+    from app.services.operation_assessment.configuration import view
+    service.question(db, user, qid)
+    return view(db, service.latest(db, qid).id)
+
+
+from app.schemas.operation_assessment import AssessmentDraft
+
+
+@router.put('/questions/{qid}/assessment')
+def save_assessment(qid: int, body: AssessmentDraft, db: Session = Depends(get_db), user: User = Depends(manager)):
+    from app.services.operation_assessment.configuration import save
+    with service.LOCK:
+        return save(db, user, qid, body)
+
+
 @router.get('/station')
 def station(user: User = Depends(manager)):
     return service.reference_station_package()

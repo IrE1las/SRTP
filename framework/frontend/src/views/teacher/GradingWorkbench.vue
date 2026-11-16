@@ -13,7 +13,7 @@
         <el-empty v-if="!current" description="选择一份学生作答开始评阅"/>
         <template v-else>
           <header class="submission-heading"><div><span class="student-pill">{{ current.student_name }} · {{ current.student_number||'未填学号' }}</span><h2><Notation :text="current.question_title"/></h2><p>{{ current.class_name||'未填班级' }} · {{ formatDate(current.created_at) }} · 作答 #{{ current.id }}</p></div><div class="submission-nav"><button :disabled="saving||!canPrevious" @click="navigate(-1)">↑ 上一份</button><button :disabled="saving||!canNext" @click="navigate(1)">下一份 ↓</button></div></header>
-          <details class="question-context"><summary>查看提交时的题干、条件与完整站场</summary><p><Notation :text="current.question.prompt"/></p><ul><li v-for="c in current.question.conditions" :key="c"><Notation :text="c"/></li></ul><ClassicStationCanvas :answer="emptyDiagram" reference-mode/><p class="muted">依据：{{ current.question.source_section }}</p></details>
+          <details class="question-context"><summary>查看提交时的题干、条件与完整站场</summary><p><Notation :text="current.question.prompt"/></p><ul><li v-for="c in current.question.conditions" :key="c"><Notation :text="c"/></li></ul><StandardStationPreview v-if="current.question.station_key==='standard-station'"/><ClassicStationCanvas v-else :answer="emptyDiagram" reference-mode/><p class="muted">依据：{{ current.question.source_section }}</p></details>
           <div class="grade-totals"><article><span>客观项</span><strong>{{ current.result.automatic_score }}<small> / {{ current.result.automatic_max }}</small></strong></article><article><span>人工项预填</span><strong>{{ enteredManual }}<small> / {{ current.result.manual_max }}</small></strong></article><article><span>{{ incomplete?'尚有未评分项':'预览合计' }}</span><strong v-if="incomplete">{{ incomplete }}<small> 栏待评</small></strong><strong v-else>{{ previewTotal }}<small> / {{ current.result.total_max }}</small></strong></article></div>
           <details class="automatic-feedback"><summary>客观项自动核对结果（{{ current.result.automatic_score }}/{{ current.result.automatic_max }}）</summary><article v-for="f in automaticFields" :key="f.id"><strong><Notation :text="f.label"/> · {{ f.points }}/{{ f.max_points }} 分</strong><p>学生填写：<Notation :text="answerText(current.answers[f.id])"/></p><p v-for="error in f.errors" :key="error"><Notation :text="error"/></p><p>参考填写：<Notation :text="answerText(f.expected)" :runs="f.expected_runs"/></p><p class="muted"><Notation :text="f.explanation"/></p></article></details>
           <fieldset class="manual-fields" :disabled="saving||detailLoading">
@@ -41,6 +41,7 @@ import {computed,onBeforeUnmount,onMounted,reactive,ref,watch} from 'vue'
 import {onBeforeRouteLeave} from 'vue-router'
 import {ElMessage,ElMessageBox} from 'element-plus'
 import {useUserStore} from '@/store/user'
+import StandardStationPreview from '@/components/StandardStationPreview.vue'
 import ClassicStationCanvas from '@/components/ClassicExam/ClassicStationCanvas.vue'
 import Notation from '@/components/RailwayNotation.vue'
 import {getManagementMetadata,getManagementOverview,listReviews,getReview,saveReviewDraft,submitGrade,exportGrades,getFeedbackSnippets,addFeedbackSnippet,deleteFeedbackSnippet} from '@/api/management'

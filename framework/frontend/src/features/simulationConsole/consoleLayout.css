@@ -1,0 +1,12 @@
+.simulation-page .console-shell { box-sizing:border-box; container-type:inline-size; }
+.simulation-page .console-menu { flex-shrink:0; flex-wrap:wrap; gap:2px 0; }
+.simulation-page .console-menu strong { white-space:nowrap; }
+.simulation-page .console-menu button { white-space:nowrap; touch-action:manipulation; }
+.simulation-page .function-region { display:flex; flex-wrap:wrap; overflow:visible; }
+.simulation-page .function-button { flex:1 0 80px; font-size:13px; min-height:44px; }
+.simulation-page .stage-wrap .reference-diagram { min-width:0; min-height:0; width:100%; height:100%; }
+.simulation-page .console-shell:fullscreen,
+.simulation-page .console-shell.window-fullscreen { width:100%; height:100dvh; min-height:0; max-width:none; border:0; margin:0; }
+.simulation-page .console-shell.window-fullscreen { position:fixed; inset:0; z-index:4000; }
+.simulation-page button:focus-visible { outline:3px solid #0075b7; outline-offset:-3px; }
+@container(max-width:800px) { .simulation-page .console-menu .mode-label { display:none; } .simulation-page .console-menu button { font-size:12px; padding:8px 7px; } .simulation-page .hint-region { flex-wrap:wrap; font-size:12px; } .simulation-page .hint-region time { margin-left:auto; font-size:11px; } }

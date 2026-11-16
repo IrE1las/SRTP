@@ -44,3 +44,6 @@ typing_extensions==4.16.0
 uvicorn==0.52.4
 watchfiles==1.2.0
 websockets==17.1
+msoffcrypto-tool==6.1.0
+olefile==0.47
+pypdf==7.1.0

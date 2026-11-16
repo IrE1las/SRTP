@@ -28,3 +28,13 @@ class PracticeBookmark(Base):
     user_id: Mapped[int] = mapped_column(Integer, primary_key=True)
     question_id: Mapped[str] = mapped_column(String(50), primary_key=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+
+
+class PracticeAiThread(Base):
+    __tablename__ = 'chapter_practice_ai_threads'
+    attempt_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    user_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    revision: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    turns: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    lease_token: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

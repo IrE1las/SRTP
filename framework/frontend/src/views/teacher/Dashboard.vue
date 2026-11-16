@@ -1,31 +1,37 @@
 <template>
   <div class="teacher-dashboard">
-  <div class="section-title-row"><div><h2>教学数据概览</h2></div><router-link to="/teacher/exercises">管理练习 ↗</router-link></div>
+  <div class="section-title-row"><div><h2>教学数据概览</h2></div><router-link to="/teacher/chapter-bank">管理客观题库 ↗</router-link></div>
+  <el-alert v-if="notice" :title="notice" type="error" :closable="false" />
   <el-card shadow="never" v-loading="loading" class="statistics-card">
     <template #header><strong>教学统计</strong></template>
     <el-row :gutter="16">
-      <el-col :span="6"><el-statistic title="题目数量" :value="stats.exercise_count || 0" /></el-col>
-      <el-col :span="6"><el-statistic title="练习次数" :value="stats.session_count || 0" /></el-col>
-      <el-col :span="6"><el-statistic title="完成率" :value="stats.completion_rate || 0" suffix="%" /></el-col>
-      <el-col :span="6"><el-statistic title="平均分" :value="stats.average_score || 0" /></el-col>
+      <el-col :span="6"><el-statistic title="客观题数量" :value="stats.question_count || 0" /></el-col>
+      <el-col :span="6"><el-statistic title="已交卷答卷" :value="stats.submitted_count || 0" /></el-col>
+      <el-col :span="6"><el-statistic title="待发布成绩" :value="stats.pending_count || 0" /></el-col>
+      <el-col :span="6"><el-statistic title="已发布成绩" :value="stats.published_count || 0" /></el-col>
     </el-row>
   </el-card>
-  <div class="teacher-actions"><router-link to="/teacher/exercises/new"><strong>创建新的练习</strong></router-link><router-link to="/teacher/exercises"><strong>管理我的题库</strong></router-link></div>
+  <div class="teacher-actions"><router-link to="/teacher/chapter-bank"><strong>管理客观题库</strong></router-link><router-link to="/exams/grading"><strong>进入考试批阅</strong></router-link></div>
   </div>
 </template>
 
 <script setup>
 import { onMounted, ref } from 'vue'
 
-import { getTeacherStatistics } from '@/api/statistics'
+import { listChapterQuestions } from '@/api/chapterAuthoring'
+import { examReviews } from '@/api/exams'
 
 const stats = ref({})
+const notice = ref('')
 const loading = ref(false)
 
 onMounted(async () => {
   loading.value = true
   try {
-    stats.value = await getTeacherStatistics()
+    const [bank, reviews] = await Promise.all([listChapterQuestions({limit:1}), examReviews({status:'all'})])
+    stats.value = {question_count:bank.total, submitted_count:reviews.counts.all, pending_count:reviews.counts.pending, published_count:reviews.counts.published}
+  } catch (error) {
+    notice.value = typeof error.response?.data?.detail === 'string' ? error.response.data.detail : '教学数据加载失败，请刷新重试'
   } finally {
     loading.value = false
   }

@@ -34,7 +34,7 @@ class Marking(BaseModel):
 
 def find_question(db, key, published=True):
     q = db.query(LabQuestion).filter_by(key=key).one_or_none()
-    if q is None: raise HTTPException(404,'专题题目不存在')
+    if q is None or not 1<=q.topic<=6: raise HTTPException(404,'专题题目不存在')
     state=db.get(QuestionWorkspace,q.id)
     if published and state is not None and state.status!='published':raise HTTPException(404,'题目未发布或已停用')
     return q
@@ -42,18 +42,18 @@ def find_question(db, key, published=True):
 
 @router.get('/questions')
 def questions(db: Session=Depends(get_db), user: User=Depends(reader)):
-    query=db.query(LabQuestion).outerjoin(QuestionWorkspace).filter(or_(QuestionWorkspace.question_id.is_(None),QuestionWorkspace.status=='published'))
+    query=db.query(LabQuestion).filter(LabQuestion.topic.between(1,6)).outerjoin(QuestionWorkspace).filter(or_(QuestionWorkspace.question_id.is_(None),QuestionWorkspace.status=='published'))
     return [public_question(q,detail=False) for q in query.order_by(LabQuestion.topic,LabQuestion.sequence,LabQuestion.id)]
 
 
 @router.get('/attempts')
 def own_attempts(db: Session=Depends(get_db), user: User=Depends(reader)):
-    return [attempt_view(a) for a in db.query(LabAttempt).filter_by(student_id=user.id).order_by(LabAttempt.id.desc()).limit(200)]
+    return [attempt_view(a) for a in db.query(LabAttempt).filter_by(student_id=user.id).filter(LabAttempt.question_snapshot['topic'].as_integer().between(1,6)).order_by(LabAttempt.id.desc()).limit(200)]
 
 
 @router.get('/reviews')
 def reviews(db: Session=Depends(get_db), user: User=Depends(teacher)):
-    pairs = db.query(LabAttempt,User).join(User,User.id==LabAttempt.student_id).order_by(LabAttempt.id.desc()).limit(300).all()
+    pairs = db.query(LabAttempt,User).join(User,User.id==LabAttempt.student_id).filter(LabAttempt.question_snapshot['topic'].as_integer().between(1,6)).order_by(LabAttempt.id.desc()).limit(300).all()
     return [{**attempt_view(a),'student_name':u.real_name or u.username,
              'rubric':[{'id':f['id'],'label':f['label'],'points':f['points'],'criteria':f.get('criteria',[])}
                        for f in a.question_snapshot['fields'] if f['kind']=='essay'],

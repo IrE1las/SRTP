@@ -34,6 +34,8 @@ class ControlEvent(Body):
 class Sync(Body):
     fullscreen: StrictBool
     events: list[ControlEvent] = Field(default_factory=list, max_length=500)
+    after_sequence: StrictInt | None = Field(default=None, ge=0)
+    state_version: StrictInt | None = Field(default=None, ge=0)
 
 
 class Submit(Body):

@@ -1,11 +1,8 @@
-"""Session-isolated, conservative first-stage teaching interlocking runtime.
+"""Session-isolated station runtime primitives.
 
-This simulator is intentionally separate from the legacy exercise engine.
-Experiment commands extend this same state machine through commands.py.
-The operator console adds checked, timed manual release in console_commands.py.
-Arbitrary train moves remain unsupported.
-Its decisions are traceable to the supplied TB/T 3027, 3578 and 3537 copies and
-to the imported workbook rows; it is not safety-certified railway software.
+The standard-station subclass supplies its own package and route conditions.
+Manual release and device commands share this state machine; the legacy
+exercise engine keeps its separate models and teaching data.
 """
 
 from __future__ import annotations
@@ -14,10 +11,9 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from copy import deepcopy
 from threading import RLock
-from time import monotonic
+from .clock import monotonic, iso as clock_iso
 from uuid import uuid4
 
-from .station import station_package
 
 
 class SimulationError(Exception):
@@ -39,12 +35,13 @@ class RuntimeSession:
     events: list[dict] = field(default_factory=list)
     history: list[dict] = field(default_factory=list)
     last_message: str = "仿真会话已准备；区段空闲，道岔定位，信号关闭。"
+    durable_events: bool = False
     mutex: RLock = field(default_factory=RLock, repr=False)
 
 
 class SimulationService:
-    def __init__(self, package: dict | None = None) -> None:
-        self.package = package if package is not None else station_package()
+    def __init__(self, package: dict) -> None:
+        self.package = package
         self.routes = {route["id"]: route for route in self.package["routes"]}
         self.buttons = {button["name"]: button for button in self.package["buttons"]}
         self.section_defs = {section["name"]: section for section in self.package["sections"]}
@@ -85,9 +82,11 @@ class SimulationService:
     def _event(session: RuntimeSession, kind: str, message: str, route_id: str | None = None) -> None:
         session.version += 1
         session.last_message = message
-        session.events.append({"version": session.version, "time": datetime.now(timezone.utc).isoformat(),
-                               "kind": kind, "message": message, "route_id": route_id})
-        if len(session.events) > 500:
+        instance = next((r for r in reversed(list(session.routes.values())) if r['route_id'] == route_id), None)
+        session.events.append({"version": session.version, "time": clock_iso(),
+                               "kind": kind, "message": message, "route_id": route_id,
+                               "instance_id": instance['id'] if instance else None})
+        if len(session.events) > 500 and not session.durable_events:
             session.events.pop(0)
 
     @staticmethod
@@ -192,19 +191,7 @@ class SimulationService:
                 "devices": devices or [], "snapshot": self._snapshot(session)}
 
     def _conditional_sections(self, session: RuntimeSession, route: dict) -> list[str]:
-        sections = route["overlap_sections"]
-        condition = route["overlap_condition"]
-        if not sections:
-            return []
-        if not condition:
-            return sections  # Unknown condition is checked conservatively.
-        from .station import _switches
-        demands, errors = _switches(condition)
-        if errors or not demands:
-            raise SimulationError(f"进路 {route['id']} 超限区段条件无法核验")
-        if all(session.switches.get(sid, {}).get("position") == pos for sid, pos in demands.items()):
-            return sections
-        return []
+        raise NotImplementedError('站场运行类须提供本身的条件区段校验')
 
     @staticmethod
     def _hostile_names(route: dict) -> set[str]:
@@ -320,13 +307,13 @@ class SimulationService:
             if not matching:
                 session.selected = []
                 session.selection_deadline = None
-                return self._reject(session, f"按钮序列 {' → '.join(proposed)} 不在本阶段候选进路中")
+                return self._reject(session, f"按钮序列 {' → '.join(proposed)} 不在本阶段候选进路中", reason_code='INVALID_SEQUENCE')
             exact = [route for route in matching if len(route["button_sequence"]) == len(proposed)]
             if exact:
                 if len(exact) != 1:
                     session.selected = []
                     session.selection_deadline = None
-                    return self._reject(session, "完整按钮序列对应多条进路，数据冲突，未开放信号")
+                    return self._reject(session, "完整按钮序列对应多条进路，数据冲突，未开放信号", reason_code='AMBIGUOUS_ROUTE')
                 return self._arrange(session, exact[0])
             session.selected = proposed
             if len(proposed) == 1:
@@ -406,6 +393,3 @@ class SimulationService:
                 self._event(session, "train_exit", f"车辆出清末端 {last}；等待三点检查和 3 秒延时",
                             instance["route_id"])
             return {"accepted": True, "message": session.last_message, "snapshot": self._snapshot(session)}
-
-
-simulation_service = SimulationService()

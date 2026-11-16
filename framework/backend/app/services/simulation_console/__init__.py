@@ -1,1 +1,1 @@
-"""Independent teaching simulation console for the data.xls station."""
+"""Standard-station simulation primitives and operation commands."""

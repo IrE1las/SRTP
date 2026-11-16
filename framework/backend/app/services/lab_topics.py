@@ -14,6 +14,7 @@ from app.models.lab_topic import LabAttempt, LabQuestion
 from app.models.shunting_route import ShuntingDataset, ShuntingRoute
 from app.services.shunting_data import DATASET_KEY, STATION_KEY
 from app.services.answer_references import load_references, explanation_text
+from app.services.simulation_console.reference_station import reference_station_package
 
 ROOT = Path(__file__).resolve().parents[4]
 BLUEPRINT = ROOT / 'ai_design/station/report_topic_blueprint.json'
@@ -48,9 +49,13 @@ def resolve_blueprint(db: Session):
     topology = dataset.station_topology
     inventory = ({s['name'] for s in topology['signals']} | {s['id'] for s in topology['switches']}
                  | {s['name'] for s in topology['sections']})
+    standard = reference_station_package()
+    standard_inventory = ({s['name'] for s in standard['signals']} | {s['id'] for s in standard['switches']}
+                          | {s['geometry']['group'] for s in standard['switches'] if s['geometry']['group']}
+                          | {s['id'] for s in standard['sections']})
     topics = {t['id']:t for t in blueprint['topics']}
-    if set(topics) != set(range(1,9)) or len(blueprint['questions']) != 24:
-        raise ValueError('专题应完整覆盖八个实验的24道复合题')
+    if set(topics) != set(range(1,7)) or len(blueprint['questions']) != 18:
+        raise ValueError('专题应完整覆盖六个实验的18道复合题')
     keys = set()
     resolved = []
     references = load_references(ROOT)
@@ -59,13 +64,15 @@ def resolve_blueprint(db: Session):
         raise ValueError('参考解答与实验专题答题栏不一致')
     for source in blueprint['questions']:
         item = copy.deepcopy(source)
-        if item['key'] in keys or item['topic'] not in topics or set(item['devices']) - inventory:
-            raise ValueError('题目编号重复或引用原图以外的设备')
+        if item['key'] in keys or item['topic'] not in topics or set(item['devices']) - (standard_inventory if item['topic']<=4 else inventory):
+            raise ValueError('题目编号重复或引用对应站场以外的设备')
         keys.add(item['key'])
         item['topic_info'] = topics[item['topic']]
         item['evidence'] = {'dataset_sha256':dataset.content_sha256,
                             'train_table_sha256':hashlib.sha256(data).hexdigest(),
-                            'station_key':STATION_KEY}
+                            'station_key':item['station_key']}
+        if item['topic']<=4:
+            item['evidence']['standard_source_sha256']=standard['source_sha256']
         ids = set()
         for field in item['fields']:
             if field['id'] in ids or field['kind'] not in KIND_LABELS or field['points'] <= 0:
@@ -79,6 +86,17 @@ def resolve_blueprint(db: Session):
                     field['expected_runs'] = route.rich_text.get(b['column'], [])
                 elif b['table'] == 'train':
                     field['expected'] = trains[b['route_number']][b['column']]
+                elif b['table'] == 'standard':
+                    route = next(r for r in standard['routes'] if r['name']==b['route'])
+                    if b['column']=='排列进路按下按钮':
+                        field['expected']=','.join(route['button_sequence'])
+                    elif b['column']=='轨道区段':
+                        field['expected']=','.join(route['sections'])
+                    elif b['column']=='道岔':
+                        groups={s['id']:s['geometry']['group'] or s['id'] for s in standard['switches']}
+                        field['expected']=','.join(dict.fromkeys(('('+groups[k]+')') if pos else groups[k] for k,pos in route['switches'].items()))
+                    else:
+                        raise ValueError('未知标准站核对项')
                 else:
                     raise ValueError('未知联锁表来源')
             if field['kind'] == 'essay':
@@ -113,7 +131,34 @@ def import_topics(db: Session):
             existing.fingerprint = fingerprint
             updated += 1
     db.flush()
-    return {'topics':8,'total':len(items),'inserted':inserted,'updated':updated}
+    return {'topics':6,'total':len(items),'inserted':inserted,'updated':updated}
+
+
+def upgrade_standard_topics(db: Session):
+    """Publish the explicit station adaptation; past answer snapshots stay immutable."""
+    from app.models.authoring import QuestionRevision, QuestionWorkspace
+    from app.services.question_authoring import initialize_workspace
+    _, items=resolve_blueprint(db)
+    updated=[]
+    for item in items:
+        if item['topic']>4:
+            continue
+        question=db.query(LabQuestion).filter_by(key=item['key']).one_or_none()
+        if question is None or question.fingerprint==digest(item):
+            continue
+        state=db.get(QuestionWorkspace,question.id)
+        if question.content.get('authoring_source')=='administrator' or (state and (state.draft is not None or state.updated_by is not None)):
+            continue
+        state=initialize_workspace(db,question)
+        state.published_version+=1
+        state.revision+=1
+        question.content=item
+        question.fingerprint=digest(item)
+        db.add(QuestionRevision(question_id=question.id,version=state.published_version,
+                               content=copy.deepcopy(item),note='专题1—4适配标准站；历史作答保留原题快照'))
+        updated.append(question.key)
+    db.flush()
+    return updated
 
 
 def public_question(question, detail=True):
@@ -125,7 +170,7 @@ def public_question(question, detail=True):
     if detail:
         result.update({k:item[k] for k in ['prompt','conditions','source_section','devices','station_key']})
         result['fingerprint'] = question.fingerprint
-        result['diagram_mode'] = item.get('diagram_mode','semi_auto' if item['topic']==7 else 'auto' if item['topic']==8 else 'station')
+        result['diagram_mode'] = 'standard' if question.topic in range(1,5) else 'station'
         result['fields'] = [{k:f[k] for k in ['id','label','kind','points','options'] if k in f} for f in item['fields']]
     return result
 

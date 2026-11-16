@@ -9,10 +9,10 @@
     </header>
     <div class="app-body">
       <aside class="layout-aside"><SidebarMenu /></aside>
-      <div class="workspace">
+      <div class="app-workspace">
         <HeaderBar @toggle-menu="mobileMenu = true" />
         <main id="main-content" class="layout-main" tabindex="-1">
-          <router-view />
+          <div class="page-container"><router-view /></div>
         </main>
       </div>
     </div>

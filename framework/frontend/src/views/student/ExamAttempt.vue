@@ -10,6 +10,7 @@
         </div>
         <dl class="exam-facts"><div><dt>交卷原因</dt><dd>{{ attempt.finish_reason_text }}</dd></div><div><dt>交卷时间（北京时间）</dt><dd>{{ beijingTime(attempt.submitted_at) }}</dd></div><div><dt>已保存的业务操作</dt><dd>{{ attempt.console?.events?.length ?? 0 }} 条</dd></div></dl>
         <section v-if="attempt.grade" class="exam-published-grade" aria-label="已发布成绩"><div><span>最终成绩</span><strong>{{ attempt.grade.score }}<small> / 100</small></strong></div><div><p v-if="attempt.grade.comment" class="op-preserve">{{ attempt.grade.comment }}</p><p class="op-help">第 {{ attempt.grade.version }} 版 · 发布于 {{ beijingTime(attempt.grade.published_at) }}</p></div></section>
+        <section v-if="attempt.grade?.assessment" class="op-panel" aria-label="已发布过程评价"><p>任务完成 {{ attempt.grade.assessment.dimensions.task }}/60 · 操作规范 {{ attempt.grade.assessment.dimensions.procedure }}/30 · 操作熟练 {{ attempt.grade.assessment.dimensions.fluency }}/10</p><p v-if="attempt.grade.assessment.teacher_adjusted" class="op-help">教师已调整最终成绩，上述为规则分项。</p><p v-for="(item,index) in attempt.grade.assessment.deductions" :key="index">{{ item.description }}，本项扣 {{ item.points }} 分{{ item.recovered ? '；已恢复' : '' }}。</p><p v-for="reason in attempt.grade.assessment.cap_reasons" :key="reason">{{ reason }}</p></section>
         <div class="op-actions-group"><el-button :loading="loading" @click="initialize">刷新成绩</el-button><el-button @click="download">下载本人日志</el-button></div>
         <OperationLog :events="attempt.console?.events || []" title="本人操作日志" />
       </section>
@@ -25,7 +26,7 @@
         <template v-else><h2>正在核对考试状态</h2><p>全屏与操作记录同步后可继续作答。</p></template>
         <el-button :disabled="syncing || refreshing" :loading="refreshing" @click="refreshExam">刷新考试</el-button>
       </section>
-      <section class="exam-station"><OperationConsole v-if="journalReady" ref="consoleRef" :session-id="sid" :read-only="paused || submitting || refreshing" :pause-pending="paused" :api="consoleApi" exam-mode /></section>
+      <section class="exam-station"><OperationConsole v-if="journalReady" ref="consoleRef" :session-id="sid" :read-only="paused || submitting || refreshing" :pause-pending="paused" :api="consoleApi" exam-mode @update="attempt && (attempt.console = $event)" /></section>
     </template>
   </main>
 </template>
@@ -37,6 +38,7 @@ import OperationConsole from '@/features/simulationConsole/OperationConsole.vue'
 import OperationLog from '@/features/operationQuestions/OperationLog.vue'
 import { getExamAttempt, syncExam, submitExam, examStation, examEvent, downloadExam, reportExamExit } from '@/api/exams'
 import { ExamJournal, beijingTime, secondsLeft, clockText, completedMessage, examError } from '@/domain/exams'
+import { mergeConsole } from '@/domain/operationConsole'
 const route = useRoute(), sid = String(route.params.attemptId), attempt = ref(null), consoleRef = ref(null)
 const loading = ref(true), notice = ref(''), connected = ref(navigator.onLine), isFullscreen = ref(!!document.fullscreenElement), journalReady = ref(false)
 const syncing = ref(false), submitting = ref(false), restoring = ref(false), estimatedNow = ref(Date.now()), pending = ref(true)
@@ -54,7 +56,10 @@ async function accept(data) {
   if (disposed) return
   if (attempt.value && (data.revision < attempt.value.revision || attempt.value.status === 'submitted' && data.status !== 'submitted')) return
   if (attempt.value?.grade && (!data.grade || data.grade.version < attempt.value.grade.version)) return
-  attempt.value = data; serverOffset = Date.parse(data.server_now) - Date.now()
+  if(data.console && attempt.value?.console && (data.console.revision<attempt.value.console.revision ||
+    data.console.revision===attempt.value.console.revision && (data.console.state_version ?? data.console.snapshot?.version ?? 0)<(attempt.value.console.state_version ?? attempt.value.console.snapshot?.version ?? 0))) data.console=attempt.value.console
+  if (data.console && !data.console.snapshot && attempt.value?.console?.snapshot) data.console = mergeConsole(attempt.value.console,data.console)
+  attempt.value = { ...attempt.value, ...data }; serverOffset = Date.parse(data.server_now) - Date.now()
   serverAnchor = Date.parse(data.server_now); performanceAnchor = performance.now(); estimatedNow.value = serverAnchor
   if (data.status === 'submitted') {
     finished = true; pending.value = false
@@ -70,7 +75,10 @@ async function synchronize() {
       // New exits captured while this request is in flight remain in storage.
       capture(!!document.fullscreenElement)
       journal.read()
-      const data = await syncExam(sid, { fullscreen: !!document.fullscreenElement, events: [...journal.pending] })
+      const data = await syncExam(sid, { fullscreen: !!document.fullscreenElement, events: [...journal.pending],
+        after_sequence: attempt.value?.console?.revision ?? 0,
+        state_version: attempt.value?.console?.state_version ?? attempt.value?.console?.snapshot?.version ?? null })
+      if(data.status==='submitted' && !finished) Object.assign(data,await getExamAttempt(sid))
       journal.acknowledge(data.acknowledged_events); pending.value = journal.pending.length > 0
       connected.value = navigator.onLine
       await accept(data)
@@ -177,5 +185,5 @@ onMounted(() => {
 onBeforeUnmount(() => { disposed = true; clearInterval(timer); document.removeEventListener('fullscreenchange', observeFullscreen); window.removeEventListener('offline', offline); window.removeEventListener('online', online); window.removeEventListener('beforeunload', beforeUnload); window.removeEventListener('pagehide', beforeUnload) })
 </script>
 <style scoped>
-.exam-shell{min-height:100dvh;background:#f1f5f9;color:#19334d;padding:20px 24px;font-family:'Microsoft YaHei',sans-serif}.exam-header{display:flex;gap:24px;align-items:center;background:#fff;border-top:4px solid #093278;padding:18px 22px}.exam-header>div:first-child{flex:1;min-width:0}.exam-header h1{font-size:23px;margin:0 0 8px;overflow-wrap:anywhere}.exam-header p{font-size:13px;line-height:1.9;color:#586f82;margin:0}.exam-countdown{display:grid;gap:2px;min-width:120px;text-align:center}.exam-countdown span{font-size:13px;color:#586f82}.exam-countdown strong{font-family:Consolas,monospace;font-size:32px;font-variant-numeric:tabular-nums;color:#093278}.exam-countdown .urgent{color:#b54732}.exam-prompt{background:white;border:1px solid #dfe7ef;padding:16px 22px;margin:14px 0}.exam-prompt h2{font-size:17px;margin:0 0 8px}.exam-prompt p{font-size:15px;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere;margin:0}.exam-station{display:flex;min-height:660px}.exam-paused{position:sticky;top:0;z-index:20;border:1px solid #c48932;background:#fff6df;padding:20px;margin-bottom:14px}.exam-paused h2{font-size:18px;margin:0 0 8px}.exam-paused p{line-height:1.8}.exam-paused .el-button{margin:6px 12px 0 0}.exam-notice{background:#fff0e9;border:1px solid #dba17e;padding:14px;line-height:1.8}.exam-finished,.exam-loading{max-width:1050px;margin:30px auto;background:white;padding:30px;border:1px solid #dfe7ef;border-top:4px solid #17815b}.exam-finished h1{font-size:24px;line-height:1.6}.exam-finished h2{font-size:19px}.exam-finished p{line-height:1.8}.exam-finished .op-actions-group{margin:24px 0}.exam-loading a{margin-left:20px}button:focus-visible,a:focus-visible{outline:3px solid #0075b7;outline-offset:3px}@media(max-width:650px){.exam-shell{padding:10px}.exam-header{padding:14px;gap:14px;flex-wrap:wrap}.exam-header>div:first-child{flex-basis:100%}.exam-header h1{font-size:20px}.exam-countdown{text-align:left}.exam-header>.el-button{margin-left:auto}.exam-finished,.exam-loading{padding:20px 16px}.exam-finished h1{font-size:21px}.exam-station{min-height:640px}}
+.exam-shell{min-height:100dvh;background:#f1f5f9;color:#19334d;padding:20px 24px;font-family:'Microsoft YaHei',sans-serif}.exam-header{display:flex;gap:24px;align-items:center;background:#fff;border-top:4px solid #093278;padding:18px 22px}.exam-header>div:first-child{flex:1;min-width:0}.exam-header h1{font-size:23px;margin:0 0 8px;overflow-wrap:anywhere}.exam-header p{font-size:13px;line-height:1.9;color:#586f82;margin:0}.exam-countdown{display:grid;gap:2px;min-width:120px;text-align:center}.exam-countdown span{font-size:13px;color:#586f82}.exam-countdown strong{font-family:Consolas,monospace;font-size:32px;font-variant-numeric:tabular-nums;color:#093278}.exam-countdown .urgent{color:#b54732}.exam-prompt{background:white;border:1px solid #dfe7ef;padding:16px 22px;margin:14px 0}.exam-prompt h2{font-size:17px;margin:0 0 8px}.exam-prompt p{font-size:15px;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere;margin:0}.exam-station{display:flex;min-height:660px}.exam-paused{position:sticky;top:0;z-index:20;border:1px solid #c48932;background:#fff6df;padding:20px;margin-bottom:14px}.exam-paused h2{font-size:18px;margin:0 0 8px}.exam-paused p{line-height:1.8}.exam-paused .el-button{margin:6px 12px 0 0}.exam-notice{background:#fff0e9;border:1px solid #dba17e;padding:14px;line-height:1.8}.exam-finished,.exam-loading{width:100%;max-width:var(--page-content-width,1600px);margin:30px auto;background:white;padding:30px;border:1px solid #dfe7ef;border-top:4px solid #17815b}.exam-finished h1{font-size:24px;line-height:1.6}.exam-finished h2{font-size:19px}.exam-finished p{line-height:1.8}.exam-finished .op-actions-group{margin:24px 0}.exam-loading a{margin-left:20px}button:focus-visible,a:focus-visible{outline:3px solid #0075b7;outline-offset:3px}@media(max-width:650px){.exam-shell{padding:10px}.exam-header{padding:14px;gap:14px;flex-wrap:wrap}.exam-header>div:first-child{flex-basis:100%}.exam-header h1{font-size:20px}.exam-countdown{text-align:left}.exam-header>.el-button{margin-left:auto}.exam-finished,.exam-loading{padding:20px 16px}.exam-finished h1{font-size:21px}.exam-station{min-height:640px}}
 </style>

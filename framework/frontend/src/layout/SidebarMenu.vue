@@ -19,7 +19,7 @@ import { navigationGroups } from '@/ui/navigation'
 defineEmits(['navigate'])
 const route = useRoute(), userStore = useUserStore()
 const groups = computed(() => navigationGroups(userStore.role))
-const learningPath = computed(() => route.path.startsWith('/student/modules') || route.path.startsWith('/student/interlocking-exam') || route.path === '/teacher/lab-topics' ? '/student/lab-topics' : route.path)
+const learningPath = computed(() => route.path === '/teacher/lab-topics' ? '/student/lab-topics' : route.path)
 const activePath = computed(() => groups.value.flatMap(group => group.items)
   .filter(item => learningPath.value === item.path || learningPath.value.startsWith(item.path + '/'))
   .sort((a, b) => b.path.length - a.path.length)[0]?.path)

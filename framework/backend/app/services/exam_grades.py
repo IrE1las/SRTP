@@ -1,5 +1,6 @@
 """Manual-only grading. Call mutations under exams.atomic and operations.LOCK."""
 from sqlalchemy import select
+from sqlalchemy.orm import object_session
 from app.models.exam_grade import ExamGrade, ExamGradePublication, ExamGradeAudit
 from app.services import exams, operations as ops
 
@@ -13,8 +14,14 @@ def public_version(row):
     if row is None:
         return None
     # Student response allowlist: never include the mutable draft or audit.
-    return {'score': row.score_cents / 100, 'comment': row.comment, 'version': row.version,
-            'published_at': exams.iso(row.published_at)}
+    result = {'score': row.score_cents / 100, 'comment': row.comment, 'version': row.version,
+              'published_at': exams.iso(row.published_at)}
+    from app.models.operation_assessment import ExamPublishedAssessment
+    db = object_session(row)
+    snapshot = db.get(ExamPublishedAssessment, row.id) if db else None
+    if snapshot:
+        result['assessment'] = snapshot.content
+    return result
 
 
 def manager_view(db, sid, *, evidence=False):
@@ -95,7 +102,7 @@ def confirm(db, user, sid, revision):
     return manager_view(db, sid, evidence=True)
 
 
-def publish(db, user, sid, revision):
+def publish(db, user, sid, revision, *, assessment_snapshot=None):
     reviewable(db, user, sid)
     # Repeating a successful publish never creates another version, even after a correction.
     old = db.scalar(select(ExamGradePublication).where(ExamGradePublication.session_id == sid,
@@ -106,9 +113,14 @@ def publish(db, user, sid, revision):
     if not grade or grade.revision != revision or grade.status != 'confirmed' or grade.score_cents is None:
         ops.fail('请先确认最新成绩；确认后仍需单独发布')
     previous = published(db, sid)
-    db.add(ExamGradePublication(session_id=sid, version=previous.version + 1 if previous else 1,
+    publication = ExamGradePublication(session_id=sid, version=previous.version + 1 if previous else 1,
         source_revision=revision, score_cents=grade.score_cents, comment=grade.comment,
-        publisher_id=user.id, published_at=exams.now()))
+        publisher_id=user.id, published_at=exams.now())
+    db.add(publication)
+    db.flush()
+    if assessment_snapshot:
+        from app.models.operation_assessment import ExamPublishedAssessment
+        db.add(ExamPublishedAssessment(publication_id=publication.id, content=assessment_snapshot))
     grade.status = 'published'
     grade.revision += 1
     grade.updated_at = exams.now()
@@ -129,6 +141,18 @@ def publish_current(db, user, sid, body):
         if previous.score_cents != int(body.score * 100) or previous.comment != comment:
             ops.fail('成绩已被修改，请保留本地输入并刷新核对')
         return manager_view(db, sid, evidence=True)
+    snapshot = None
+    from app.models.operation_assessment import ExamAssessmentReview
+    from app.services.operation_assessment import service as assessment
+    reviewed = db.get(ExamAssessmentReview, sid)
+    grade = db.get(ExamGrade, sid)
+    evaluation = assessment.view(db, sid)
+    if reviewed and grade and reviewed.grade_revision == body.revision and grade.revision == body.revision and (
+        grade.score_cents == int(body.score * 100) and evaluation and reviewed.evaluation_id == evaluation['id'] and evaluation['status'] == 'ready'):
+        snapshot = {'dimensions': evaluation['dimensions'], 'milestones': evaluation['milestones'],
+                    'teacher_adjusted': grade.score_cents != evaluation['suggested_score'] * 100,
+                    'deductions': [{'description': e['message'], 'points': e['points'], 'recovered': e['recovered']} for e in evaluation['episodes']],
+                    'cap_reasons': evaluation['cap_reasons']}
     save(db, user, sid, body)
     confirm(db, user, sid, body.revision + 1)
-    return publish(db, user, sid, source_revision)
+    return publish(db, user, sid, source_revision, assessment_snapshot=snapshot)

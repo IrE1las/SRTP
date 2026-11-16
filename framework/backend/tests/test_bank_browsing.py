@@ -1,17 +1,22 @@
 from app.services.chapter_bank import import_bank, chapters, question_list
 
 
-def sample(qid, kind='choice', status='material_supported', **extra):
-    return dict(id=qid, chapter=1, kind=kind, answer_status=status, stem='Test stem '+qid,
-                source_reference='Course page 7', **extra)
+def sample(qid, kind='choice', status='teacher_verified', **extra):
+    from app.services.chapter_practice import signature
+    value = dict(id=qid, chapter=1, kind=kind, answer_status=status, stem='Test stem '+qid,
+                 source_reference='Course page 7', options=['A. First','B. Second'], answer='A')
+    value.update(extra)
+    if status == 'teacher_verified':
+        value['_practice_rule'] = {'id':qid,'kind':kind,'signature':signature(value)}
+    return value
 
 
 def test_objective_statistics_exclude_essay_reference_counts(db_session):
     import_bank(db_session, {'questions': [sample('ready'), sample('pending', status='pending'),
                                          sample('essay', kind='essay')]})
     first, empty = chapters(db_session)[:2]
-    assert first['objective_ready'] == 1 and first['objective_pending'] == 1
-    assert first['kinds']['choice'] == 2 and first['kinds']['essay'] == 1
+    assert first['objective_ready'] == 1 and first['objective_pending'] == 0
+    assert first['kinds']['choice'] == 1 and first['kinds']['essay'] == 0
     assert empty['objective_ready'] == 0 and empty['kinds']['cell'] == 0
 
 

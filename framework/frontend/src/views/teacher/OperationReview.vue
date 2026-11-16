@@ -9,6 +9,7 @@
         <section class="op-panel"><div class="op-panel-header"><h2>题目内容</h2><router-link v-if="!current.disabled && !historical" :to="destination(current.id)">{{ current.status === 'published' ? '修改并建立新版本' : '修改题设' }}</router-link></div><h3 class="op-question-title">{{ displayed.title || '未命名题目' }}</h3><p class="op-preserve">{{ displayed.prompt || '尚未填写任务说明。' }}</p></section>
         <section class="op-panel"><h2>初始站场条件</h2><dl class="op-facts op-initial-facts"><div><dt>区间许可</dt><dd>{{ displayed.initial.interval_available ? '具备' : '不具备' }}</dd></div><div><dt>预置占用区段</dt><dd>{{ displayed.initial.occupied_sections.join('、') || '全部空闲' }}</dd></div></dl></section>
         <section class="op-panel"><div class="op-panel-header"><div><h2>标准答案</h2><p class="op-help">{{ displayed.standard_log?.length ? `${displayed.standard_log.length} 次业务点击` : '尚未保存标准答案' }}</p></div><el-button v-if="displayed.standard_session_id" :loading="downloading" @click="download(displayed.standard_session_id)">下载日志</el-button></div><OperationLog v-if="displayed.standard_log?.length" :key="displayed.version_id" :events="displayed.standard_log" /><div v-else class="op-empty"><p>进入站场完成标准操作，结束录制并保存答案后，日志会显示在这里。</p><router-link v-if="!current.disabled && !historical && current.status === 'draft'" :to="destination(current.id, 'record')">去录制标准答案 →</router-link></div></section>
+        <AssessmentConfig v-if="!historical" :key="displayed.version_id" :question-id="current.id" :locked="current.disabled || current.status !== 'draft'" @dirty="assessmentDirty = $event" />
       </div>
       <aside>
         <section class="op-panel op-publish-panel"><div class="op-panel-header"><h2>发布状态</h2><span class="op-status" :class="displayed.status">{{ operationStatus(displayed.status) }}</span></div>
@@ -31,6 +32,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/store/user'
 import OperationFlow from '@/features/operationQuestions/OperationFlow.vue'
 import OperationLog from '@/features/operationQuestions/OperationLog.vue'
+import AssessmentConfig from '@/features/operationQuestions/AssessmentConfig.vue'
 import ListPager from '@/components/ListPager.vue'
 import { paginate } from '@/domain/pagination'
 import { operationLocation, operationReturn, operationStatus, sessionStatus, operationError, publishIssues } from '@/domain/operationPresentation'
@@ -40,6 +42,7 @@ const backTo = computed(() => operationReturn(route.query.back))
 function destination(id, step = 'edit', query = {}) { return operationLocation(id, step, backTo.value, query) }
 const current = ref(null), displayed = ref(null), loading = ref(true), loadFailed = ref(false), working = ref(false), notice = ref(''), noticeType = ref('error'), showRecords = ref(false), recordsPage = ref(1), downloading = ref(false)
 const historical = computed(() => !!displayed.value && displayed.value.version_id !== current.value?.version_id)
+const assessmentDirty=ref(false)
 const issues = computed(() => publishIssues(current.value, current.value?.sessions || []))
 const sessionPage = computed(() => paginate(current.value?.sessions || [], recordsPage.value))
 let request = 0
@@ -57,6 +60,7 @@ async function load() {
 }
 function selectVersion(number) { router.push(destination(current.value.id, 'review', number === current.value.number ? {} : { version: String(number) })) }
 async function publish() {
+  if(assessmentDirty.value){noticeType.value='error';notice.value='请先保存评价设置，再发布题目。';return}
   if (historical.value || issues.value.length || current.value?.disabled || current.value?.status !== 'draft' || working.value) return
   try { await ElMessageBox.confirm(`将 v${current.value.number} 发布给：${current.value.classes.join('、')}。发布后该版本的题设和标准答案将冻结。`, '发布操作题', { confirmButtonText: '确认发布', cancelButtonText: '返回检查', type: 'info' }) } catch { return }
   working.value = true; notice.value = ''

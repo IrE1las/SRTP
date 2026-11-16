@@ -84,7 +84,7 @@ def test_only_signed_ready_imageless_questions_are_available(practice_bank):
     client, app = practice_bank
     rows = client.get('/api/chapter-bank/practice/chapters').json()
     assert rows[0]['available'] == 2
-    assert rows[0]['total_objective'] == 6
+    assert rows[0]['total_objective'] == 2
     assert rows[1]['available'] == 1
     assert rows[3]['available'] == 0
     assert draw(client, 4).status_code == 404
@@ -240,3 +240,65 @@ def test_submission_transport_rejects_oversized_payload_even_on_retry(practice_b
     url = f"/api/chapter-bank/practice/attempts/{attempt['id']}/submit"
     assert client.post(url, json={'answer': False}).status_code == 200
     assert client.post(url, json={'answer': answer}).status_code == 422
+
+
+def test_whole_chapter_browsing_is_answer_free_and_does_not_create_attempts(practice_bank, db_session):
+    from app.models.chapter_practice import PracticeAttempt
+    client, _ = practice_bank
+    data = client.get('/api/chapter-bank/practice/chapters/1/questions').json()
+    assert [item['question']['id'] for item in data['items']] == ['choice', 'multi']
+    assert data['total'] == 2
+    for item in data['items']:
+        assert item['attempt'] is None
+        assert item['attempted'] is False
+        assert item['ever_correct'] is False
+        assert not {'answer', 'explanation', 'answer_evidence', 'correct_answer'} & item['question'].keys()
+    assert db_session.query(PracticeAttempt).count() == 0
+    assert client.get('/api/chapter-bank/practice/chapters/7/questions').status_code == 422
+
+
+def test_selected_question_attempts_restore_only_own_feedback_and_ever_correct(practice_bank):
+    client, app = practice_bank
+    prefix = '/api/chapter-bank/practice'
+    first = client.post(prefix + '/questions/choice/attempts').json()
+    assert first['question']['id'] == 'choice'
+    assert first['feedback'] is None
+    # Starting any other question does not require submitting the first.
+    assert client.post(prefix + '/questions/multi/attempts').status_code == 200
+    client.post(f"{prefix}/attempts/{first['id']}/submit", json={'answer': 'B'})
+    wrong = client.post(prefix + '/questions/choice/attempts').json()
+    client.post(f"{prefix}/attempts/{wrong['id']}/submit", json={'answer': 'A'})
+    item = client.get(prefix + '/chapters/1/questions').json()['items'][0]
+    assert item['attempted'] and item['ever_correct']
+    assert item['attempt']['id'] == wrong['id']
+    assert item['attempt']['feedback']['correct'] is False
+    chapter = client.get(prefix + '/chapters').json()[0]
+    assert chapter['attempted'] == chapter['ever_correct'] == 1
+    app.dependency_overrides[get_current_user] = lambda: SimpleNamespace(id=2, role='student')
+    item = client.get(prefix + '/chapters/1/questions').json()['items'][0]
+    assert not item['attempted'] and not item['ever_correct']
+    assert item['attempt'] is None
+    assert client.get(f"{prefix}/attempts/{first['id']}").status_code == 404
+    assert client.get(prefix + '/chapters').json()[0]['attempted'] == 0
+
+
+@pytest.mark.parametrize('qid', ['missing', 'pending', 'stale', 'unruled', 'image'])
+def test_direct_selection_cannot_bypass_verified_pool(practice_bank, qid):
+    client, _ = practice_bank
+    assert client.post(f'/api/chapter-bank/practice/questions/{qid}/attempts').status_code == 404
+
+
+def test_edited_question_does_not_restore_old_feedback(practice_bank, db_session):
+    client, _ = practice_bank
+    prefix = '/api/chapter-bank/practice'
+    attempt = client.post(prefix + '/questions/choice/attempts').json()
+    client.post(f"{prefix}/attempts/{attempt['id']}/submit", json={'answer': 'B'})
+    row = db_session.get(ChapterBankQuestion, 'choice')
+    updated = {**row.content, 'stem': '修改后的题干', 'answer_status': 'teacher_verified'}
+    updated['_practice_rule'] = {'kind': row.kind, 'signature': service.signature(updated)}
+    row.content = updated
+    row.answer_status = 'teacher_verified'
+    db_session.commit()
+    item = client.get(prefix + '/chapters/1/questions').json()['items'][0]
+    assert item['question']['stem'] == '修改后的题干'
+    assert item['attempt'] is None

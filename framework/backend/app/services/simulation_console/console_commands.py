@@ -1,6 +1,6 @@
 """Operator-console commands; permission checks live at the HTTP boundary."""
 import os
-from time import monotonic
+from .clock import monotonic
 
 from .commands import execute
 from .runtime import SimulationError

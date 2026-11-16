@@ -1,6 +1,4 @@
 <template>
-  <p v-if="user.role === 'admin'" class="operation-management-link"><router-link to="/operations/manage">操作题管理</router-link></p>
-  <p v-if="user.role === 'admin'" class="operation-management-link"><router-link to="/exams/manage">考试管理</router-link></p>
   <section class="profile-home" v-loading="loading">
     <h1>个人资料与密码</h1>
     <p v-if="notice" role="status">{{ notice }}</p>
@@ -119,6 +117,6 @@ onMounted(async () => {
 })
 </script>
 <style scoped>
-.profile-home{max-width:820px;background:white;border:1px solid #dce7f0;padding:32px;border-radius:10px}.profile-home h1{margin:0 0 24px;color:#183850}.profile-home dl{margin:0 0 24px}.profile-home dt{color:#586f82;margin-top:22px}.profile-home dd{margin:8px 0 0;padding:10px 0 14px;border-bottom:1px solid #e8eff5;color:#19334d;overflow-wrap:anywhere}.password-row{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:28px 0 20px}.password-row h2{font-size:18px;margin:0}.profile-home [role=status]{color:#304e66;overflow-wrap:anywhere}@media(max-width:600px){.profile-home{padding:20px}}
+.profile-home{width:100%;background:white;border:1px solid #dce7f0;padding:32px;border-radius:10px}.profile-home h1{margin:0 0 24px;color:#183850}.profile-home dl{margin:0 0 24px}.profile-home dt{color:#586f82;margin-top:22px}.profile-home dd{margin:8px 0 0;padding:10px 0 14px;border-bottom:1px solid #e8eff5;color:#19334d;overflow-wrap:anywhere}.password-row{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:28px 0 20px}.password-row h2{font-size:18px;margin:0}.profile-home [role=status]{color:#304e66;overflow-wrap:anywhere}@media(max-width:600px){.profile-home{padding:20px}}
 .contact-actions{display:flex;justify-content:flex-end;gap:8px}.profile-home [role=alert]{color:#a52727;overflow-wrap:anywhere}
 </style>

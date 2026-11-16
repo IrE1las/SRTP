@@ -1,6 +1,7 @@
 import request from '@/utils/request'
 const root = '/exams'
 export const listExams = (page = 1) => request.get(root, { params: { page } })
+export const examReviews = params => request.get(root + '/reviews', { params })
 export const getExam = id => request.get(`${root}/${id}`)
 export const createExam = body => request.post(root, body)
 export const editExam = (id, body) => request.put(`${root}/${id}`, body)
@@ -16,7 +17,7 @@ export const getExamAttempt = id => request.get(`${root}/attempts/${id}`)
 export const syncExam = (id, body) => request.post(`${root}/attempts/${id}/sync`, body, { quiet: true })
 export const submitExam = (id, sequence) => request.post(`${root}/attempts/${id}/submit`, { expected_sequence: sequence })
 export const examStation = () => request.get(root + '/station')
-export const examEvent = (id, event) => request.post(`${root}/attempts/${id}/events`, event)
+export const examEvent = (id, event) => request.post(`${root}/attempts/${id}/events?light=true`, event)
 export const saveExamGrade = (id, body) => request.put(`${root}/attempts/${id}/grade`, body)
 export const confirmExamGrade = (id, revision) => request.post(`${root}/attempts/${id}/grade/confirm`, { revision })
 export const publishExamGrade = (id, body) => request.post(`${root}/attempts/${id}/grade/publish`, body)

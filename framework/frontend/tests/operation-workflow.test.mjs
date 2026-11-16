@@ -402,13 +402,18 @@ test('real router keeps the workspace outside the campus shell and enforces mana
   const source=await readFile(new URL('../src/router/index.js',import.meta.url),'utf8')
   const user={role:'teacher',isLoggedIn:true}
   const script=source.replace(/^import .*$/gm,'').replace(/^export \{.*\}$/gm,'').replace('export const roleHomeMap', 'const roleHomeMap').replace(/import\('[^']+'\)/g,'Promise.resolve({render:()=>null})').replace('export default router','return router')
-  const router=new Function('createRouter','createWebHistory','AppLayout','useUserStore',script)(createRouter,createMemoryHistory,{},()=>user)
+  const {teacherDestination}=await import('../src/ui/navigation.js')
+  const router=new Function('createRouter','createWebHistory','AppLayout','useUserStore','teacherDestination',script)(createRouter,createMemoryHistory,{},()=>user,teacherDestination)
   for(const path of [operationBase,operationBase+'/new',operationPath(1),operationPath(1,'review'),operationPath(1,'record')]) {
     await router.push(path)
     assert.equal(router.currentRoute.value.path,path)
   }
   assert.equal(router.currentRoute.value.matched.length,1)
   assert.equal(router.currentRoute.value.meta.requiresAuth,true)
+  for(const [path,destination] of [['/teacher/lab-topics','/teacher/grading'],['/student/simulation-console','/teacher/dashboard'],['/teacher/exercises/new','/teacher/dashboard'],['/student/chapter-bank/2','/teacher/chapter-bank']]){
+    await router.push(path);assert.equal(router.currentRoute.value.path,destination)
+  }
+  await router.push('/exams/grading');assert.equal(router.currentRoute.value.path,'/exams/grading')
   user.role='student'
   await router.push(operationPath(1,'review'))
   assert.equal(router.currentRoute.value.path,'/student/dashboard')

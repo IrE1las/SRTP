@@ -13,8 +13,7 @@ from app.services.shunting_data import DATASET_KEY, STATION_KEY
 
 
 def topic_catalog():
-    return json.loads(BLUEPRINT.read_text(encoding='utf-8'))['topics']+[
-        {'id':9,'title':'自主命题','objective':'围绕原图自主编排题目与评分标准。','report':'管理员自编'}]
+    return json.loads(BLUEPRINT.read_text(encoding='utf-8'))['topics']
 
 
 def text_value(value, name, limit=6000, required=False):
@@ -37,7 +36,7 @@ def whole(value,name,low=1,high=100):
 
 def validate_content(db, raw, *, publish=False, previous=None):
     if not isinstance(raw,dict): raise ValueError('题目格式不正确')
-    topic=whole(raw.get('topic',9),'专题',1,9)
+    topic=whole(raw.get('topic',1),'专题',1,6)
     info=next(t for t in topic_catalog() if t['id']==topic)
     dataset=db.query(ShuntingDataset).filter_by(dataset_key=DATASET_KEY).one_or_none()
     if dataset is None: raise ValueError('缺少原图站场资料')
@@ -51,15 +50,20 @@ def validate_content(db, raw, *, publish=False, previous=None):
         'conditions':strings(raw.get('conditions',[]),'题设条件',15,2000),
         'tags':strings(raw.get('tags',[]),'标签',10,30),
         'devices':strings(raw.get('devices',[]),'关联设备',100,50),
-        'diagram_mode':raw.get('diagram_mode','semi_auto' if topic==7 else 'auto' if topic==8 else 'station'),
-        'station_key':STATION_KEY,
+        'diagram_mode':raw.get('diagram_mode','standard' if topic<=4 else 'station'),
+        'station_key':'standard-station' if topic<=4 else STATION_KEY,
     }
-    if result['diagram_mode'] not in ('station','semi_auto','auto'): raise ValueError('站场展示方式不正确')
+    if result['diagram_mode'] not in ('station','standard'): raise ValueError('站场展示方式不正确')
+    result['diagram_mode']='standard' if topic<=4 else 'station'
     topo=dataset.station_topology
     devices={s['name'] for s in topo['signals']}|{s['id'] for s in topo['switches']}|{s['name'] for s in topo['sections']}
-    if set(result['devices'])-devices: raise ValueError('引用了原图未定义的站内设备')
-    if publish and result['diagram_mode']!='station' and not result['conditions']:
-        raise ValueError('区间题须填写补充题设条件')
+    if topic<=4:
+        from app.services.simulation_console.reference_station import reference_station_package
+        standard=reference_station_package()
+        devices=({s['name'] for s in standard['signals']}|{s['id'] for s in standard['switches']}
+                 |{s['geometry']['group'] for s in standard['switches'] if s['geometry']['group']}
+                 |{s['id'] for s in standard['sections']})
+    if set(result['devices'])-devices: raise ValueError('引用了对应站场未定义的站内设备')
     fields=raw.get('fields',[])
     if not isinstance(fields,list) or len(fields)>30 or (publish and not fields):
         raise ValueError('发布题目须有1至30个答题栏')

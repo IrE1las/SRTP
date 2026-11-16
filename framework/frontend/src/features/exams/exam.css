@@ -1,6 +1,6 @@
 /* Operation exams: campus typography, timetable structure, quiet work surfaces. */
 .exam-page{--exam-ink:var(--swjtu-ink,#19334d);--exam-wash:var(--swjtu-paper,#f5f7fa);--exam-line:var(--swjtu-line,#e6ebf1);--exam-muted:var(--swjtu-muted,#708094);--exam-ok:#1b7158;--exam-warn:#a64a2d;color:var(--exam-ink)}
-.op-page.exam-page{max-width:1240px}
+
 .exam-page .exam-masthead{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;padding:4px 0 24px;border-bottom:1px solid var(--exam-line);border-top:3px solid var(--swjtu-gold,#c6aa70);padding-top:18px;margin-bottom:28px}
 .exam-page .exam-kicker{font-size:13px;font-weight:600;letter-spacing:.1em;color:var(--exam-muted);margin:0 0 6px}
 .exam-page h1{font-family:var(--el-font-family);font-size:27px;font-weight:600;line-height:1.5;margin:0 0 8px}
