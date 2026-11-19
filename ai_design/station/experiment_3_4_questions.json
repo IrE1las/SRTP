@@ -1,0 +1,1292 @@
+{
+  "schema_version": 1,
+  "reports": [
+    {
+      "source": "车站与区间控制实验/车站与区间控制实验3和实验4问答整理.docx",
+      "sha256": "cd12bafdace29229f4456f689812d304aba82b34041a0be2762fbb7562b81c23"
+    }
+  ],
+  "questions": [
+    {
+      "key": "lab-01-04",
+      "topic": 1,
+      "sequence": 4,
+      "title": "道岔单独操作",
+      "source_section": "实验3 · 1（1）—（4）",
+      "prompt": "办理5/7的总定、总反，以及9/11的单锁、单解。",
+      "fields": [
+        {
+          "id": "normal",
+          "label": "5/7总定位、总反位",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "能办理",
+          "explanation": "能办理"
+        },
+        {
+          "id": "single_lock",
+          "label": "9/11单锁后改变位置",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "不能办理",
+          "explanation": "单锁保持道岔位置，须先单解。"
+        },
+        {
+          "id": "occupied",
+          "label": "7DG占用时转换5/7",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "不能办理",
+          "explanation": "任一端道岔区段占用均限制整组转换。"
+        },
+        {
+          "id": "sealed",
+          "label": "仅封闭5/7后总定、总反",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "能办理",
+          "explanation": "封闭限制进路选用，不代替单锁。"
+        },
+        {
+          "id": "record",
+          "label": "记录单锁、单解、占用、封闭时的道岔变化。",
+          "kind": "essay",
+          "points": 10,
+          "criteria": [
+            "操作条件与步骤完整",
+            "分别记录信号和锁闭状态",
+            "结合记录说明原因"
+          ],
+          "reference_answer": "正常可以总定总反；单锁后不能转换，单解后恢复；7DG占用时5/7不能转换；仅封闭不阻止单独操纵。"
+        }
+      ],
+      "devices": [
+        "5/7",
+        "9/11",
+        "7DG"
+      ],
+      "level": "应用",
+      "conditions": [
+        "各项分别从空闲、表示正常、未锁闭的工况开始。"
+      ],
+      "station_key": "standard-station",
+      "diagram_mode": "standard"
+    },
+    {
+      "key": "lab-01-05",
+      "topic": 1,
+      "sequence": 5,
+      "title": "D1至D15基本调车进路",
+      "source_section": "实验3 · 2（1）—（5）、C",
+      "prompt": "办理D1至D15的调车基本进路，分别改变下列条件。",
+      "fields": [
+        {
+          "id": "normal_lock",
+          "label": "1/3定位单锁时，D1→D15",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "能办理",
+          "explanation": "能办理"
+        },
+        {
+          "id": "reverse_lock",
+          "label": "1/3反位单锁时，D1→D15",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "不能办理",
+          "explanation": "不能办理"
+        },
+        {
+          "id": "normal_seal",
+          "label": "1/3定位封闭时，D1→D15",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "不能办理",
+          "explanation": "不能办理"
+        },
+        {
+          "id": "reverse_seal",
+          "label": "1/3反位封闭时，D1→D15",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "不能办理",
+          "explanation": "不能办理"
+        },
+        {
+          "id": "track_fault",
+          "label": "1DG故障占用时，D1→D15",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "不能办理",
+          "explanation": "不能办理"
+        },
+        {
+          "id": "point_fault",
+          "label": "先将1/3设为失表示，再办理D1→D15",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "不能办理",
+          "explanation": "不能办理"
+        },
+        {
+          "id": "vehicle_terminal",
+          "label": "仅终端1/19WG车辆占用时，D1→D15",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "能办理",
+          "explanation": "能办理"
+        },
+        {
+          "id": "fault_terminal",
+          "label": "仅终端1/19WG故障占用时，D1→D15",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "能办理",
+          "explanation": "能办理"
+        },
+        {
+          "id": "repeat_fault",
+          "label": "进路办理后1DG故障，重复开放D1",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "不能办理",
+          "explanation": "不能办理"
+        },
+        {
+          "id": "repeat_clear",
+          "label": "恢复1DG空闲后，重复开放D1",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "能办理",
+          "explanation": "能办理"
+        },
+        {
+          "id": "record",
+          "label": "记录D1在故障、恢复空闲和重复开放三个阶段的灯色，解释终端占用与内方占用的区别。",
+          "kind": "essay",
+          "points": 10,
+          "criteria": [
+            "操作条件与步骤完整",
+            "分别记录信号和锁闭状态",
+            "结合记录说明原因"
+          ],
+          "reference_answer": "1DG故障使D1关闭为蓝灯，故障期间不能重开；恢复空闲不自动开放，须重复开放才显示白灯。终端无岔区段1/19WG允许占用，不改变其红光带。"
+        }
+      ],
+      "devices": [
+        "D1",
+        "D15",
+        "1/3",
+        "1DG",
+        "1/19WG"
+      ],
+      "level": "应用",
+      "conditions": [
+        "各项为独立工况；进路终端点击D15调车按钮。"
+      ],
+      "station_key": "standard-station",
+      "diagram_mode": "standard"
+    },
+    {
+      "key": "lab-01-06",
+      "topic": 1,
+      "sequence": 6,
+      "title": "D1至4G长调车进路",
+      "source_section": "实验3 · 3（1）—（3）",
+      "prompt": "分别在1/19WG空闲和占用时办理D1至4G长调车。",
+      "fields": [
+        {
+          "id": "clear_once",
+          "label": "1/19WG空闲，一次办理D1→4G",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "能办理",
+          "explanation": "能办理"
+        },
+        {
+          "id": "occupied_once",
+          "label": "1/19WG车辆占用，一次办理D1→4G",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "不能办理",
+          "explanation": "不能办理"
+        },
+        {
+          "id": "occupied_segments",
+          "label": "1/19WG占用，先D15→4G，再D1→D15",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "能办理",
+          "explanation": "能办理"
+        },
+        {
+          "id": "first_signal",
+          "label": "长调车办理后19DG或27DG故障，D1的显示",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "白灯",
+            "蓝灯"
+          ],
+          "expected": "白灯",
+          "explanation": "故障属于D15基本段，不关闭前方D1。"
+        },
+        {
+          "id": "later_signal",
+          "label": "同一故障下D15的显示",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "白灯",
+            "蓝灯"
+          ],
+          "expected": "蓝灯",
+          "explanation": "蓝灯"
+        },
+        {
+          "id": "record",
+          "label": "记录分段办理顺序、红光带和两个基本段信号；恢复故障后怎样重开？",
+          "kind": "essay",
+          "points": 10,
+          "criteria": [
+            "操作条件与步骤完整",
+            "分别记录信号和锁闭状态",
+            "结合记录说明原因"
+          ],
+          "reference_answer": "空闲可一次办理；1/19WG占用则先办D15→4G，再办D1→D15，终端红光带保留。19DG或27DG故障只关闭D15，D1保持白灯；故障恢复后D15不自行重开，须重复开放。"
+        }
+      ],
+      "devices": [
+        "D1",
+        "D15",
+        "S4",
+        "1/19WG",
+        "19DG",
+        "27DG"
+      ],
+      "level": "应用",
+      "conditions": [],
+      "station_key": "standard-station",
+      "diagram_mode": "standard"
+    },
+    {
+      "key": "lab-01-07",
+      "topic": 1,
+      "sequence": 7,
+      "title": "变通进路",
+      "source_section": "实验3 · 4",
+      "prompt": "按下列按钮顺序办理调车、发车和接车变通进路。",
+      "fields": [
+        {
+          "id": "shunt",
+          "label": "先D7A→D1A，再S4DA→D9A，S4与D7的显示",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "均为白灯",
+            "均为蓝灯",
+            "仅D7为白灯"
+          ],
+          "expected": "均为白灯",
+          "explanation": "均为白灯"
+        },
+        {
+          "id": "departure",
+          "label": "SⅢLA→BA1→XFLA，SⅢ的显示",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "绿灯",
+            "双黄灯",
+            "红灯"
+          ],
+          "expected": "绿灯",
+          "explanation": "绿灯"
+        },
+        {
+          "id": "reception",
+          "label": "XLA→BA1→SⅢLA，X的显示",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "绿灯",
+            "双黄灯",
+            "红灯"
+          ],
+          "expected": "双黄灯",
+          "explanation": "双黄灯"
+        },
+        {
+          "id": "record",
+          "label": "完成三种变通办理，记录按钮顺序、道岔位置和信号显示。",
+          "kind": "essay",
+          "points": 10,
+          "criteria": [
+            "操作条件与步骤完整",
+            "分别记录信号和锁闭状态",
+            "结合记录说明原因"
+          ],
+          "reference_answer": "调车组合成立后S4、D7显示白灯；SⅢ经BA1向XF发车显示绿灯；X经BA1接ⅢG显示双黄灯。"
+        }
+      ],
+      "devices": [
+        "D7",
+        "D1",
+        "S4",
+        "D9",
+        "SIII",
+        "XF",
+        "X",
+        "BA1"
+      ],
+      "level": "应用",
+      "conditions": [],
+      "station_key": "standard-station",
+      "diagram_mode": "standard"
+    },
+    {
+      "key": "lab-01-08",
+      "topic": 1,
+      "sequence": 8,
+      "title": "X至ⅢG正常接车条件",
+      "source_section": "实验3 · 5（1）—（4）",
+      "prompt": "分别设置下列条件，试办X至ⅢG正常接车进路。",
+      "fields": [
+        {
+          "id": "stock_occupied",
+          "label": "ⅢG车辆占用时，X正常接车至ⅢG",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "不能办理",
+          "explanation": "不能办理"
+        },
+        {
+          "id": "inside_fault",
+          "label": "3DG故障占用时，X正常接车至ⅢG",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "不能办理",
+          "explanation": "不能办理"
+        },
+        {
+          "id": "opposing_train",
+          "label": "已建立S→ⅢG接车，再建立X→ⅢG接车",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "不能办理",
+          "explanation": "不能办理"
+        },
+        {
+          "id": "overlap_shunt",
+          "label": "已建立S→ⅢG接车，再建立D12→ⅢG调车",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "不能办理",
+          "explanation": "不能办理"
+        },
+        {
+          "id": "record",
+          "label": "分别记录失败的条件，说明同股道相向列车进路与同咽喉重叠调车的限制。",
+          "kind": "essay",
+          "points": 10,
+          "criteria": [
+            "操作条件与步骤完整",
+            "分别记录信号和锁闭状态",
+            "结合记录说明原因"
+          ],
+          "reference_answer": "接车股道及内方区段均须空闲；同一到发线的相向列车接车进路敌对；已有接车进路时，同一咽喉顺向重叠的调车进路不能同时办理。"
+        }
+      ],
+      "devices": [
+        "X",
+        "S",
+        "SIII",
+        "D12",
+        "IIIG",
+        "3DG"
+      ],
+      "level": "应用",
+      "conditions": [],
+      "station_key": "standard-station",
+      "diagram_mode": "standard"
+    },
+    {
+      "key": "lab-01-09",
+      "topic": 1,
+      "sequence": 9,
+      "title": "引导接车与引导总锁闭",
+      "source_section": "实验3 · 5（5）—（7）",
+      "prompt": "分别办理X至ⅢG普通引导和引导总锁闭接车。",
+      "fields": [
+        {
+          "id": "fault_guide",
+          "label": "5DG故障、道岔已就位时，X引导接ⅢG",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "能办理",
+          "explanation": "能办理"
+        },
+        {
+          "id": "filament_guide",
+          "label": "X灯丝断丝时办理引导",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "能办理",
+          "explanation": "能办理"
+        },
+        {
+          "id": "filament_lamps",
+          "label": "X灯丝断丝时，已办理的引导能否点亮红白灯",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能",
+            "不能"
+          ],
+          "expected": "不能",
+          "explanation": "引导办理与灯丝实际点亮分别处理。"
+        },
+        {
+          "id": "total_only",
+          "label": "只建立X引导总锁、不按引导按钮，X是否开放引导",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "开放",
+            "不开放"
+          ],
+          "expected": "不开放",
+          "explanation": "不开放"
+        },
+        {
+          "id": "total_switch",
+          "label": "X引导总锁期间总定、总反27",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "不能办理",
+          "explanation": "不能办理"
+        },
+        {
+          "id": "lost_passage",
+          "label": "总锁引导路径上有失表示道岔，自动模拟车能否通过",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能",
+            "不能"
+          ],
+          "expected": "不能",
+          "explanation": "不能"
+        },
+        {
+          "id": "record",
+          "label": "比较普通引导与总锁引导的步骤、灯色、道岔限制和解锁手续。",
+          "kind": "essay",
+          "points": 10,
+          "criteria": [
+            "操作条件与步骤完整",
+            "分别记录信号和锁闭状态",
+            "结合记录说明原因"
+          ],
+          "reference_answer": "先将道岔设为接车路径；普通引导不要求终端按钮。5DG故障可办理引导并显示红白灯，须恢复空闲后用总人解完成解锁。断丝允许办理，但灯位不亮。普通引导不能使用失表示道岔；总锁本身不开放信号，按对应引导按钮后可开放，模拟车仍不能通过失表示道岔。总锁限制整咽喉道岔；关闭引导后解除总锁。"
+        }
+      ],
+      "devices": [
+        "X",
+        "SIII",
+        "5/7",
+        "5DG",
+        "27",
+        "IIIG"
+      ],
+      "level": "应用",
+      "conditions": [
+        "道岔须先就位。按现行设备菜单规则，进路内任一端已锁闭时不能注入整组失表示；失表示工况须在建立进路前设置。"
+      ],
+      "station_key": "standard-station",
+      "diagram_mode": "standard"
+    },
+    {
+      "key": "lab-01-10",
+      "topic": 1,
+      "sequence": 10,
+      "title": "首区段故障下的引导保持",
+      "source_section": "实验3 · 6（1）—（2）",
+      "prompt": "IAG故障时办理X至ⅡG引导接车，并试办重叠调车。",
+      "fields": [
+        {
+          "id": "first_fault",
+          "label": "IAG故障、道岔已就位时，引导接ⅡG",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "能办理",
+          "explanation": "能办理"
+        },
+        {
+          "id": "hold_time",
+          "label": "IAG故障时引导保持的计时",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "15秒",
+            "30秒",
+            "180秒"
+          ],
+          "expected": "15秒",
+          "explanation": "15秒"
+        },
+        {
+          "id": "clear_hold",
+          "label": "引导开放后排除IAG故障，是否继续要求15秒保持",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "继续要求",
+            "不再要求"
+          ],
+          "expected": "不再要求",
+          "explanation": "不再要求"
+        },
+        {
+          "id": "overlap",
+          "label": "引导接ⅡG后办理重叠的D8→ⅡG长调车",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "不能办理",
+          "explanation": "不能办理"
+        },
+        {
+          "id": "record",
+          "label": "记录故障保持倒计时、再次保持、排除故障以及重叠进路试办的结果。",
+          "kind": "essay",
+          "points": 10,
+          "criteria": [
+            "操作条件与步骤完整",
+            "分别记录信号和锁闭状态",
+            "结合记录说明原因"
+          ],
+          "reference_answer": "IAG故障时可按预设道岔办理引导，显示红白灯并计时15秒；需要再次保持或排除首区段故障。恢复空闲后不再倒计时；已建立引导接车时，重叠的D8→ⅡG长调车不能办理。"
+        }
+      ],
+      "devices": [
+        "X",
+        "SII",
+        "D8",
+        "IAG",
+        "IIG"
+      ],
+      "level": "应用",
+      "conditions": [],
+      "station_key": "standard-station",
+      "diagram_mode": "standard"
+    },
+    {
+      "key": "lab-02-04",
+      "topic": 2,
+      "sequence": 4,
+      "title": "长调车逐段取消",
+      "source_section": "实验4 · 1",
+      "prompt": "办理D1至ⅠG长调车，依次取消D13、D9、D1基本段。",
+      "fields": [
+        {
+          "id": "last",
+          "label": "D1→ⅠG办好后，仅取消D13基本段，D1和D9是否仍开放",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "仍开放",
+            "同时关闭"
+          ],
+          "expected": "仍开放",
+          "explanation": "仍开放"
+        },
+        {
+          "id": "middle",
+          "label": "再取消D9基本段，D1是否仍保持",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "保持",
+            "同时取消"
+          ],
+          "expected": "保持",
+          "explanation": "保持"
+        },
+        {
+          "id": "record",
+          "label": "按远端到近端依次取消D13、D9、D1，记录各段信号和锁闭。",
+          "kind": "essay",
+          "points": 10,
+          "criteria": [
+            "操作条件与步骤完整",
+            "分别记录信号和锁闭状态",
+            "结合记录说明原因"
+          ],
+          "reference_answer": "总取消加相应基本段始端，分别取消D13、D9、D1；每次只处理所选基本段，其余信号和锁闭保持。"
+        }
+      ],
+      "devices": [
+        "D1",
+        "D9",
+        "D13",
+        "SI",
+        "IG"
+      ],
+      "level": "应用",
+      "conditions": [
+        "各基本段内方和接近均空闲。"
+      ],
+      "station_key": "standard-station",
+      "diagram_mode": "standard"
+    },
+    {
+      "key": "lab-02-05",
+      "topic": 2,
+      "sequence": 5,
+      "title": "接近有车的调车人工解锁",
+      "source_section": "实验4 · 2",
+      "prompt": "D1至ⅠG长调车办好后，设置IIAG车辆占用。",
+      "fields": [
+        {
+          "id": "approach_cancel",
+          "label": "D1外方IIAG有车，能否直接总取消D1基本段",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能",
+            "不能"
+          ],
+          "expected": "不能",
+          "explanation": "不能"
+        },
+        {
+          "id": "manual_time",
+          "label": "先取消远端基本段，再对D1总人解的延时",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "立即",
+            "30秒",
+            "180秒"
+          ],
+          "expected": "30秒",
+          "explanation": "30秒"
+        },
+        {
+          "id": "record",
+          "label": "记录远端取消、D1关闭、锁闭保持和人工解锁完成的顺序。",
+          "kind": "essay",
+          "points": 10,
+          "criteria": [
+            "操作条件与步骤完整",
+            "分别记录信号和锁闭状态",
+            "结合记录说明原因"
+          ],
+          "reference_answer": "先取消D13、D9基本段；D1接近有车，不能总取消，须总人解30秒。信号先关闭，所选基本段的锁闭延时保持；其他段分别处理。"
+        }
+      ],
+      "devices": [
+        "D1",
+        "D9",
+        "D13",
+        "SI",
+        "IIAG",
+        "IG"
+      ],
+      "level": "应用",
+      "conditions": [],
+      "station_key": "standard-station",
+      "diagram_mode": "standard"
+    },
+    {
+      "key": "lab-02-06",
+      "topic": 2,
+      "sequence": 6,
+      "title": "X至ⅠG的取消与人工解锁",
+      "source_section": "实验4 · 3",
+      "prompt": "分别在YXG空闲、有车时办理X至ⅠG进路的解锁。",
+      "fields": [
+        {
+          "id": "empty_cancel",
+          "label": "YXG空闲且内方空闲时，总取消",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "能办理",
+          "explanation": "能办理"
+        },
+        {
+          "id": "occupied_cancel",
+          "label": "YXG有车且内方空闲时，总取消",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "不能办理",
+          "explanation": "不能办理"
+        },
+        {
+          "id": "delay",
+          "label": "接近有车改办总人解的延时",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "立即",
+            "30秒",
+            "180秒"
+          ],
+          "expected": "180秒",
+          "explanation": "180秒"
+        },
+        {
+          "id": "record",
+          "label": "分别记录接近无车、有车时的手续、信号变化和锁闭状态。",
+          "kind": "essay",
+          "points": 10,
+          "criteria": [
+            "操作条件与步骤完整",
+            "分别记录信号和锁闭状态",
+            "结合记录说明原因"
+          ],
+          "reference_answer": "无接近车时可总取消，不设人工解锁倒计时；接近有车时总取消失败，须总人解180秒。信号先关闭，延时内锁闭保持，内方必须空闲。"
+        }
+      ],
+      "devices": [
+        "X",
+        "SI",
+        "YXG",
+        "IG"
+      ],
+      "level": "应用",
+      "conditions": [],
+      "station_key": "standard-station",
+      "diagram_mode": "standard"
+    },
+    {
+      "key": "lab-02-07",
+      "topic": 2,
+      "sequence": 7,
+      "title": "X至5G的取消与人工解锁",
+      "source_section": "实验4 · 4",
+      "prompt": "分别在YXG空闲、有车时办理X至5G进路的解锁。",
+      "fields": [
+        {
+          "id": "empty_cancel",
+          "label": "YXG空闲且内方空闲时，总取消",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "能办理",
+          "explanation": "能办理"
+        },
+        {
+          "id": "occupied_cancel",
+          "label": "YXG有车且内方空闲时，总取消",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "不能办理",
+          "explanation": "不能办理"
+        },
+        {
+          "id": "delay",
+          "label": "接近有车改办总人解的延时",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "立即",
+            "30秒",
+            "180秒"
+          ],
+          "expected": "180秒",
+          "explanation": "180秒"
+        },
+        {
+          "id": "record",
+          "label": "分别记录接近无车、有车时的手续、信号变化和锁闭状态。",
+          "kind": "essay",
+          "points": 10,
+          "criteria": [
+            "操作条件与步骤完整",
+            "分别记录信号和锁闭状态",
+            "结合记录说明原因"
+          ],
+          "reference_answer": "无接近车时可总取消，不设人工解锁倒计时；接近有车时总取消失败，须总人解180秒。信号先关闭，延时内锁闭保持，内方必须空闲。"
+        }
+      ],
+      "devices": [
+        "X",
+        "S5",
+        "YXG",
+        "5G"
+      ],
+      "level": "应用",
+      "conditions": [],
+      "station_key": "standard-station",
+      "diagram_mode": "standard"
+    },
+    {
+      "key": "lab-02-08",
+      "topic": 2,
+      "sequence": 8,
+      "title": "SⅢ向XD发车的解锁",
+      "source_section": "实验4 · 5",
+      "prompt": "分别在ⅢG空闲、有车时办理SⅢ至XD发车进路的解锁。",
+      "fields": [
+        {
+          "id": "empty_cancel",
+          "label": "ⅢG空闲且内方空闲时，总取消",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "能办理",
+          "explanation": "能办理"
+        },
+        {
+          "id": "occupied_cancel",
+          "label": "ⅢG有车且内方空闲时，总取消",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "不能办理",
+          "explanation": "不能办理"
+        },
+        {
+          "id": "delay",
+          "label": "接近有车改办总人解的延时",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "立即",
+            "30秒",
+            "180秒"
+          ],
+          "expected": "180秒",
+          "explanation": "180秒"
+        },
+        {
+          "id": "record",
+          "label": "分别记录接近无车、有车时的手续、信号变化和锁闭状态。",
+          "kind": "essay",
+          "points": 10,
+          "criteria": [
+            "操作条件与步骤完整",
+            "分别记录信号和锁闭状态",
+            "结合记录说明原因"
+          ],
+          "reference_answer": "无接近车时可总取消，不设人工解锁倒计时；接近有车时总取消失败，须总人解180秒。信号先关闭，延时内锁闭保持，内方必须空闲。"
+        }
+      ],
+      "devices": [
+        "SIII",
+        "XD",
+        "IIIG"
+      ],
+      "level": "应用",
+      "conditions": [],
+      "station_key": "standard-station",
+      "diagram_mode": "standard"
+    },
+    {
+      "key": "lab-02-09",
+      "topic": 2,
+      "sequence": 9,
+      "title": "SⅢ向XF发车的解锁",
+      "source_section": "实验4 · 6",
+      "prompt": "分别在ⅢG空闲、有车时办理SⅢ至XF发车进路的解锁。",
+      "fields": [
+        {
+          "id": "empty_cancel",
+          "label": "ⅢG空闲且内方空闲时，总取消",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "能办理",
+          "explanation": "能办理"
+        },
+        {
+          "id": "occupied_cancel",
+          "label": "ⅢG有车且内方空闲时，总取消",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "不能办理",
+          "explanation": "不能办理"
+        },
+        {
+          "id": "delay",
+          "label": "接近有车改办总人解的延时",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "立即",
+            "30秒",
+            "180秒"
+          ],
+          "expected": "180秒",
+          "explanation": "180秒"
+        },
+        {
+          "id": "record",
+          "label": "分别记录接近无车、有车时的手续、信号变化和锁闭状态。",
+          "kind": "essay",
+          "points": 10,
+          "criteria": [
+            "操作条件与步骤完整",
+            "分别记录信号和锁闭状态",
+            "结合记录说明原因"
+          ],
+          "reference_answer": "无接近车时可总取消，不设人工解锁倒计时；接近有车时总取消失败，须总人解180秒。信号先关闭，延时内锁闭保持，内方必须空闲。"
+        }
+      ],
+      "devices": [
+        "SIII",
+        "XF",
+        "IIIG"
+      ],
+      "level": "应用",
+      "conditions": [],
+      "station_key": "standard-station",
+      "diagram_mode": "standard"
+    },
+    {
+      "key": "lab-02-10",
+      "topic": 2,
+      "sequence": 10,
+      "title": "区故解与信号关闭",
+      "source_section": "实验4 · 7",
+      "prompt": "办理接车、调车进路后，对下列区段进行第一次区故解。",
+      "fields": [
+        {
+          "id": "train_close",
+          "label": "X接ⅡG开放时，第一次对5DG区故解后X的显示",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "关闭",
+            "仍开放"
+          ],
+          "expected": "关闭",
+          "explanation": "关闭"
+        },
+        {
+          "id": "train_lock",
+          "label": "同次操作后5DG锁闭是否自动释放",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "释放",
+            "不释放"
+          ],
+          "expected": "不释放",
+          "explanation": "不释放"
+        },
+        {
+          "id": "shunt_close",
+          "label": "D11→5G开放时，第一次对21DG区故解后D11的显示",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "白灯",
+            "蓝灯"
+          ],
+          "expected": "蓝灯",
+          "explanation": "蓝灯"
+        },
+        {
+          "id": "wait",
+          "label": "第一次操作后持续等待，原锁闭是否自行释放",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "释放",
+            "不释放"
+          ],
+          "expected": "不释放",
+          "explanation": "不释放"
+        },
+        {
+          "id": "record",
+          "label": "分别记录两条进路首次区故解前后信号和锁闭的变化，解释为何关闭信号不等于解锁。",
+          "kind": "essay",
+          "points": 10,
+          "criteria": [
+            "操作条件与步骤完整",
+            "分别记录信号和锁闭状态",
+            "结合记录说明原因"
+          ],
+          "reference_answer": "X接ⅡG后首次对5DG区故解只关闭X，原锁闭保持；D11→5G后首次对21DG区故解只关闭D11为蓝灯，原锁闭保持。第一次操作不建立自动释放计时，等待不能代替后续解锁手续。"
+        }
+      ],
+      "devices": [
+        "X",
+        "SII",
+        "D11",
+        "S5",
+        "5DG",
+        "21DG"
+      ],
+      "level": "应用",
+      "conditions": [],
+      "station_key": "standard-station",
+      "diagram_mode": "standard"
+    },
+    {
+      "key": "lab-02-11",
+      "topic": 2,
+      "sequence": 11,
+      "title": "故障恢复与接近锁闭",
+      "source_section": "实验4 · 8",
+      "prompt": "按D3DA、D7DA办理进路，设置3DG故障，随后恢复空闲。",
+      "fields": [
+        {
+          "id": "fault_lamp",
+          "label": "D3A→D7A办好后3DG故障，D3显示",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "白灯",
+            "蓝灯"
+          ],
+          "expected": "蓝灯",
+          "explanation": "蓝灯"
+        },
+        {
+          "id": "recover_lamp",
+          "label": "3DG恢复空闲后，D3是否自动开放",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "自动开放",
+            "不自动开放"
+          ],
+          "expected": "不自动开放",
+          "explanation": "不自动开放"
+        },
+        {
+          "id": "approached_cancel",
+          "label": "IAG有车时，总取消该进路",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "能办理",
+            "不能办理"
+          ],
+          "expected": "不能办理",
+          "explanation": "不能办理"
+        },
+        {
+          "id": "record",
+          "label": "记录故障、恢复、重复开放和接近占用后的取消操作。",
+          "kind": "essay",
+          "points": 10,
+          "criteria": [
+            "操作条件与步骤完整",
+            "分别记录信号和锁闭状态",
+            "结合记录说明原因"
+          ],
+          "reference_answer": "按明确按钮D3A→D7A办理。3DG故障使D3关闭；恢复空闲不自动重开，须重复开放。IAG有车后接近锁闭，不能总取消。"
+        }
+      ],
+      "devices": [
+        "D3",
+        "D7",
+        "3DG",
+        "IAG"
+      ],
+      "level": "应用",
+      "conditions": [],
+      "station_key": "standard-station",
+      "diagram_mode": "standard"
+    },
+    {
+      "key": "lab-02-12",
+      "topic": 2,
+      "sequence": 12,
+      "title": "牵出与折返解锁",
+      "source_section": "实验4 · 9两种工况",
+      "prompt": "办理SⅢ至D3牵出和D13至ⅡG折返，比较是否进入过3DG。",
+      "fields": [
+        {
+          "id": "short_tail",
+          "label": "牵出未占用3DG就折返，未走的D7基本段是否自动解锁",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "自动解锁",
+            "不自动解锁"
+          ],
+          "expected": "不自动解锁",
+          "explanation": "不自动解锁"
+        },
+        {
+          "id": "entered_tail",
+          "label": "已占用3DG再退回，相关接近区段全部出清后，D7基本段是否返回解锁",
+          "kind": "choice",
+          "points": 5,
+          "options": [
+            "返回解锁",
+            "始终锁闭"
+          ],
+          "expected": "返回解锁",
+          "explanation": "返回解锁"
+        },
+        {
+          "id": "record",
+          "label": "分别记录两种车列头尾位置、占用/出清顺序及剩余基本段，比较正常逐段解锁和中途返回解锁。",
+          "kind": "essay",
+          "points": 10,
+          "criteria": [
+            "操作条件与步骤完整",
+            "分别记录信号和锁闭状态",
+            "结合记录说明原因"
+          ],
+          "reference_answer": "经D13办理SⅢ→D3牵出，再D13→ⅡG折返。未进入首区段3DG，未走尾段不能自行解锁，需总取消；进入过3DG后退回，待对应接近区段均出清，按返回解锁处理。已走过的区段按正常顺序释放，不能将红光带消失等同于锁闭立即消失。"
+        }
+      ],
+      "devices": [
+        "SIII",
+        "D3",
+        "D13",
+        "SII",
+        "D7",
+        "9DG",
+        "15DG",
+        "3DG"
+      ],
+      "level": "应用",
+      "conditions": [
+        "9DG和15DG分别占用、出清。先设置道岔，选择经D13的牵出路径。"
+      ],
+      "station_key": "standard-station",
+      "diagram_mode": "standard"
+    }
+  ]
+}

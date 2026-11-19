@@ -84,7 +84,7 @@ def validate_version(db, vid):
     q = db.get(OperationQuestion, v.question_id) if v else None
     if not v or not q or q.disabled or v.status != 'published' or not v.standard_log:
         ops.fail('请选择未停用操作题的已发布版本')
-    if v.station_version != ops.station_version():
+    if not ops.station_compatible(v.station_version):
         ops.fail('标准站版本已变化，请先重新发布操作题')
     return q, v
 
@@ -238,7 +238,7 @@ def detail(db, user, attempt, *, refresh=False, after_sequence=None, state_versi
         console = ops.refresh(db, user, attempt.session_id, exam=True, commit=False,
                               after_sequence=after_sequence, state_version=state_version)
     else:
-        if record.station_version != ops.station_version():
+        if not ops.station_compatible(record.station_version):
             console = None
         else:
             engine, session = unpack(ops.reference_station_package(), record.engine_state)
@@ -280,7 +280,7 @@ def begin(db, user, eid, fullscreen):
     if at < exam.opens_at or at >= exam.closes_at:
         ops.fail('考试尚未开放或已经截止')
     frozen = exam.question_snapshot
-    if frozen['station_version'] != ops.station_version():
+    if not ops.station_compatible(frozen['station_version']):
         ops.fail('考试标准站版本与当前程序不同，请联系教师；未占用作答机会')
     engine = ops.ReferenceSimulationService(ops.reference_station_package())
     initial = deepcopy(frozen['initial'])
@@ -364,7 +364,7 @@ def readonly_sync(db, user, sid, body):
     expected = 'inside' if body.fullscreen else 'outside'
     if attempt.submitted_at or attempt.fullscreen_state != expected or expected != 'inside' or at >= attempt.deadline:
         return None
-    if record.status != 'active' or record.engine_state.get('evidence_schema') != 1 or record.station_version != ops.station_version():
+    if record.status != 'active' or record.engine_state.get('evidence_schema') != 1 or not ops.station_compatible(record.station_version):
         return None
     from app.services.simulation_console import clock
     from app.services.operation_assessment.evidence import due_epochs
@@ -378,13 +378,24 @@ def readonly_sync(db, user, sid, body):
             if pending and pending['expires_at']<=epoch:
                 pending=None
             remaining=lambda due:max(0,int((due or 0)-epoch+.99))
+            signal_timers={name:{'manual_remaining_seconds':0,'guide_remaining_seconds':0} for name in state['signals']}
+            route_timers=[]
+            for route in state['routes'].values():
+                if route['status'] in {'cancelled','released'}:
+                    continue
+                manual=remaining(route.get('manual_release_due'))
+                for segment in route.get('segments',[]):
+                    seconds=remaining(segment.get('manual_due'))
+                    signal_timers[segment['signal']]['manual_remaining_seconds']=seconds
+                    manual=max(manual,seconds)
+                guide=remaining(route.get('guide_deadline'))
+                signal_timers[route['signal']]['guide_remaining_seconds']=guide
+                route_timers.append({'id':route['id'],'manual_remaining_seconds':manual,'guide_remaining_seconds':guide})
             console={'snapshot':None,'events':[],'status':record.status,'pending':pending,
                 'revision':record.revision,'event_count':record.revision,'state_version':state['version'],'session_id':sid,
                 'timers':{'selection_remaining_seconds':remaining(state.get('selection_deadline')),
                     'fault_releases':{k:remaining(v) for k,v in record.engine_state['reference']['fault_releases'].items()},
-                    'routes':[{'id':r['id'],'manual_remaining_seconds':remaining(r.get('manual_release_due')),
-                               'guide_remaining_seconds':remaining(r.get('guide_deadline'))}
-                              for r in state['routes'].values() if r['status'] not in {'cancelled','released'}]}}
+                    'signals':signal_timers,'routes':route_timers}}
         else:
             engine,session=unpack(ops.reference_station_package(),record.engine_state)
             console=ops.response(db,record,engine,session,after_sequence=body.after_sequence,state_version=body.state_version)

@@ -4,6 +4,7 @@ export function mergeConsole(previous, incoming) {
   return { ...incoming, snapshot: { ...previous.snapshot,
     selection_remaining_seconds: timers.selection_remaining_seconds ?? previous.snapshot.selection_remaining_seconds,
     fault_releases: timers.fault_releases ?? previous.snapshot.fault_releases,
+    signals: Object.fromEntries(Object.entries(previous.snapshot.signals || {}).map(([name,value])=>[name,{...value,...(timers.signals?.[name] || {})}])),
     routes: (previous.snapshot.routes || []).map(item => ({ ...item, ...(byId.get(item.id) || {}) })),
     pending: incoming.pending } }
 }

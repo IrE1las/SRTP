@@ -66,7 +66,7 @@ def visible_version(db, user, qid):
             OperationVersion.number == q.published_version)) if q and q.published_version else None
     if not q or q.disabled or not v or not user.class_name or user.class_name not in v.classes:
         ops.fail('题目不存在、已停用或未向本班发布', 404)
-    if v.station_version != ops.station_version():
+    if not ops.station_compatible(v.station_version):
         ops.fail('标准站版本已变化，请联系教师重新发布题目')
     return q, v
 

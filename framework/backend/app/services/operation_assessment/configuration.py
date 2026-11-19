@@ -5,7 +5,9 @@ from app.services.operation_assessment.evidence import digest, engine_version
 RUBRIC_VERSION = 'reception-1.0'
 SPECIAL_COMMANDS = {'MANUAL_UNLOCK_ROUTE', 'SECTION_FAULT_UNLOCK', 'GUIDE_ARM', 'GUIDE_MAINTAIN',
                     'GUIDE_TOTAL_LOCK', 'GUIDE_TOTAL_UNLOCK', 'BLOCK_ACCIDENT_RESET', 'BLOCK_TOTAL_AUX',
-                    'BLOCK_DEPARTURE_AUX', 'BLOCK_RECEPTION_AUX'}
+                    'BLOCK_DEPARTURE_AUX', 'BLOCK_RECEPTION_AUX', 'SET_SWITCH_INDICATION',
+                    'SET_SECTION_OCCUPANCY','CLEAR_SECTION_OCCUPANCY','SIGNAL_FILAMENT_BREAK',
+                    'SIGNAL_FILAMENT_RESTORE','RESTORE_SWITCH_INDICATION','BLOCK_PEER_ACCEPT','SIMULATE_TRAIN_START'}
 DEVICE_COMMANDS = {'SWITCH_SINGLE_LOCK', 'SWITCH_SINGLE_UNLOCK', 'SWITCH_SEAL', 'SWITCH_UNSEAL',
                    'SIGNAL_SEAL', 'SIGNAL_UNSEAL', 'SIGNAL_LIGHT_ON', 'SIGNAL_LIGHT_OFF'}
 
@@ -49,7 +51,6 @@ def save(db, user, qid, body):
 
 def freeze(db, version, initial):
     from app.services import operations as ops
-    from app.services.simulation_console.reference_runtime import ReferenceSimulationService
     from app.services.simulation_console import clock
     from app.services.operation_assessment import evidence
     config = view(db, version.id)
@@ -66,7 +67,7 @@ def freeze(db, version, initial):
         ops.fail('此接车模板的标准示范应为目标进路的一次完整无误办理，请核对目标或重新录制')
     # Independently check that every declared variant can complete from this initial state.
     for route in config['routes']:
-        engine = ReferenceSimulationService(ops.reference_station_package())
+        engine = ops.ReferenceSimulationService(ops.reference_station_package())
         snap = engine.new_session(0, initial.get('interval_available', True), initial.get('occupied_sections', []))
         session = engine.sessions[snap['session_id']]
         for button in route['button_sequence']:

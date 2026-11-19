@@ -72,6 +72,8 @@ def due_epochs(package):
 
 def _due_times(session, reference):
     timers = []
+    timers.extend(reference.get('clearing_sections', {}).values())
+    timers.extend(mask['due'] for mask in reference.get('clearing_branches', {}).values())
     if session.selected and session.selection_deadline is not None:
         timers.append(session.selection_deadline)
     for sid, motion in reference['point_motions'].items():
@@ -80,15 +82,17 @@ def _due_times(session, reference):
     for route in session.routes.values():
         if route['status'] in {'cancelled', 'released'}:
             continue
-        for key in ('signal_open_due', 'manual_release_due'):
+        for key in ('signal_open_due', 'manual_release_due', 'auto_due'):
             if route.get(key) is not None:
                 timers.append(route[key])
         pending = route.get('cancel_pending') or {}
         if pending.get('due') is not None:
             timers.append(pending['due'])
         timers.extend(route.get('release_due', {}).values())
-        if route.get('mode') == 'guide' and session.signals[route['signal']].get('aspect') == 'HB':
+        if route.get('mode','').startswith('guide') and route.get('guide_deadline') and session.signals[route['signal']].get('aspect') == 'HB':
             timers.append(route['guide_deadline'])
+        for segment in route.get('segments', []):
+            timers.extend(segment[key] for key in ('manual_due','return_due') if segment.get(key) is not None)
     return timers
 
 

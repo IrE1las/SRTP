@@ -7,14 +7,14 @@ from typing import Literal
 from app.api.deps import require_roles
 from app.models.user import User
 from app.services.simulation_console.runtime import SimulationError
-from app.services.simulation_console.reference_station import reference_station_package
-from app.services.simulation_console.reference_runtime import ReferenceSimulationService
+from app.services.simulation_console.console_station import console_station_package
+from app.services.simulation_console.console_runtime import ConsoleSimulationService
 from app.services.simulation_console.console_commands import operate
 
 
 router = APIRouter()
 AnyRole = Depends(require_roles("student", "teacher", "admin"))
-reference_service = ReferenceSimulationService(reference_station_package())
+reference_service = ConsoleSimulationService(console_station_package())
 
 
 def service_for(session_id):
@@ -50,7 +50,8 @@ class ConsoleCommandRequest(BaseModel):
                   'SIGNAL_SEAL', 'SIGNAL_UNSEAL', 'SIGNAL_LIGHT_ON', 'SIGNAL_LIGHT_OFF',
                   'SECTION_FAULT_UNLOCK', 'GUIDE_ARM', 'GUIDE_MAINTAIN', 'GUIDE_TOTAL_LOCK', 'GUIDE_TOTAL_UNLOCK',
                   'BLOCK_REQUEST', 'BLOCK_PEER_ACCEPT', 'BLOCK_RESET', 'BLOCK_ACCIDENT_RESET',
-                  'BLOCK_DEPARTURE_AUX', 'BLOCK_RECEPTION_AUX', 'BLOCK_TOTAL_AUX']
+                  'BLOCK_DEPARTURE_AUX', 'BLOCK_RECEPTION_AUX', 'BLOCK_TOTAL_AUX', 'SIMULATE_TRAIN_STEP',
+                  'SIMULATE_TRAIN_START', 'SIGNAL_FILAMENT_BREAK', 'SIGNAL_FILAMENT_RESTORE']
     target: str = Field(min_length=1, max_length=80)
     payload: dict = Field(default_factory=dict)
     pin: str | None = Field(default=None, max_length=32)
@@ -66,7 +67,7 @@ def _call(action, *args):
 
 @router.get("/station")
 def get_station(source: Literal['reference'] = 'reference', current_user: User = AnyRole) -> dict:
-    package = reference_station_package()
+    package = console_station_package()
     if current_user.role == "student":
         return {k: v for k, v in package.items() if k not in {"routes", "source"}}
     return package

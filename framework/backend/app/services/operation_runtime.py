@@ -2,11 +2,12 @@
 from dataclasses import fields
 from app.services.simulation_console.clock import monotonic, time
 from app.services.simulation_console.runtime import RuntimeSession
+from app.services.simulation_console.console_runtime import ConsoleSimulationService
 from app.services.simulation_console.reference_runtime import ReferenceSimulationService
 
 TIMER_KEYS = {'selection_deadline', 'manual_release_due', 'signal_open_due',
-              'guide_deadline', 'due', 'deadline'}
-TIMER_MAPS = {'release_due', 'fault_releases'}
+              'guide_deadline', 'due', 'deadline', 'auto_due', 'manual_due', 'return_due'}
+TIMER_MAPS = {'release_due', 'fault_releases', 'clearing_sections'}
 
 
 def transform(value, offset, key=''):
@@ -38,13 +39,26 @@ def pack(engine, sid):
             if f.name not in {'mutex', 'history'}}
     # Process-local monotonic deadlines become absolute UTC deadlines, including
     # point motion, track proving, cancellation, guide hold and fault release.
-    return transform({'session': data, 'reference': engine._state(session)}, time() - monotonic())
+    aliases = {rid:r for rid,r in engine.routes.items() if r.get('source_route_id')}
+    return transform({'session': data, 'reference': engine._state(session),
+                      'runtime_profile':'console-v1' if engine.package.get('console_circuits') else 'reference-v1',
+                      'route_aliases':aliases}, time() - monotonic())
 
 
 def unpack(package, data):
     restored = restore_sets(transform(data, monotonic() - time()))
-    engine = ReferenceSimulationService(package)
+    if restored.get('runtime_profile') == 'console-v1' and not package.get('console_circuits'):
+        from app.services.simulation_console.console_station import console_station_package
+        package = console_station_package()
+    engine = ConsoleSimulationService(package) if package.get('console_circuits') else ReferenceSimulationService(package)
+    engine.routes.update(restored.get('route_aliases', {}))
+    migrated = restored.get('runtime_profile') != 'console-v1' and package.get('console_circuits')
+    if migrated:
+        from app.services.operation_station_upgrade import adapt_state
+        restored = adapt_state(engine, restored)
     session = RuntimeSession(**restored['session'])
     engine.sessions[session.id] = session
     engine.reference_states[session.id] = restored['reference']
+    if migrated:
+        engine._event(session, 'station_upgrade', '操作台已更新，原操作记录保留')
     return engine, session

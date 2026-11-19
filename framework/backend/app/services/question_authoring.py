@@ -8,12 +8,12 @@ from fastapi import HTTPException
 from sqlalchemy import update
 
 from app.models import LabQuestion, QuestionWorkspace, QuestionRevision, ShuntingDataset
-from app.services.lab_topics import BLUEPRINT, KIND_LABELS, digest
+from app.services.lab_topics import BLUEPRINT, KIND_LABELS, digest, load_blueprint
 from app.services.shunting_data import DATASET_KEY, STATION_KEY
 
 
 def topic_catalog():
-    return json.loads(BLUEPRINT.read_text(encoding='utf-8'))['topics']
+    return load_blueprint()['topics']
 
 
 def text_value(value, name, limit=6000, required=False):
@@ -58,11 +58,11 @@ def validate_content(db, raw, *, publish=False, previous=None):
     topo=dataset.station_topology
     devices={s['name'] for s in topo['signals']}|{s['id'] for s in topo['switches']}|{s['name'] for s in topo['sections']}
     if topic<=4:
-        from app.services.simulation_console.reference_station import reference_station_package
+        from app.services.simulation_console.console_station import console_station_package as reference_station_package
         standard=reference_station_package()
         devices=({s['name'] for s in standard['signals']}|{s['id'] for s in standard['switches']}
                  |{s['geometry']['group'] for s in standard['switches'] if s['geometry']['group']}
-                 |{s['id'] for s in standard['sections']})
+                 |{s['id'] for s in standard['sections']}|{b['name'] for b in standard['buttons']}|set(standard['section_aliases']))
     if set(result['devices'])-devices: raise ValueError('引用了对应站场未定义的站内设备')
     fields=raw.get('fields',[])
     if not isinstance(fields,list) or len(fields)>30 or (publish and not fields):

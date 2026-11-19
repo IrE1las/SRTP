@@ -23,9 +23,9 @@ def completed(question):
 
 
 def test_report_coverage_and_source_binding(topics, db_session):
-    assert len(topics)==18
+    assert len(topics)==34
     assert {q.topic for q in topics}==set(range(1,7))
-    assert all(sum(q.topic==topic for q in topics)==3 for topic in range(1,7))
+    assert [sum(q.topic==topic for q in topics) for topic in range(1,7)]==[10,12,3,3,3,3]
     assert db_session.query(ShuntingRoute).count()==35
     assert db_session.query(ShuntingQuestion).count()==0
     shunting=db_session.query(ShuntingRoute).filter_by(route_number=34).one()
@@ -115,7 +115,7 @@ def test_order_and_multi_are_checked_exactly(topics):
 
 
 def test_import_is_idempotent_and_does_not_generate_old_questions(topics,db_session):
-    assert lab_topics.import_topics(db_session)=={'topics':6,'total':18,'inserted':0,'updated':0}
+    assert lab_topics.import_topics(db_session)=={'topics':6,'total':34,'inserted':0,'updated':0}
     assert db_session.query(ShuntingQuestion).count()==0
 
 
@@ -135,7 +135,7 @@ def test_student_submit_teacher_review_and_history_isolation(client,topics,db_se
     q=topics[0]
     path=f'/api/lab-topics/questions/{q.key}'
     assert client.get('/api/lab-topics/questions').status_code==401
-    assert len(client.get('/api/lab-topics/questions',headers=student).json())==18
+    assert len(client.get('/api/lab-topics/questions',headers=student).json())==34
     assert 'expected' not in client.get(path,headers=student).text
     assert client.get(path+'/rubric',headers=student).status_code==403
     assert client.get('/api/lab-topics/reviews',headers=student).status_code==403

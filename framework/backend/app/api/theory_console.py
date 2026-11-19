@@ -8,8 +8,8 @@ from app.api.deps import require_roles
 from app.api.lab_topics import find_question
 from app.core.database import get_db
 from app.models.user import User
-from app.services.simulation_console.reference_station import reference_station_package
-from app.services.simulation_console.reference_runtime import ReferenceSimulationService
+from app.services.simulation_console.console_station import console_station_package as reference_station_package
+from app.services.simulation_console.console_runtime import ConsoleSimulationService as ReferenceSimulationService
 from app.services.simulation_console.runtime import SimulationError
 from app.services.simulation_console.console_commands import operate
 
@@ -49,7 +49,7 @@ class Body(BaseModel):
 
 class SessionRequest(Body):
     interval_available:bool=True
-    occupied_sections:list[str]=Field(default_factory=list,max_length=35)
+    occupied_sections:list[str]=Field(default_factory=list,max_length=42)
 
 class VersionRequest(Body):
     version:StrictInt=Field(ge=0)
@@ -67,7 +67,8 @@ class CommandRequest(VersionRequest):
                  'MANUAL_UNLOCK_ROUTE','SIGNAL_SEAL','SIGNAL_UNSEAL','SIGNAL_LIGHT_ON','SIGNAL_LIGHT_OFF',
                  'SECTION_FAULT_UNLOCK','GUIDE_ARM','GUIDE_MAINTAIN','GUIDE_TOTAL_LOCK','GUIDE_TOTAL_UNLOCK',
                  'BLOCK_REQUEST','BLOCK_PEER_ACCEPT','BLOCK_RESET','BLOCK_ACCIDENT_RESET',
-                 'BLOCK_DEPARTURE_AUX','BLOCK_RECEPTION_AUX','BLOCK_TOTAL_AUX']
+                 'BLOCK_DEPARTURE_AUX','BLOCK_RECEPTION_AUX','BLOCK_TOTAL_AUX',
+                 'SIMULATE_TRAIN_START','SIMULATE_TRAIN_STEP','SIGNAL_FILAMENT_BREAK','SIGNAL_FILAMENT_RESTORE']
     target:str=Field(min_length=1,max_length=80)
     payload:dict=Field(default_factory=dict,max_length=10)
     pin:str|None=Field(default=None,max_length=32,repr=False)

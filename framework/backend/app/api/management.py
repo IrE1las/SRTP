@@ -87,12 +87,12 @@ def validation(operation):
 def metadata(db:Session=Depends(get_db),user:User=Depends(grader)):
     from app.models import ShuntingDataset
     from app.services.shunting_data import DATASET_KEY
-    from app.services.simulation_console.reference_station import reference_station_package
+    from app.services.simulation_console.console_station import console_station_package as reference_station_package
     dataset=db.query(ShuntingDataset).filter_by(dataset_key=DATASET_KEY).one_or_none()
     standard=reference_station_package()
     standard_devices=sorted({s['name'] for s in standard['signals']}|{s['id'] for s in standard['switches']}
                             |{s['geometry']['group'] for s in standard['switches'] if s['geometry']['group']}
-                            |{s['id'] for s in standard['sections']})
+                            |{s['id'] for s in standard['sections']}|{b['name'] for b in standard['buttons']}|set(standard['section_aliases']))
     return {'topics':topic_catalog(),'topology':dataset.station_topology if dataset else None,
             'standard_devices':standard_devices,
             'questions':[{'id':q.id,'title':q.content['title']} for q in db.query(LabQuestion).outerjoin(QuestionWorkspace).filter(func.coalesce(QuestionWorkspace.status,'published')!='draft').order_by(LabQuestion.topic,LabQuestion.sequence)],

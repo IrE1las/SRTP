@@ -197,7 +197,7 @@ def test_reference_http_selection_ownership_and_fault_permissions(client,db_sess
     root='/api/simulation-console'
     package=client.get(root+'/station?source=reference',headers=student).json()
     assert package['profile']=='reference' and 'routes' not in package and 'source' not in package
-    assert package['counts']['sections']==35
+    assert package['counts']['sections']==42
     assert client.get(root+'/station?source=reference',headers=teacher).json()['routes']
     snap=client.post(root+'/sessions',headers=student,json={'source':'reference'}).json()
     assert snap['profile']=='reference'

@@ -12,14 +12,18 @@ from sqlalchemy import delete, func, select, text, update
 from sqlalchemy.exc import IntegrityError
 from app.models.operation import OperationQuestion, OperationVersion, OperationSession, OperationEvent
 from app.services.operation_runtime import pack, unpack
-from app.services.simulation_console.reference_station import reference_station_package
-from app.services.simulation_console.reference_runtime import ReferenceSimulationService
+from app.services.simulation_console.console_station import console_station_package as reference_station_package
+from app.services.simulation_console.console_runtime import ConsoleSimulationService as ReferenceSimulationService
 from app.services.simulation_console.console_commands import operate, SEALED_COMMANDS
 from app.services.simulation_console.runtime import SimulationError
 
 # The HTTP protocol is shared by future student attempts. Presets and peer
 # inputs deliberately have no click command, even for a teacher recording.
 COMMAND_TARGETS = {
+    'SET_SWITCH_INDICATION':'switch', 'RESTORE_SWITCH_INDICATION':'switch',
+    'SET_SECTION_OCCUPANCY':'section', 'CLEAR_SECTION_OCCUPANCY':'section',
+    'SIGNAL_FILAMENT_BREAK':'signal', 'SIGNAL_FILAMENT_RESTORE':'signal',
+    'SIMULATE_TRAIN_START':'section', 'BLOCK_PEER_ACCEPT':'block',
     'CANCEL_ROUTE': 'route', 'MANUAL_UNLOCK_ROUTE': 'route', 'REPEAT_OPEN_SIGNAL': 'route',
     'SECTION_FAULT_UNLOCK': 'section', 'GUIDE_ARM': 'signal', 'GUIDE_MAINTAIN': 'signal',
     'GUIDE_TOTAL_LOCK': 'signal', 'GUIDE_TOTAL_UNLOCK': 'signal',
@@ -31,6 +35,9 @@ COMMAND_TARGETS = {
     'BLOCK_DEPARTURE_AUX': 'block', 'BLOCK_RECEPTION_AUX': 'block', 'BLOCK_TOTAL_AUX': 'block',
 }
 LOCK = RLock()
+MENU_COMMANDS = {'SET_SWITCH_INDICATION','RESTORE_SWITCH_INDICATION','SET_SECTION_OCCUPANCY',
+                 'CLEAR_SECTION_OCCUPANCY','SIGNAL_FILAMENT_BREAK','SIGNAL_FILAMENT_RESTORE',
+                 'SIMULATE_TRAIN_START','BLOCK_PEER_ACCEPT'}
 
 
 def digest(value):
@@ -48,6 +55,11 @@ def station_version():
     if _station_digest[0] is not package:
         _station_digest = (package, digest(package))
     return _station_digest[1]
+
+
+def station_compatible(version):
+    from app.services.simulation_console.reference_station import reference_station_package as legacy_station
+    return version in {station_version(), digest(legacy_station())}
 
 
 def persistent_state(engine, sid, previous=None):
@@ -243,7 +255,7 @@ def publish(db, user, qid):
     if any(e['action'] == 'function' and e['button_id'] not in {*COMMAND_TARGETS, 'CLEAR_SELECTION'}
            for e in v.standard_log):
         fail('标准日志包含学生无权执行的操作')
-    if not any(e['action'] in {'button', 'target'} and e['result']['accepted'] for e in v.standard_log):
+    if not any(e['action'] in {'button', 'target','command'} and e['result']['accepted'] for e in v.standard_log):
         fail('标准日志须至少包含一次有效业务目标操作')
     claimed = db.execute(update(OperationVersion).where(OperationVersion.id == v.id,
         OperationVersion.revision == v.revision, OperationVersion.status == 'draft').values(
@@ -290,7 +302,7 @@ def view_session(db, user, sid):
     question(db, user, version.question_id)
     if record.owner_id == user.id and record.kind != 'learning':
         return {**refresh(db, user, sid), 'read_only': False}
-    if record.station_version != station_version():
+    if not station_compatible(record.station_version):
         fail('站场版本已变化，请下载原日志查看')
     engine, session = unpack(reference_station_package(), record.engine_state)
     return {**response(db, record, engine, session), 'read_only': True}
@@ -314,7 +326,7 @@ def get_session(db, user, sid, *, exam=False):
     # Course data are shared; live commands remain bound to the originating operator.
     if record.owner_id != user.id:
         fail('该操作台属于另一位录制人', 404)
-    if record.station_version != station_version():
+    if not station_compatible(record.station_version):
         fail('运行规则版本已变化，原日志保留；请新建版本录制')
     return record
 
@@ -336,6 +348,8 @@ def response(db, record, engine, session, *, after_sequence=None, state_version=
     return {'snapshot': None if unchanged else snapshot,
             'timers': {'selection_remaining_seconds': snapshot['selection_remaining_seconds'],
                        'fault_releases': snapshot.get('fault_releases', {}),
+                       'signals': {name:{k:value.get(k,0) for k in ('manual_remaining_seconds','guide_remaining_seconds')}
+                                   for name,value in snapshot['signals'].items()},
                        'routes': [{'id': r['id'], 'manual_remaining_seconds': r['manual_remaining_seconds'],
                                    'guide_remaining_seconds': r.get('guide_remaining_seconds', 0)}
                                   for r in snapshot['routes'] if r['status'] not in {'cancelled', 'released'}]} if unchanged else None,
@@ -349,7 +363,7 @@ def start_session(db, user, qid, kind):
     v = latest(db, qid)
     if q.disabled or (kind == 'recording' and v.status != 'draft'):
         fail('仅草稿可录制，已停用题目不能开始新会话')
-    if v.station_version != station_version():
+    if not station_compatible(v.station_version):
         fail('站场版本已变化，请保存新题目版本')
     # A teacher may record again; previous active console is sealed, never overwritten.
     for previous in db.scalars(select(OperationSession).where(OperationSession.version_id == v.id,
@@ -408,18 +422,31 @@ def click(db, user, sid, body, *, exam=False, commit=True, light=False):
         fail('操作记录已封存，不得追加操作')
     if body.sequence != record.revision + 1:
         fail('操作序号不连续，请同步会话后重试')
-    if body.action == 'function' and body.button_id not in {*COMMAND_TARGETS, 'CLEAR_SELECTION'}:
+    if body.action == 'function' and body.button_id not in (set(COMMAND_TARGETS)-MENU_COMMANDS) | {'CLEAR_SELECTION'}:
         fail('该按钮不属于学生可用的业务操作', 422)
     if body.action == 'button' and body.button_id not in {b['name'] for b in reference_station_package()['buttons']}:
         fail('未知站场按钮', 422)
-    if body.action == 'target':
+    if body.action in {'target','command'}:
         package = reference_station_package()
         known = {'signal': {s['name'] for s in package['signals']},
                  'switch': {s['id'] for s in package['switches']},
                  'section': {s['name'] for s in package['sections']},
                  'block': {s['signal'] for s in package['blocks']}}
-        if body.target_id not in known[body.target_kind]:
+        if body.action == 'target' and body.target_id not in known[body.target_kind]:
             fail('目标不在当前标准站设备中', 422)
+        if body.action == 'command':
+            if body.button_id not in COMMAND_TARGETS:
+                fail('未知设备命令', 422)
+            expected_kind = COMMAND_TARGETS[body.button_id]
+            if expected_kind == 'route':
+                valid = body.target_id in record.engine_state['session']['routes'] and body.target_kind == 'signal'
+            else:
+                valid = body.target_kind == expected_kind and body.target_id in known.get(expected_kind, set())
+            allowed = {'SET_SECTION_OCCUPANCY': {'kind'}, 'RESTORE_SWITCH_INDICATION': {'position'},
+                       'SIMULATE_TRAIN_START': {'route_instance_id'},
+                       'CANCEL_ROUTE': {'signal'}, 'MANUAL_UNLOCK_ROUTE': {'signal'}, 'REPEAT_OPEN_SIGNAL': {'signal'}}
+            if not valid or set(body.parameters)-allowed.get(body.button_id, set()):
+                fail('设备命令目标或参数不正确', 422)
     engine, session = unpack(reference_station_package(), record.engine_state)
     tracked = record.engine_state.get('evidence_schema') == 1
     if tracked:
@@ -449,6 +476,17 @@ def click(db, user, sid, body, *, exam=False, commit=True, light=False):
         elif body.action == 'button' and not context.get('pending'):
             result = engine.select_button(sid, user.id, button)
             target = next((b.get('signal') for b in engine.package['buttons'] if b['name'] == button), None)
+        elif body.action == 'command':
+            parameters = deepcopy(body.parameters)
+            result = operate(engine, sid, user.id, {'type':button, 'target':target,
+                             'payload':parameters, 'pin':body.pin}, None)
+            if COMMAND_TARGETS[button] == 'route':
+                target = 'route:' + session.routes[target]['route_id']
+            if button == 'SIMULATE_TRAIN_START':
+                iid = parameters.get('route_instance_id')
+                if iid in session.routes:
+                    parameters = {'route_id':session.routes[iid]['route_id']}
+            context['pending'] = None
         else:
             pending = context.get('pending')
             if body.action == 'button':
@@ -484,7 +522,7 @@ def click(db, user, sid, body, *, exam=False, commit=True, light=False):
         result = {'accepted': False, 'message': str(exc)}
     content = {'schema_version': 1, 'event_id': str(body.event_id), 'session_id': sid,
                'sequence': body.sequence, 'action': body.action, 'button_id': button,
-               'target_id': target, 'parameters': {**parameters, **({'target_kind': body.target_kind} if body.action == 'target' else {})},
+               'target_id': target, 'parameters': {**parameters, **({'target_kind': body.target_kind} if body.action in {'target','command'} else {})},
                'event_time': simulation_clock.iso(),
                'engine_version': session.version,
                'result': {'accepted': bool(result['accepted']), 'message': result['message'],

@@ -53,14 +53,14 @@ def test_authoring_permissions_and_draft_visibility(client,setup,db_session):
     q=create(client,setup['admin'])
     assert q['status']=='draft' and q['published_version']==0
     assert client.get('/api/lab-topics/questions/'+q['key'],headers=setup['student']).status_code==404
-    assert len(client.get('/api/lab-topics/questions',headers=setup['student']).json())==18
+    assert len(client.get('/api/lab-topics/questions',headers=setup['student']).json())==34
     live=publish(client,setup['admin'],q)
     assert live['status']=='published' and live['published_version']==1
     public=client.get('/api/lab-topics/questions/'+q['key'],headers=setup['student']).json()
     assert public['topic_info']['title']=='调车进路联锁表'
     assert public['diagram_mode']=='station'
     assert all(not set(f)&{'expected','rubric','criteria','accepted_answers'} for f in public['fields'])
-    assert len(client.get('/api/lab-topics/questions',headers=setup['student']).json())==19
+    assert len(client.get('/api/lab-topics/questions',headers=setup['student']).json())==35
 
 
 def test_published_edits_versions_and_old_attempts_remain_unchanged(client,setup,db_session):

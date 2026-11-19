@@ -9,8 +9,8 @@ export function operationLocation(id, step = 'edit', back = operationBase, query
 }
 export const operationStatus = value => ({ draft: '草稿', published: '已发布', disabled: '已停用' })[value] || value
 export const sessionStatus = value => ({ active: '进行中', stopped: '已结束', abandoned: '已封存' })[value] || value
-export const actionLabel = value => ({ function: '选择功能', target: '选择设备', button: '进路按钮', cancel_selection: '取消选择' })[value] || value
-export const buttonLabel = value => COMMANDS.find(item => item.type === value)?.label || ({ BLOCK_REQUEST: '请求发车', BLOCK_RESET: '复原', BLOCK_ACCIDENT_RESET: '事故复原', BLOCK_TOTAL_AUX: '总辅助', BLOCK_DEPARTURE_AUX: '发车辅助', BLOCK_RECEPTION_AUX: '接车辅助' })[value] || value || '—'
+export const actionLabel = value => ({ function: '选择功能', target: '选择设备', button: '进路按钮', command:'设备操作', cancel_selection: '取消选择' })[value] || value
+export const buttonLabel = value => COMMANDS.find(item => item.type === value)?.label || ({ SET_SWITCH_INDICATION:'道岔失去表示',RESTORE_SWITCH_INDICATION:'恢复道岔表示',SET_SECTION_OCCUPANCY:'区段占用',CLEAR_SECTION_OCCUPANCY:'区段出清',SIGNAL_FILAMENT_BREAK:'灯丝断丝',SIGNAL_FILAMENT_RESTORE:'灯丝完好',SIMULATE_TRAIN_START:'模拟行车',BLOCK_PEER_ACCEPT:'模拟邻站同意',BLOCK_REQUEST: '请求发车', BLOCK_RESET: '复原', BLOCK_ACCIDENT_RESET: '事故复原', BLOCK_TOTAL_AUX: '总辅助', BLOCK_DEPARTURE_AUX: '发车辅助', BLOCK_RECEPTION_AUX: '接车辅助' })[value] || value || '—'
 export function operationError(error, fallback = '操作失败，请重试。') {
   const detail = error?.response?.data?.detail
   return typeof detail === 'string' ? detail : error?.message || fallback
@@ -33,7 +33,7 @@ export function publishIssues(question, sessions = []) {
   if (!question) return []
   const issues = Object.values(draftErrors(question))
   if (!question.standard_session_id || !question.standard_log?.length) issues.push('录制并保存一份标准答案。')
-  else if (!question.standard_log.some(event => ['button', 'target'].includes(event.action) && event.result?.accepted)) issues.push('标准答案需要包含有效的设备或进路操作。')
+  else if (!question.standard_log.some(event => ['button', 'target','command'].includes(event.action) && event.result?.accepted)) issues.push('标准答案需要包含有效的设备或进路操作。')
   if (sessions.some(item => item.version_id === question.version_id && item.status === 'active')) issues.push('先结束该版本仍在进行的录制或预览。')
   return issues
 }

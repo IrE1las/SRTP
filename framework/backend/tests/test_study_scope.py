@@ -33,7 +33,7 @@ def test_standard_only_free_console_never_writes_experiment_records(client,db_se
 def test_six_topics_use_the_right_station_and_question_sessions_are_isolated(client,topics):
     auth=auth_headers(client,'topic_scope_student','student')
     questions=client.get('/api/lab-topics/questions',headers=auth).json()
-    assert len(questions)==18 and {q['topic'] for q in questions}==set(range(1,7))
+    assert len(questions)==34 and {q['topic'] for q in questions}==set(range(1,7))
     for topic in range(1,7):
         q=client.get(f'/api/lab-topics/questions/lab-{topic:02d}-01',headers=auth).json()
         assert q['diagram_mode']==('standard' if topic<=4 else 'station')
@@ -124,11 +124,11 @@ def test_retirement_backs_up_removed_content_and_preserves_retained_answers(db_s
         assert report['removed_questions']==1 and report['backup'].is_file()
         assert not (set(REMOVED_TABLES) & set(inspect(db_session.bind).get_table_names()))
         db_session.expire_all()
-        assert db_session.query(LabQuestion).count()==18
+        assert db_session.query(LabQuestion).count()==34
         assert db_session.query(LabAttempt).count()==1
         assert db_session.get(LabAttempt,kept_id).answers==completed(kept)
         with closing(sqlite3.connect(report['backup'])) as backup:
-            assert backup.execute('SELECT count(*) FROM lab_questions').fetchone()[0]==19
+            assert backup.execute('SELECT count(*) FROM lab_questions').fetchone()[0]==35
         assert retire_study_scope(db_session.bind) is None
     finally:
         report['backup'].unlink()

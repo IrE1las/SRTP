@@ -4,7 +4,7 @@
     <p v-if="notice" class="notice" role="alert">{{ notice }}</p>
     <fieldset class="editor-fields" :disabled="loading||busy"><div class="editor-grid">
       <div class="editor-main">
-        <section class="editor-panel"><div class="panel-title"><h2>题目内容</h2><span>原图站场 · 自主编排</span></div>
+        <section class="editor-panel"><div class="panel-title"><h2>题目内容</h2><span>{{ form.topic<=4?'标准站':'原图站场' }} · 自主编排</span></div>
           <label class="control">题目标题<el-input v-model="form.title" maxlength="150" placeholder="如：D13至II股道的带动道岔分析" aria-label="题目标题"/></label>
           <div class="control-grid"><label class="control">所属专题<el-select v-model="form.topic" aria-label="所属专题"><el-option v-for="t in topics" :key="t.id" :value="t.id" :label="t.title"/></el-select></label><label class="control">难度<el-select v-model="form.level" allow-create filterable aria-label="难度"><el-option v-for="l in ['基础','综合','分析']" :key="l" :label="l" :value="l"/></el-select></label><label class="control">专题内排序<el-input-number v-model="form.sequence" :min="1" :max="999" aria-label="专题内排序"/></label></div>
           <label class="control">题干<el-input v-model="form.prompt" type="textarea" :rows="5" maxlength="6000" show-word-limit placeholder="说明任务、已知条件和学生需要完成的工作。" aria-label="题干"/></label>

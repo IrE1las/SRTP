@@ -18,6 +18,7 @@ from app.services.simulation_console.reference_station import reference_station_
 
 ROOT = Path(__file__).resolve().parents[4]
 BLUEPRINT = ROOT / 'ai_design/station/report_topic_blueprint.json'
+SUPPLEMENT = ROOT / 'ai_design/station/experiment_3_4_questions.json'
 KIND_LABELS = {'choice':'判断选择','multi':'多项辨析','order':'时序排序','cell':'联锁表填写','essay':'记录与分析'}
 
 
@@ -25,8 +26,17 @@ def digest(value):
     return hashlib.sha256(json.dumps(value, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
 
 
-def resolve_blueprint(db: Session):
+def load_blueprint():
     blueprint = json.loads(BLUEPRINT.read_text(encoding='utf-8'))
+    extra = json.loads(SUPPLEMENT.read_text(encoding='utf-8'))
+    blueprint['reports'] += extra['reports']
+    blueprint['questions'] += extra['questions']
+    blueprint['expected_question_count'] = 18 + len(extra['questions'])
+    return blueprint
+
+
+def resolve_blueprint(db: Session):
+    blueprint = load_blueprint()
     if blueprint['schema_version'] != 1 or blueprint['station_key'] != STATION_KEY:
         raise ValueError('专题版本或原图站场关联不正确')
     dataset = db.query(ShuntingDataset).filter_by(dataset_key=DATASET_KEY).one_or_none()
@@ -49,17 +59,18 @@ def resolve_blueprint(db: Session):
     topology = dataset.station_topology
     inventory = ({s['name'] for s in topology['signals']} | {s['id'] for s in topology['switches']}
                  | {s['name'] for s in topology['sections']})
-    standard = reference_station_package()
+    from app.services.simulation_console.console_station import console_station_package
+    standard = console_station_package()
     standard_inventory = ({s['name'] for s in standard['signals']} | {s['id'] for s in standard['switches']}
                           | {s['geometry']['group'] for s in standard['switches'] if s['geometry']['group']}
-                          | {s['id'] for s in standard['sections']})
+                          | {s['id'] for s in standard['sections']} | {b['name'] for b in standard['buttons']} | set(standard['section_aliases']))
     topics = {t['id']:t for t in blueprint['topics']}
-    if set(topics) != set(range(1,7)) or len(blueprint['questions']) != 18:
-        raise ValueError('专题应完整覆盖六个实验的18道复合题')
+    if set(topics) != set(range(1,7)) or len(blueprint['questions']) != blueprint['expected_question_count']:
+        raise ValueError('专题题目范围不完整')
     keys = set()
     resolved = []
     references = load_references(ROOT)
-    manual_keys = {(q['key'], f['id']) for q in blueprint['questions'] for f in q['fields'] if f['kind']=='essay'}
+    manual_keys = {(q['key'], f['id']) for q in blueprint['questions'] for f in q['fields'] if f['kind']=='essay' and not f.get('reference_answer')}
     if set(references) != manual_keys:
         raise ValueError('参考解答与实验专题答题栏不一致')
     for source in blueprint['questions']:
@@ -102,7 +113,7 @@ def resolve_blueprint(db: Session):
             if field['kind'] == 'essay':
                 if not field.get('criteria') or 'expected' in field:
                     raise ValueError('论述题必须有教师评阅要点，不能伪设唯一答案')
-                field['explanation'] = explanation_text(references[(item['key'], field['id'])])
+                field['explanation'] = field.pop('reference_answer') if field.get('reference_answer') else explanation_text(references[(item['key'], field['id'])])
             elif 'expected' not in field or not field.get('explanation'):
                 raise ValueError('客观题缺少答案或原因解释')
             if field['kind'] in ('multi','order') and set(field['expected']) - set(field['options']):
@@ -138,13 +149,17 @@ def upgrade_standard_topics(db: Session):
     """Publish the explicit station adaptation; past answer snapshots stay immutable."""
     from app.models.authoring import QuestionRevision, QuestionWorkspace
     from app.services.question_authoring import initialize_workspace
-    _, items=resolve_blueprint(db)
+    dataset, items=resolve_blueprint(db)
     updated=[]
     for item in items:
         if item['topic']>4:
             continue
         question=db.query(LabQuestion).filter_by(key=item['key']).one_or_none()
-        if question is None or question.fingerprint==digest(item):
+        if question is None:
+            db.add(LabQuestion(key=item['key'], dataset_id=dataset.id, topic=item['topic'], sequence=item['sequence'], content=item, fingerprint=digest(item)))
+            updated.append(item['key'])
+            continue
+        if question.fingerprint==digest(item):
             continue
         state=db.get(QuestionWorkspace,question.id)
         if question.content.get('authoring_source')=='administrator' or (state and (state.draft is not None or state.updated_by is not None)):

@@ -28,6 +28,7 @@ const admin = { title: '平台管理', items: [
   { title: '用户管理', path: '/admin/users', icon: UserFilled },
   { title: 'AI 设置', path: '/admin/ai-settings', icon: Cpu },
   { title: '资料库', path: '/admin/knowledge', icon: Files },
+  { title: '实验题目', path: '/admin/questions', icon: Files },
 ] }
 export const roleLabels = { student: '学生', teacher: '教师', admin: '管理员' }
 export function navigationGroups(role) {
