@@ -55,6 +55,15 @@ def _ensure_default_admin() -> None:
 def on_startup() -> None:
     """Create database tables and seed the local default admin and demo station."""
 
+<<<<<<< Updated upstream
+=======
+    retire_study_scope(engine)
+    upgrade_accounts(engine)
+    from app.services.operation_assessment.upgrade import upgrade as upgrade_assessment
+    upgrade_assessment(engine)
+    from app.services.objective_exam_upgrade import upgrade as upgrade_objective_exams
+    upgrade_objective_exams(engine)
+>>>>>>> Stashed changes
     Base.metadata.create_all(bind=engine)
     _ensure_default_admin()
     with SessionLocal() as db:

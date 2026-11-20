@@ -34,3 +34,14 @@ __all__ = [
     "Switch",
     "User",
 ]
+<<<<<<< Updated upstream
+=======
+
+from app.models.operation import OperationQuestion, OperationVersion, OperationSession, OperationEvent
+from app.models.operation_learning import OperationAttempt, OperationReview
+from app.models.exam import Exam, ExamParticipant, ExamAttempt, ExamControlEvent, ObjectiveExamPaper, ObjectiveExamResponse
+from app.models.exam_grade import ExamGrade, ExamGradePublication, ExamGradeAudit
+from app.models.operation_assessment import (OperationAssessmentConfig, OperationEvidenceEvent,
+    ExamEvidenceSeal, ExamEvaluation, ExamAssessmentReview, ExamStudentCommentary,
+    ExamAssessmentReviewHistory, ExamPublishedAssessment)
+>>>>>>> Stashed changes

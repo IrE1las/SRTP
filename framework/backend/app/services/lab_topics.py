@@ -32,7 +32,7 @@ def resolve_blueprint(db: Session):
     if dataset is None or not dataset.source.get('reviewed'):
         raise ValueError('请先导入经人工核对的原图调车联锁表')
     for report in blueprint['reports']:
-        path = (ROOT/report['source']).resolve()
+        path = (ROOT / report['source'].replace('\\', '/')).resolve()
         if not path.is_relative_to(ROOT/'车站与区间控制实验') or not path.is_file():
             raise ValueError('实验报告来源不在指定目录')
         if hashlib.sha256(path.read_bytes()).hexdigest() != report['sha256'].lower():

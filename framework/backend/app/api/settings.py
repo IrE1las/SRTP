@@ -1,7 +1,9 @@
 """System settings API routes (AI model configuration)."""
 
 import os
-from dotenv import dotenv_values
+import tempfile
+from threading import RLock
+from dotenv import dotenv_values, set_key
 from openai import OpenAI, APIStatusError, APITimeoutError, APIConnectionError
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -12,6 +14,7 @@ from app.models.user import User
 from app.schemas.settings import AISettingsOut, AISettingsUpdate, AITestRequest
 
 router = APIRouter()
+_CONFIG_LOCK = RLock()
 
 
 def _read_env() -> dict:
@@ -21,27 +24,20 @@ def _read_env() -> dict:
 
 
 def _write_env(env: dict):
-    """Write the dict back to .env, keeping comments and unrelated keys."""
-
-    lines = []
-    if ENV_FILE.exists():
-        with open(ENV_FILE, "r", encoding="utf-8") as f:
-            for line in f:
-                stripped = line.strip()
-                if not stripped or stripped.startswith("#"):
-                    lines.append(line.rstrip())
-                    continue
-                if "=" in stripped:
-                    key = stripped.split("=", 1)[0].strip()
-                    if key in env:
-                        lines.append(f"{key}={env.pop(key)}")
-                    else:
-                        lines.append(line.rstrip())
-    # Append any remaining keys that were not already present in the file
-    for key, value in env.items():
-        lines.append(f"{key}={value}")
-    with open(ENV_FILE, "w", encoding="utf-8") as f:
-        f.write("\n".join(lines) + "\n")
+    """Atomically save quoted values, preserving comments and unrelated keys."""
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', dir=ENV_FILE.parent,
+                                         prefix='.ai-config-', delete=False) as stream:
+            temporary = stream.name
+            if ENV_FILE.exists():
+                stream.write(ENV_FILE.read_text(encoding='utf-8'))
+        for key, value in env.items():
+            set_key(temporary, key, value, quote_mode='always')
+        os.replace(temporary, ENV_FILE)
+    finally:
+        if temporary and os.path.exists(temporary):
+            os.unlink(temporary)
 
 
 def _mask_key(key: str) -> str:
@@ -87,24 +83,19 @@ def update_ai_settings(
     if not data.base_url.strip():
         raise HTTPException(status_code=400, detail="API 地址不能为空")
 
-    env = _read_env()
-
-    if data.api_key is not None and data.api_key.strip():
-        new_key = data.api_key.strip()
-    else:
-        new_key = env.get("DEEPSEEK_API_KEY", "")
-
     new_model = data.model.strip()
     new_base_url = data.base_url.strip()
-
-    # Persist to .env
-    env["DEEPSEEK_API_KEY"] = new_key
-    env["DEEPSEEK_MODEL"] = new_model
-    env["DEEPSEEK_BASE_URL"] = new_base_url
-    _write_env(env)
-
-    # Take effect immediately
-    _update_runtime_config(new_key, new_model, new_base_url)
+    with _CONFIG_LOCK:
+        try:
+            env = _read_env()
+            new_key = (data.api_key.strip() if data.api_key and data.api_key.strip()
+                       else env.get('DEEPSEEK_API_KEY', settings.deepseek_api_key or ''))
+            env.update(DEEPSEEK_API_KEY=new_key, DEEPSEEK_MODEL=new_model,
+                       DEEPSEEK_BASE_URL=new_base_url)
+            _write_env(env)
+        except OSError:
+            raise HTTPException(503, 'AI配置未保存：配置存储不可写，请联系维护人员。') from None
+        _update_runtime_config(new_key, new_model, new_base_url)
 
     return {"success": True, "message": "配置已保存并即时生效"}
 

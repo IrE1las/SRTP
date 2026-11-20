@@ -1,15 +1,22 @@
 """Application configuration."""
 
 from functools import lru_cache
+import os
 from pathlib import Path
 
-from dotenv import load_dotenv
+from dotenv import dotenv_values, load_dotenv
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parents[2]
-ENV_FILE = BASE_DIR / ".env"
+ENV_FILE = Path(os.environ.get('SRTP_ENV_FILE', str(BASE_DIR / '.env')))
 load_dotenv(ENV_FILE)
+# Docker's environment is captured when a container is created. Read saved AI
+# settings from the mounted file on every process start, including restarts.
+if os.environ.get('SRTP_ENV_FILE'):
+    for name, value in dotenv_values(ENV_FILE).items():
+        if name in {'DEEPSEEK_API_KEY', 'DEEPSEEK_MODEL', 'DEEPSEEK_BASE_URL'} and value is not None:
+            os.environ[name] = value
 
 
 class Settings(BaseSettings):
