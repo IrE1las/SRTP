@@ -1,0 +1,12 @@
+ARG BASE_IMAGE=srtp:20261117-ai-fix
+FROM ${BASE_IMAGE}
+WORKDIR /
+COPY framework/backend/requirements.lock.txt /tmp/srtp-requirements.txt
+RUN cmp -s /tmp/srtp-requirements.txt /app/framework/backend/requirements.lock.txt || pip install --no-cache-dir -r /tmp/srtp-requirements.txt
+# This clears only inherited application files in the new image layer.
+# Persistent server data is mounted separately when the container starts.
+RUN rm -rf /app && mkdir -p /app/framework/backend
+COPY . /app
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 SRTP_ENV_FILE=/app/.runtime/server.env
+WORKDIR /app/framework/backend
+CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1", "--proxy-headers"]

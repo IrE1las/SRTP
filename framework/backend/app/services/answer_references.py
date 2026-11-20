@@ -15,7 +15,7 @@ def load_references(root):
         raise ValueError('参考答案版本不支持')
     source_paths = set()
     for source in data['sources']:
-        path = (root / source['path']).resolve()
+        path = (root / source['path'].replace('\\', '/')).resolve()
         if not path.is_relative_to(root.resolve()) or not path.is_file():
             raise ValueError('参考答案资料须位于项目内')
         if hashlib.sha256(path.read_bytes()).hexdigest() != source['sha256']:
