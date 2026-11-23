@@ -1,3 +1,5 @@
+import { randomId } from './randomId.js'
+
 export const completedMessage = '考试已完成，待教师确认并发布考试成绩'
 export const examStates = { draft: '草稿', published: '已发布', open: '可参加', active: '进行中', upcoming: '未开始', missed: '已结束', submitted: '已交卷' }
 export function examAction(exam) {
@@ -45,7 +47,7 @@ export async function enterExam(requestFullscreen, begin) {
 // Persist before any network request or navigation. IDs survive retries and
 // acknowledgment only removes IDs actually accepted in that response.
 export class ExamJournal {
-  constructor(storage, key, clock = Date.now, uuid = () => crypto.randomUUID()) {
+  constructor(storage, key, clock = Date.now, uuid = randomId) {
     this.storage = storage; this.key = key; this.clock = clock; this.uuid = uuid
     this.read()
   }

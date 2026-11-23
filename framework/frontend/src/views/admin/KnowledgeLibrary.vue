@@ -7,9 +7,14 @@
           管理 AI 解析与追问使用的教学资料，引用可追溯到课件页码或原文段落。
         </p>
       </div>
-      <el-button type="primary" :icon="Upload" @click="uploadOpen = true"
-        >上传资料</el-button
-      >
+      <div class="knowledge-heading-actions">
+        <router-link :to="{ name: 'AdminQuestionBank' }" class="el-button">
+          管理实验题目
+        </router-link>
+        <el-button type="primary" :icon="Upload" @click="uploadOpen = true">
+          上传资料
+        </el-button>
+      </div>
     </header>
     <div class="knowledge-toolbar">
       <el-input

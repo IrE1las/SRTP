@@ -1,5 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import { webcrypto } from 'node:crypto'
 import { createChapterTutor } from '../src/features/chapterBank/useChapterTutor.js'
 
 const response = (turns = [], extra = {}) => ({
@@ -69,6 +70,31 @@ test('initial explanation posts only identity, revision and action and duplicate
   assert.equal(calls[0][2].timeout, 120000)
   pending.resolve(response([turn()]))
   await first
+  assert.equal(tutor.state.value.turns.length, 1)
+  assert.equal(tutor.state.value.pending, null)
+})
+
+test('plain HTTP can send an explanation with a valid UUID when randomUUID is unavailable', async (context) => {
+  const original = Object.getOwnPropertyDescriptor(globalThis, 'crypto')
+  Object.defineProperty(globalThis, 'crypto', {
+    configurable: true,
+    value: { getRandomValues: webcrypto.getRandomValues.bind(webcrypto) },
+  })
+  context.after(() => {
+    if (original) Object.defineProperty(globalThis, 'crypto', original)
+    else delete globalThis.crypto
+  })
+
+  const tutor = createChapterTutor({
+    get: async () => response(),
+    post: async (url, { request_id }) => {
+      assert.match(request_id, /^[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/)
+      return response([turn(request_id)])
+    },
+  })
+
+  await tutor.setAttempt('one')
+  await tutor.send('explain')
   assert.equal(tutor.state.value.turns.length, 1)
   assert.equal(tutor.state.value.pending, null)
 })

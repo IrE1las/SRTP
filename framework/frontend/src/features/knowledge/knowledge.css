@@ -20,6 +20,15 @@
 .knowledge-heading {
   margin-bottom: 24px;
 }
+.knowledge-heading-actions {
+  display: flex;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  gap: 12px;
+}
+.knowledge-heading-actions > .el-button {
+  margin-left: 0;
+}
 .knowledge-heading h1 {
   font-size: 24px;
   margin: 0 0 8px;

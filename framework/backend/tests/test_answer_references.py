@@ -12,11 +12,21 @@ from tests.test_management import setup, content, create, publish, submit
 
 def test_all_manual_fields_have_supported_or_explicitly_limited_references(topics):
     refs = load_references(lab_topics.ROOT)
-    manual = [(q.key, f) for q in topics for f in q.content['fields'] if f['kind']=='essay']
-    assert len(manual) == len(refs) == 35
-    for key, field in manual:
+    report_explanations = {key: explanation_text(reference) for key, reference in refs.items()}
+    supplement = json.loads(lab_topics.SUPPLEMENT.read_text(encoding='utf-8'))
+    inline_explanations = {
+        (question['key'], field['id']): field['reference_answer']
+        for question in supplement['questions'] for field in question['fields']
+        if field['kind'] == 'essay'
+    }
+    assert len(report_explanations) == 35 and len(inline_explanations) == 16
+    assert not (report_explanations.keys() & inline_explanations.keys())
+    expected = report_explanations | inline_explanations
+    manual = {(q.key, f['id']): f for q in topics for f in q.content['fields'] if f['kind'] == 'essay'}
+    assert manual.keys() == expected.keys()
+    for key, field in manual.items():
         assert 'expected' not in field
-        assert field['explanation'] == explanation_text(refs[(key, field['id'])])
+        assert field['explanation'] == expected[key]
     assert not any(key.startswith(('lab-07-','lab-08-')) for key,_ in refs)
 
 

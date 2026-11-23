@@ -29,10 +29,15 @@ function send(action,values={}){
  queue=queue.then(async()=>{
   if(disposed||props.pausePending||outstanding||result.value?.read_only||result.value?.status!=='active')throw Error('当前操作台不可操作')
   working.value=true
-  const event=eventEnvelope(action,result.value.revision+1,values)
-  outstanding=persistableEvent(event);sessionStorage.setItem(key,JSON.stringify(outstanding))
-  try{const data=await(props.api?.event||postOperationEvent)(props.sessionId,event);const snapshot=accept(data);outstanding=null;sessionStorage.removeItem(key);return{...data.event.result,snapshot}}
-  catch(e){error.value=e.response?.data?.detail||'操作尚未确认，请同步并重试。';throw e}
+  try{
+   const event=eventEnvelope(action,result.value.revision+1,values)
+   const saved=persistableEvent(event)
+   sessionStorage.setItem(key,JSON.stringify(saved));outstanding=saved
+   const data=await(props.api?.event||postOperationEvent)(props.sessionId,event)
+   const snapshot=accept(data);sessionStorage.removeItem(key);outstanding=null
+   return{...data.event.result,snapshot}
+  }
+  catch(e){error.value=e.response?.data?.detail||(outstanding?'操作尚未确认，请同步并重试。':'无法在浏览器保存本次操作，请同步后重试。');throw e}
   finally{working.value=false}
  });const task=queue;queue=task.catch(()=>{});return task
 }

@@ -46,11 +46,12 @@ import {onBeforeRouteLeave,useRoute,useRouter} from 'vue-router'
 import {ElMessage,ElMessageBox} from 'element-plus'
 import Notation from '@/components/RailwayNotation.vue'
 import QuestionPreview from '@/components/QuestionPreview.vue'
+import {randomId} from '@/domain/randomId'
 import {getManagementMetadata,getManagedQuestion,createManagedQuestion,saveQuestionDraft,publishQuestion,previewManagedQuestion,getQuestionVersions,restoreQuestionVersion} from '@/api/management'
 const route=useRoute(),router=useRouter(),loading=ref(true),busy=ref(false),recordId=ref(null),state=ref({revision:0,published_version:0}),dirty=ref(false),savedText=ref('尚未保存'),notice=ref('')
 const topics=ref([]),originalDevices=ref([]),standardDevices=ref([]),activeField=ref(''),previewOpen=ref(false),previewData=ref(null),previewContent=ref(null),versionsOpen=ref(false),versions=ref([])
 const kinds={choice:'单选 / 判断',multi:'多项选择',order:'时序排序',cell:'填写题',essay:'论述 / 记录'}
-const clone=value=>JSON.parse(JSON.stringify(value)),uid=()=>`f_${crypto.randomUUID().replaceAll('-','').slice(0,12)}`
+const clone=value=>JSON.parse(JSON.stringify(value)),uid=()=>`f_${randomId().replaceAll('-','').slice(0,12)}`
 function newField(kind){const f={id:uid(),kind,label:'',points:10};if(kind==='essay')Object.assign(f,{criteria:[],rubric:[]});else{f.explanation='';if(kind==='cell')Object.assign(f,{expected:'',accepted_answers:[],matching:'tokens'});else Object.assign(f,{options:['选项1','选项2'],expected:kind==='choice'?'':kind==='order'?['选项1','选项2']:[],scoring:'exact'})}return f}
 const form=ref({title:'未命名题目',topic:1,sequence:1,level:'基础',prompt:'',conditions:[],source_section:'管理员命题',tags:[],devices:[],diagram_mode:'standard',fields:[newField('essay')]})
 const devices=computed(()=>form.value.topic<=4?standardDevices.value:originalDevices.value)

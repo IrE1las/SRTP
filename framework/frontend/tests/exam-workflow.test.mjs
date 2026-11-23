@@ -1,5 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import { webcrypto } from 'node:crypto'
 import { ExamJournal, enterExam, secondsLeft, clockText, examPayload, beijingInput, beijingTime, examFormErrors } from '../src/domain/exams.js'
 
 function setup() {
@@ -31,6 +32,20 @@ test('first exit survives refresh without a second exit or a new timeout', () =>
   assert.equal(Date.parse(refreshed.pending[1].occurred_at) - Date.parse(out.occurred_at), 59000)
   refreshed.observe(false)
   assert.deepEqual(refreshed.pending.map(e => e.kind), ['exit', 'restore', 'exit'])
+})
+
+test('fullscreen exit and restore persist distinct IDs on plain HTTP', (context) => {
+  const original = Object.getOwnPropertyDescriptor(globalThis, 'crypto')
+  Object.defineProperty(globalThis, 'crypto', {configurable:true, value:{getRandomValues:webcrypto.getRandomValues.bind(webcrypto)}})
+  context.after(() => Object.defineProperty(globalThis, 'crypto', original))
+  const {storage} = setup()
+  const journal = new ExamJournal(storage, 'attempt')
+  journal.observe(false)
+  journal.observe(true)
+  const saved = new ExamJournal(storage, 'attempt')
+  assert.deepEqual(saved.pending.map(event => event.kind), ['exit', 'restore'])
+  assert.notEqual(saved.pending[0].event_id, saved.pending[1].event_id)
+  for (const {event_id} of saved.pending) assert.match(event_id, /^[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/)
 })
 
 test('offline events retain IDs and event times; acknowledgment preserves events created in flight', () => {

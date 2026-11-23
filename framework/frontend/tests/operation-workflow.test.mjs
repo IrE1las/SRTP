@@ -1,24 +1,41 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import { webcrypto } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import { computed, reactive, ref } from 'vue'
 import { parse } from '@vue/compiler-sfc'
 import { COMMANDS } from '../src/features/simulationConsole/standardDisplay.js'
+import { consoleCommands } from '../src/features/simulationConsole/consoleCommands.js'
 import { eventEnvelope, persistableEvent, initialForm, draftPayload } from '../src/domain/operationEvents.js'
+import { mergeConsole } from '../src/domain/operationConsole.js'
 import { paginate } from '../src/domain/pagination.js'
 
-async function consoleHarness({ stored, failOnce = false, initialPending = null, props = {sessionId:'sid'} } = {}) {
-  const source = await readFile(new URL('../src/features/simulationConsole/OperationConsole.vue', import.meta.url), 'utf8')
-  const descriptor = parse(source).descriptor
+async function consoleHarness({ stored, failOnce = false, failStorageOnce = false, initialPending = null, props = {sessionId:'sid'} } = {}) {
+  const readConsole = async (name) => {
+    const source = await readFile(new URL(`../src/features/simulationConsole/${name}.vue`, import.meta.url), 'utf8')
+    return parse(source).descriptor.scriptSetup.content.replace(/^import .*$/gm, '')
+  }
+  const [parentScript, boardScript] = await Promise.all([readConsole('OperationConsole'), readConsole('SimulationConsole')])
   const calls = [], updates = [], storage = new Map(stored ? [['srtp-operation-pending-sid', JSON.stringify(stored)]] : [])
-  let mount, unmount, exposed, failed = false
-  const server = { session_id:'sid', revision:0, status:'active', pending:initialPending, events:[], snapshot:{ session_kind:'recording', selected_buttons:[], switches:{} } }
+  let mount, exposed, failed = false
+  const server = { session_id:'sid', revision:0, status:'active', pending:initialPending, events:[],
+    snapshot:{ session_id:'sid', session_kind:'recording', version:0, pending:initialPending, selected_buttons:[], switches:{} } }
+  const sessionStorage = {
+    setItem(key, value) {
+      if (failStorageOnce) {
+        failStorageOnce = false
+        throw new Error('storage unavailable')
+      }
+      storage.set(key, value)
+    },
+    getItem: key => storage.get(key),
+    removeItem: key => storage.delete(key),
+  }
+  const evaluate = (script, dependencies, result) => new Function(...Object.keys(dependencies), `${script}\nreturn {${result}};`)(...Object.values(dependencies))
   const dependencies = {
-    computed, ref, COMMANDS, eventEnvelope, persistableEvent,
+    computed, ref, eventEnvelope, persistableEvent, mergeConsole, sessionStorage,
     defineProps: () => props, defineEmits: () => (_, data) => updates.push(data), defineExpose: value => { exposed = value },
-    onMounted: fn => { mount = fn }, onBeforeUnmount: fn => { unmount = fn },
-    setInterval: () => 1, clearInterval: () => {},
-    sessionStorage: { setItem:(key,value) => storage.set(key,value), getItem:key => storage.get(key), removeItem:key => storage.delete(key) },
+    onBeforeUnmount: () => {},
     getOperationStation: async () => ({ buttons:[{ name:'D3DA', signal:'D3' }] }),
     getOperationSession: async () => structuredClone(server),
     postOperationEvent: async (sid, event) => {
@@ -27,28 +44,41 @@ async function consoleHarness({ stored, failOnce = false, initialPending = null,
       if (!server.events.some(row => row.event_id === event.event_id)) {
         assert.equal(event.sequence, server.revision + 1)
         server.events.push(event); server.revision++
-        server.pending = event.action === 'function' && event.button_id !== 'CLEAR_SELECTION' ? { type:event.button_id, target:'signal' } : null
+        server.pending = event.action === 'function' && event.button_id !== 'CLEAR_SELECTION' ? { type:event.button_id, target:COMMANDS.find(item => item.type === event.button_id)?.target, expires_at:Date.now() / 1000 + 15 } : null
+        server.snapshot = {...server.snapshot, pending:server.pending, version:server.revision}
       }
-      return structuredClone(server)
+      return {...structuredClone(server), event:{result:{accepted:true}}}
     },
   }
-  const script = descriptor.scriptSetup.content.replace(/^import .*$/gm, '')
-  const state = new Function(...Object.keys(dependencies), script + '\nreturn {choose, target, press, group, signal, inspect, block, confirmPin, cancelPin, recover, refresh, error, result, pin, showPin, busy};')(...Object.values(dependencies))
+  const parent = evaluate(parentScript, dependencies, 'board, client, error, recover, result, working')
+  const browser = {addEventListener:() => {}, setInterval:() => 1}
+  const board = evaluate(boardScript, {
+    computed, ref, consoleCommands, sessionStorage, nextTick:async () => {},
+    ElMessage:{warning:() => {}, info:() => {}}, useUserStore:() => ({role:'teacher', user:{id:7}}),
+    useConsoleFullscreen:() => ({}), document:browser, window:browser,
+    defineProps:() => ({client:parent.client, get readOnly() {return props.readOnly || props.pausePending || !!parent.error.value}}),
+    defineExpose:value => {parent.board.value = {...value, get busy() {return value.busy.value}}},
+    onMounted:fn => {mount = fn}, onBeforeUnmount:() => {},
+  }, 'choose:chooseCommand, target:(_kind, id) => executeTarget(id), press:pressButton, block:chooseCommand, confirmPin, cancelPin, pin, showPin:computed(() => !!pinCommand.value)')
   await mount()
-  return { state, calls, storage, server, updates, exposed, unmount, template:descriptor.template.content }
+  return { state:{...parent, ...board}, calls, storage, server, updates, exposed }
 }
 
-test('real console setup persists the function click before a device target and keeps true repeat clicks', async () => {
+test('the recording console sends valid event IDs over HTTP and records repeated clicks separately', async (context) => {
+  const original = Object.getOwnPropertyDescriptor(globalThis, 'crypto')
+  Object.defineProperty(globalThis, 'crypto', {configurable:true, value:{getRandomValues:webcrypto.getRandomValues.bind(webcrypto)}})
+  context.after(() => Object.defineProperty(globalThis, 'crypto', original))
   const { state, calls, server } = await consoleHarness()
   await state.choose(COMMANDS.find(c => c.type === 'SWITCH_TOTAL_NORMAL'))
   assert.equal(calls[0].action, 'function')
   assert.equal(state.result.value.pending.type, 'SWITCH_TOTAL_NORMAL')
   await state.target('switch', '1')
-  assert.equal(calls[1].action, 'target')
+  assert.equal(calls[1].action, 'command')
   assert.equal(calls[1].target_id, '1')
   const a = state.press('D3DA'), b = state.press('D3DA')
   await Promise.all([a,b])
   assert.deepEqual(calls.map(c => c.sequence), [1,2,3,4])
+  for (const {event_id} of calls) assert.match(event_id, /^[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/)
   assert.notEqual(calls[2].event_id, calls[3].event_id)
   assert.equal(server.events.length, 4)
 })
@@ -83,6 +113,17 @@ test('an uncertain request pauses operations and retry reuses its original event
   assert.equal(storage.size, 0)
 })
 
+test('a temporary browser storage failure does not send an untracked click or leave recording busy', async () => {
+  const { state, calls, exposed } = await consoleHarness({ failStorageOnce:true })
+  await state.press('D3DA')
+  assert.equal(calls.length, 0)
+  assert.match(state.error.value, /无法在浏览器保存/)
+  assert.equal(exposed.hasUnconfirmed.value, false)
+  await state.recover()
+  await state.press('D3DA')
+  assert.equal(calls[0].sequence, 1)
+})
+
 test('PIN passes only with the target request, never to persistent browser storage or click parameters', async () => {
   const { state, calls, storage } = await consoleHarness()
   await state.choose(COMMANDS.find(c => c.type === 'SIGNAL_SEAL'))
@@ -109,7 +150,8 @@ test('reload restores an unconfirmed envelope and sends the same event instead o
 test('restored sealed selection asks for the PIN again and cancel persists a cancellation event', async () => {
   const { state, calls } = await consoleHarness({ initialPending:{type:'SIGNAL_SEAL', target:'signal'} })
   assert.equal(state.showPin.value, true)
-  await state.cancelPin()
+  state.cancelPin()
+  await new Promise(resolve => setTimeout(resolve, 0))
   assert.equal(calls[0].action, 'cancel_selection')
   assert.equal(state.showPin.value, false)
   assert.equal(state.result.value.pending, null)
@@ -122,7 +164,7 @@ test('fixed block button captures the function first and the target after sealed
   state.pin.value = 'test-pin'
   state.confirmPin()
   await new Promise(resolve => setTimeout(resolve, 0))
-  assert.equal(calls[1].action, 'target')
+  assert.equal(calls[1].action, 'command')
   assert.equal(calls[1].target_id, 'XD')
   assert.equal(calls[1].target_kind, 'block')
 })
@@ -136,8 +178,8 @@ test('late polling responses cannot roll the confirmed sequence back or reopen a
   await state.press('D3DA')
   exposed.sync({status:'active',revision:0,snapshot:{}})
   assert.equal(state.result.value.revision,1)
-  exposed.sync({status:'stopped',revision:1,snapshot:{}})
-  exposed.sync({status:'active',revision:1,snapshot:{}})
+  exposed.sync({status:'stopped',revision:1,snapshot:{version:2}})
+  exposed.sync({status:'active',revision:1,snapshot:{version:1}})
   assert.equal(state.result.value.status,'stopped')
 })
 
@@ -148,7 +190,7 @@ test('cancelling a sealed block clears its deferred target before confirming ano
   await state.choose(COMMANDS.find(item => item.type === 'SIGNAL_SEAL'))
   state.pin.value = 'test-pin'; state.confirmPin()
   await new Promise(resolve => setTimeout(resolve, 0))
-  assert.ok(!calls.some(item => item.action === 'target'))
+  assert.ok(!calls.some(item => item.action === 'command'))
   await state.target('signal', 'D3')
   assert.equal(calls.at(-1).target_id, 'D3')
 })

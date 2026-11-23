@@ -28,7 +28,6 @@ const admin = { title: '平台管理', items: [
   { title: '用户管理', path: '/admin/users', icon: UserFilled },
   { title: 'AI 设置', path: '/admin/ai-settings', icon: Cpu },
   { title: '资料库', path: '/admin/knowledge', icon: Files },
-  { title: '实验题目', path: '/admin/questions', icon: Files },
 ] }
 export const roleLabels = { student: '学生', teacher: '教师', admin: '管理员' }
 export function navigationGroups(role) {
@@ -45,6 +44,7 @@ export function pageLabel(path, role) {
   if (path === '/exams/grading') return '考试批阅'
   if (path === '/student/chapter-bank/all') return '全部题目'
   if (path.startsWith('/student/exams/attempts/')) return '正式考试'
+  if (path === '/admin/questions') return '实验题目'
   if (path.startsWith('/exams/manage/attempts/')) return '考试批阅'
   if (path.startsWith('/exams/manage/')) return '考试设置'
   if (/^\/operations\/manage\/.*\/record$/.test(path)) return '录制标准操作'

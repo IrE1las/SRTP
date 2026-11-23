@@ -1,12 +1,14 @@
 import { computed, ref } from 'vue'
 import { errorText } from './presentation.js'
+import { randomId } from '../../domain/randomId.js'
 
 const path = (id) =>
   `/chapter-bank/practice/attempts/${encodeURIComponent(id)}/ai-chat`
+
 export function createChapterTutor({
   get,
   post,
-  makeId = () => crypto.randomUUID(),
+  makeId = randomId,
   schedule = (fn, delay) => setTimeout(fn, delay),
   cancel = (id) => clearTimeout(id),
 }) {

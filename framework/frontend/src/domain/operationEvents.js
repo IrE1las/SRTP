@@ -1,6 +1,8 @@
+import { randomId } from './randomId.js'
+
 // The pending envelope contains no operation PIN. Reuse its event ID after
 // an uncertain response so a network retry cannot become a second click.
-export function eventEnvelope(action, sequence, values = {}, eventId = crypto.randomUUID()) {
+export function eventEnvelope(action, sequence, values = {}, eventId = randomId()) {
   return { event_id: eventId, sequence, action, ...values }
 }
 export function persistableEvent(event) {
